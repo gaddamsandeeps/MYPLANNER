@@ -1,0 +1,56 @@
+.timeLine > div {
+    height: 6px;
+    background: #1D6A18;
+    text-align: right;
+    -moz-border-radius: 10px; /* Firefox */
+    -webkit-border-radius: 10px; /* Webkit */
+    border-radius: 10px;
+    max-width: 100%;
+    position: absolute;
+    top: 1px;
+}
+.itemLine > div {
+    height: 4px;
+    background: #7E7E7E;
+    text-align: right;
+    -moz-border-radius: 10px; /* Firefox */
+    -webkit-border-radius: 10px; /* Webkit */
+    border-radius: 10px;
+    max-width: 100%;
+    position: absolute;
+}
+.timelineWrapper{
+    background: #EBEBEB;
+    padding: 10px !important;
+    border: 1px solid #DDDDDD;
+}
+.timeLine{
+    padding: 4px !important;
+    background: #A7A7A7;
+    position: relative;
+}
+.timelineDates{
+    margin: -6px 0px 5px 0px;
+}
+.boldDot{
+    padding: 6px;
+    background: #575852;
+    border-radius: 10px;
+    display: inline-block;
+    position: absolute;
+}
+.boldDotLeft{
+    left: -3px;
+    top: -2px;
+}
+.boldDotRight{
+    right: -5px;
+    top: -2px;
+}
+.itemLine{
+    background:#ccc;
+    margin: 0px 5px;
+    padding: 0px;
+    position: relative;
+    height: 4px;
+}

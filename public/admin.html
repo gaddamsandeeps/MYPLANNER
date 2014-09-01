@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Reports</title>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="lib/bootstrap.css" rel="stylesheet">
+</head>
+<body>
+    <% var pageName = 'admin' %>
+	<%include header.html%>
+
+	<table style="width: 300px">
+		<th colspan="5">Teams</th>
+		<tr>
+			<td>ID</td>
+			<td>NAME</td>
+			<td>DESCRIPTION</td>
+			<td>LEAD</td>
+			<td>Action(E/D)</td>
+		</tr>
+		<%teams.forEach(function(team) {%>
+		<tr>
+			<td><%=team.id%></td>
+			<td><%=team.name%></td>
+			<td><%=team.description%></td>
+			<td><%=team.leadid%></td>
+			<td><a href='#'><%=team.leadid%></a>
+			</td>
+		</tr>
+		<%})%>
+	</table>
+	<br>
+	<br>
+	
+	<table style="width: 300px">
+		<th colspan="4">Roles</th>
+		<tr>
+			<td>ID</td>
+			<td>NAME</td>
+			<td>DESCRIPTION</td>
+
+			<td>Action(E/D)</td>
+		</tr>
+		<%roles.forEach(function(role) {%>
+		<tr>
+			<td><%=role.id%></td>
+			<td><%=role.name%></td>
+			<td><%=role.description%></td>
+			<td><a href='#'><%=role.id%></a>
+			</td>
+		</tr>
+		<%})%>
+	</table>
+	<%include footer.html%>
+</body>
+</html>

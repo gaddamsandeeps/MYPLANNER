@@ -1,0 +1,80 @@
+.topNavBg{
+    background: #004C7E;
+}
+.headerNav{
+    margin:4px 0px;
+    padding: 0px;
+}
+.headerNav > li{
+    border-right: 1px solid #043351;
+    border-left: 1px solid #5D6F79;
+    float: left;
+    list-style: none;
+    padding: 0px 10px;
+    color: #fff;
+    position: relative;
+}
+.headerNav > li:first-child{
+    border-left: none;
+}
+.headerNav > li:last-child{
+    border-right: none;
+}
+.headerNav li a{
+    color: #fff;
+    font-size: 16px;
+    line-height: 42px;
+}
+.headerNav li a span{
+    position: relative;
+    top: -2px;
+    margin-right: 5px;
+}
+.headerNav > li a:hover{
+    text-shadow: 1px 1px 2px #ccc;
+    text-decoration: none
+}
+.headerNav > li ul.topNavSubmenu{
+    position: absolute;
+    top: 38px;
+    right: 5px;
+    background: #EEEEEE;
+    padding: 10px;
+    border: 1px solid #D8D8D8;
+    border-top: none;
+    width:130px;
+    border-radius: 0px 0px 5px 5px;
+    display: none;
+        
+}
+ul.topNavSubmenu li{
+    list-style: none;
+    border-bottom:1px solid #fff;
+    border-top: 1px solid #ddd;
+}
+ul.topNavSubmenu li:first-child{
+    border-top: none;
+}
+ul.topNavSubmenu li:last-child{
+    border-bottom: none;
+}
+ul.topNavSubmenu li a{
+    color: #7E7E7E;
+    line-height: 30px;
+}
+.headerNav > li:hover ul.topNavSubmenu{
+    display: block
+}
+.usernavIcon{
+    width: 25px;
+    height: 25px;
+    border: 1px solid #fff;
+    border-radius: 15px;
+    display: inline-block;
+    top: 8px !important;
+}
+.usernavIcon img{
+    position: absolute;
+    top: 1px;
+    left: 2px;
+}

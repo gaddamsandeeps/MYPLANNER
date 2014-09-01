@@ -1,0 +1,104 @@
+@import 'resource.css';
+#ProjectView {
+    min-height: 500px;
+}
+/*#Projects, #ProjectView, #Resources {
+    border: 1px solid #ccc;
+    border-width: 4px 1px 1px 1px;
+}*/
+
+/*.item {
+    border: 1px dashed #146fb4;
+    margin: 5px;
+    padding: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}*/
+
+.item i {
+    font-style: normal;
+    font-size: 12px;
+    font-weight: normal;
+    background-color: #ccc;
+    border-radius: 5px;
+    padding: 0 4px;
+}
+
+.pv {
+    border: 1px solid #ccc;
+    margin: 0px;
+    padding: 10px;
+    background-color: #fafafa;
+    position: relative;
+}
+
+.pv .close {
+    position: absolute;
+    top: 0;
+    right: 5px;
+}
+
+.pv > div {
+    padding: 5px 0;
+}
+
+.developers {
+    /*border: 1px dashed #146fb4;*/
+    min-height: 38px;
+}
+
+.developer {
+    display: inline-block;
+    padding: 3px 20px 3px 10px;
+    margin: 0 5px;
+    background-color: #ddd;
+    border-radius: 5px;
+    position: relative;
+}
+
+.developer i {
+    font-style: normal;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    right: 5px;
+    font-size: 11px;
+}
+
+.over {
+    background-color: #eee;
+}
+
+.navbar-nav > li {
+    margin: 10px;
+}
+
+#Mashup {
+    margin-right: 10px;
+}
+/*
+input.ng-invalid.has-visited.has-focus {
+    border: 1px solid #8d8d8d;
+}
+input.ng-invalid.has-visited {
+    border: 1px solid #E44848;
+}
+input.ng-valid.has-visited {
+    border: 1px solid #a3bf57;
+}
+*/
+.error-message {
+    color: #a94442;
+}
+
+[ng-cloak] {
+    display: none;
+}
+
+.form-group .error-message {
+    display: none;
+}
+
+.form-group.has-error .error-message {
+    display: block;
+}

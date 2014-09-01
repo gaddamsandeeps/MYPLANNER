@@ -1,0 +1,34 @@
+{
+    "db_config": {
+        "host": "localhost",
+        "port": "3307",
+
+        "dbName": "RESOURCETRACKER",
+        "uName": "root",
+        "pwd": "root"
+    },
+
+    "server_config": {
+        "port": "9999"
+    },
+
+    "logger": {
+        "logAppender": "file",
+        "logFilename": "D:/Resource-Tracker/logs/RESOURCETRACKER.log",
+        "logCategory": "RESOURCETRACKING",
+        "logLevel": "DEBUG",
+        "maxLogSize": "75MB",
+        "backups": 10
+    },
+
+    "common": {
+        "parentPath": "D:/Resource-Tracking/RESOURCETRACKER",
+        "projectName": "Resource Tracker"
+    },
+
+    "session": {
+        "key": "asdklghakjhsadd21721973hsa1892",
+        "maxAge": 900000,
+        "expires": 900000
+    }
+}

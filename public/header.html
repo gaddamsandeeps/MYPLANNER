@@ -1,0 +1,71 @@
+<% if (typeof user !="undefined" ) { %>
+
+
+<script>
+    var userid = '<%= user.id %>';
+</script>
+
+
+<% } %>
+<link rel="stylesheet" type="text/css" href="css/navigation.css" />
+<div class="navbar topNavBg navbar-static-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href=".">
+                <img src="images/resource-tracker.png" />
+            </a>
+        </div>
+        <% if (typeof user != "undefined" ) { %>
+        <ul class="headerNav pull-right">
+            <% if (user.roleName === "MANAGER" ) { %>
+            <li>
+                <a data-toggle="modal" id="addproject" href="#AddProjectModal"></a>
+            </li>
+            <% if (pageName === "report" || pageName === "usertimesheet" || pageName === "editprofile") { %>
+            <li>
+                <a data-toggle="modal" href="/dashboard">Dashboard</a>
+            </li>
+            <% } %>
+            <% if (pageName === "dashboard" || pageName === "usertimesheet"  || pageName === "editprofile") { %>
+            <li>
+                <a data-toggle="modal" href="/reports">Reports</a>
+            </li>
+            <% }} else if (user.roleName === "USER" ) {%>
+            <% if (pageName === "report" || pageName === "editprofile") { %>
+            <li>
+                <a data-toggle="modal" href="/timesheet">Timesheet</a>
+            </li>
+            <% }%>
+            <% if (pageName === "timesheet" || pageName === "editprofile") { %>
+            <li>
+                <a data-toggle="modal" href="/reports?id=<%=user.id%>">Reports</a>
+            </li>
+            <% }%>
+            <% }%>
+            <li style="border-right: none;padding-right: 0px;">
+                <a href="javascript:void(0)">
+                    <%=user.firstname +" "+ user.lastname %> 
+                    <span class="usernavIcon">
+                        <img src="images/user-pic.png" height="18"/>
+                    </span>
+                </a>
+                <ul class="topNavSubmenu">
+                    <li>
+                        <a href="/profile">My Profile</a>
+                    </li>
+                    <li>
+                        <a href="/signout">Logout</a>
+                    </li>
+                </ul>
+            </li>
+            <div class="clearfix"></div>
+        </ul>
+        <% } %>
+    </div>
+</div>

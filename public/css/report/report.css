@@ -1,0 +1,14 @@
+ .reportGenerator{
+    width: 850px;
+    margin: 0px auto;
+}
+.reports{
+    display: none;
+    width: 800px;  margin: 0 auto;   
+    display: block;
+}
+.tab-pane{
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-top: none;
+}

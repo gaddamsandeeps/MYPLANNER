@@ -1,0 +1,55 @@
+{
+    "project": {
+        "id": "id",
+        "userId": "userid",
+        "name": "name",
+        "desc": "description",
+        "startDate": "startdate",
+        "endDate": "enddate",
+        "updatePid": "updatepid",
+        "removePid": "removepid"
+    },
+
+    "team": {
+        "name": "name",
+        "desc": "description",
+        "leadId": "leadid",
+        "teamId": "teamid",
+        "userId": "userid"
+    },
+
+    "role": {
+        "name": "name",
+        "desc": "description"
+    },
+
+    "roles": {
+        "manager": "MANAGER",
+        "admin": "ADMIN",
+        "user": "USER"
+    },
+
+    "user": {
+        "id": "id",
+        "userName": "username",
+        "userId": "userid",
+        "password": "password",
+        "teamId": "teamid",
+        "roleId": "roleid",
+        "firstName": "firstname",
+	"lastName": "lastname",
+        "sex": "sex",
+	"dob": "dob",
+        "contact": "contact",
+        "oldPassword": "oldpassword",
+        "newPassword": "newpassword"
+    },
+
+    "logs": {
+        "id": "id",
+        "projectId": "projectid",
+        "startDate": "startdate",
+        "endDate": "enddate",
+        "desc": "description"
+    }
+}

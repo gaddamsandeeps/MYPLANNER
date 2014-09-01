@@ -1,0 +1,22 @@
+{
+    "name": "RESOURCETRACKER",
+    "description": "RESOURCE TRACKER project is a resource management tool",
+    "author": "Sandeep G",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "start": "node server/server.js"
+    },
+    "dependencies": {
+        "express": "3.4.4",
+        "log4js": "0.6.16",
+        "mysql": "2.4.2",
+        "crypto": "0.0.3",
+        "ejs": "1.0.0",
+        "passport": "0.2.0",
+        "passport-local": "1.0.0",
+        "connect-flash": "0.1.1",
+        "dateformat": "1.0.8-1.2.3",
+        "domain": "0.2.8"
+    }
+}

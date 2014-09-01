@@ -1,0 +1,66 @@
+{
+    "user": {
+        "getUser": "SELECT users.id, username, roleid, firstname,lastname, sex, dob, contactno, teamid  FROM users  join userdetails  AS usd on users.id = usd.userid LEFT JOIN teamresource tr ON tr.userid = users.id WHERE users.id = ? AND usd.active = true",
+        "getUserById": "SELECT users.id, username  FROM users WHERE id = ?",
+        "getUserByName": "SELECT users.id, username  FROM users WHERE BINARY username = ?",
+        "getTeamUsers": "SELECT users.id, username, usd.firstname, usd.lastname FROM users  join userdetails  AS usd on users.id = usd.userid JOIN teamresource tr ON tr.userid = users.id WHERE tr.teamid = ? AND usd.active = true",
+        "getTeamUsersWithStatus": "SELECT users.id, username, usd.firstname, usd.lastname from users  join userdetails  AS usd on users.id = usd.userid JOIN teamresource tr ON tr.userid = users.id WHERE tr.teamid = ? AND usd.active = true",
+        "getNonTeamUsers": "SELECT users.id, username, ud.firstname, ud.lastname  FROM users  join userdetails  AS ud on users.id = ud.userid JOIN teamresource tr ON tr.userid = users.id WHERE tr.teamid != ?",
+        "getLeads": "SELECT users.id, username, usd.firstname, usd.lastname FROM users JOIN userdetails AS usd ON users.id = usd.userid  JOIN role on usd.roleid = role.id WHERE role.id = 2 AND usd.active = true",
+        "authUser": "SELECT users.id,username, firstname, lastname FROM users JOIN userdetails  AS usd ON users.id = usd.userid WHERE BINARY username LIKE ? AND password LIKE ? AND usd.active = true",
+        "contactExist": "SELECT count(1) as length FROM users AS usr JOIN userdetails AS uds ON usr.id=uds.userid WHERE BINARY usr.username = ? AND uds.contactno = ? ",
+        "userExist": "SELECT count(1) as length FROM users AS usr WHERE BINARY usr.username = ?",
+        "saveUserPro": "call saveuser(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "editUserDetailsPro": "call edituserdetails(?, ?, ?, ?, ?, ?, ?, ?)",
+        "editPassword": "UPDATE users SET password = ? WHERE BINARY username = ?",
+        "getUsersAvailabilityTeamId": "SELECT userid, SUM(NOW() >= startdate AND NOW() <= enddate) AS valid FROM logs WHERE userid IN (SELECT users.id FROM users  JOIN teamresource tr ON tr.userid = users.id WHERE tr.teamid = ?)  AND logs.startdate BETWEEN  CONCAT(CURDATE(), ?)  AND CONCAT(CURDATE(), ?) GROUP BY userid"
+    },
+
+    "project": {
+        "getProjects": "SELECT id, name FROM project WHERE leadid = ? AND active = true",
+        "getUserProjects": "SELECT pr.id, pr.name FROM users as usr JOIN teamresource tr ON usr.id = tr.userid JOIN Team tm on tr.teamid = tm.id JOIN project pr on pr.leadid = tm.leadid WHERE usr.id = ? AND pr.active = true",
+        "getMyProjects": "SELECT projectid FROM myprojects  WHERE userid = ? AND active = true",
+        "getProject": "SELECT * FROM project AS pr WHERE pr.id = ? AND active = true",
+        "saveProject": "INSERT INTO project(name  ,description ,startdate ,enddate , leadid ,createddate) VALUES  (?, ?, ?, ?, ?, now())",
+        "editProject": "UPDATE project SET description = ?, startdate = ?, enddate= ?, editdate = now() WHERE id = ?",
+        "getResourcesForProject": "SELECT users.id,users.username, usd.firstname, usd.lastname  FROM users JOIN userdetails  AS usd ON users.id = usd.userid JOIN projectresource AS pr ON users.Id = pr.userid  WHERE pr.projectid = ?",
+        "addResourceToProject": "INSERT INTO projectresource(projectid  ,userid, createddate) VALUES  (?, ?, now())",
+        "removeResourceFromProject": "DELETE FROM projectresource WHERE projectid = ? and userid = ?",
+        "addMyProject": "call editmyproject(?, ?)",
+        "removeMyProjectPro": "UPDATE myprojects SET ACTIVE = false, editdate = now() WHERE projectid = ?",
+        "addNRemoveResourceFromProject": "UPDATE projectresource SET projectid = ?, editdate = now() WHERE projectid = ? AND userid = ?",
+        "getUserMappedProjectCountByTeamId": "SELECT userid,count(1) AS count FROM projectresource WHERE userid IN (SELECT users.id FROM users JOIN userdetails usd ON users.id = usd.userid JOIN teamresource tr ON tr.userid = users.id WHERE tr.teamid = ? and usd.active = true) GROUP BY userid",
+        "getProjectMappedUserCountByTeamId": "SELECT projectid,count(1) AS count FROM projectresource WHERE userid IN (SELECT users.id FROM users  JOIN userdetails usd ON users.id = usd.userid JOIN teamresource tr ON tr.userid = users.id WHERE tr.teamid = ? and usd.active = true) GROUP BY projectid"
+    },
+
+    "team": {
+        "getTeams": "SELECT team.id, team.name, team.description,users.username,users.id as leadid FROM team join users on team.leadid = users.id",
+        "getTeam": "SELECT team.id,team.name FROM team WHERE team.leadid = ?",
+        "saveTeam": "INSERT INTO team(name  ,description ,leadid, createddate) VALUES  (?, ?, ?, now())",
+        "mapUserPro": "call mapuser(?, ?, ?)"
+    },
+
+    "role": {
+        "getRoles": "SELECT id, name, description FROM role",
+        "getRole": "SELECT role.name FROM userdetails JOIN ROLE ON userdetails.roleid = role.id WHERE userdetails.userid = ?",
+        "getRoleByUserName": "SELECT role.name FROM users JOIN userdetails ON users.id = userdetails.userid JOIN role ON userdetails.roleid = role.id WHERE users.username = ?",
+        "saveRole": "INSERT INTO role(name , description ) VALUES  (?, ?)"
+    },
+
+    "log": {
+        "getLogsByUserId": "SELECT logs.id, project.name as title ,logs.startdate as start, logs.enddate as end, logs.description, logs.locked FROM logs JOIN project ON logs.projectid = project.id WHERE logs.startdate BETWEEN  ? AND ? AND userid = ? ORDER BY logs.startdate",
+        "getLogById": "SELECT * FROM logs WHERE id = ?",
+        "saveLog": "INSERT INTO logs (projectid, startdate, enddate, createddate, userid, description) VALUES (?, ?, ?, now(), ?, ?)",
+        "editLog": "UPDATE logs SET projectid = ?, startdate = ?, enddate = ?, description = ?, editdate = now(),locked = true where  id = ?",
+        "getUserReportLogs": "SELECT logs.id , project.name as title, timestampdiff( minute, logs.startdate,logs.enddate ) as diff FROM logs JOIN project ON logs.projectid = project.id WHERE logs.startdate BETWEEN  ? AND ? AND userid = ? ORDER BY logs.startdate",
+        "getReportLogs": "SELECT logs.id, project.name, CONCAT (usd.firstname, ' ' , usd.lastname)  as title, timestampdiff( minute, logs.startdate,logs.enddate ) as diff FROM logs JOIN project ON logs.projectid = project.id join users ON users.id = logs.userid join userdetails AS usd ON  users.id = usd.userid WHERE logs.startdate BETWEEN  ? AND ?  ORDER BY logs.startdate",
+        "getTodayUsersLogsByTeamId": "SELECT userid, sum(timestampdiff(minute,startdate,enddate)) as logged FROM `logs` WHERE userid in (SELECT users.id FROM users  JOIN teamresource tr ON tr.userid = users.id WHERE tr.teamid = ?) AND logs.startdate BETWEEN  CONCAT(CURDATE(), ?)  AND CONCAT(CURDATE(), ?) GROUP BY userid",
+        "getTodayProjectsLogsByLeadId": "SELECT projectid, sum(timestampdiff(minute,startdate,enddate)) as logged FROM `logs` WHERE projectid in (SELECT project.id FROM project  WHERE project.leadid = ?) AND logs.startdate BETWEEN  CONCAT(CURDATE(), ?)  AND CONCAT(CURDATE(), ?) GROUP BY projectid",
+	"unlockLog":"UPDATE logs SET locked = false, editdate = now() WHERE userid = ? and  id = ?"
+    },
+
+    "common": {
+        "getSelect": "SELECT * FROM ?? WHERE ?? = ?"
+    }
+
+}

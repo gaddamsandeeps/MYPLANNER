@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>Reports</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="lib/bootstrap.css" rel="stylesheet">        
+        <link href='lib/fullcalendar.css' rel='stylesheet'>
+        <link href='css/report/report.css' rel='stylesheet'>
+        <script src='lib/jquery.js'></script>
+        <script src="js/report/highcharts.js"></script>
+        <script src="js/report/exporting.js"></script>
+        <script src='js/common/util.js'></script>    
+        <script src='js/report/dateformat.js'></script>    
+        <script src="js/report/report.js"></script>
+        <script type="text/javascript">
+            $(function() {
+               $('#myTab li a').click(function(){
+                  var getname=$(this).attr('name');
+                  $('.tab-pane').hide();
+                  $('.active').removeClass('active');
+                  $(this).parent('li').addClass('active');
+                  $('#'+getname).parent('.tab-pane').show();
+               })
+            });
+        </script>
+
+    </head>
+    <body>
+        <% var pageName = 'report' %>
+        <% include header.html %>
+
+
+        <div class="reportGenerator">
+            <ul id="myTab" class="nav nav-tabs">
+                <li class="active wholereport">
+                    <a href="javascript:void(0)" name="userReport">
+                        Users Report
+                    </a>
+                </li>
+                <li class="wholereport">
+                    <a href="javascript:void(0)" name="ProjectReport">
+                        Projects Report
+                    </a>
+                </li>
+                <li class="active singlereport">
+                    <a href="javascript:void(0)" name="SingleUserReport">
+                        Projects Report
+                    </a>
+                </li>
+                <li class="singlereport">
+                    <a href="javascript:void(0)" name="workingHoursReport">
+                        Logs Report
+                    </a>
+                </li>
+            </ul>
+            <div id="myTabContent" class="tab-content">
+                <div class="datePickers">
+                    <div class="col-md-4">
+                        Start date :
+                        <input type="date" id="reportStartTime"  name="reportStartTime" class="form-control" placeholder="Start Time" required>
+                    </div>
+                    <div class="col-md-4">
+                        End Date :
+                        <input type="date" id="reportEndTime" name="reportEndTime" class="form-control" >
+                    </div>
+                    <div class="col-md-4">
+                        <button style="margin-top:25px" id="checkReport" class="fc-today-button pull-right fc-button fc-state-default fc-corner-left fc-corner-right fc-state-disabled" onclick=" DifferenceCounter()">Check Report</button>
+                    </div>
+                </div>
+                <div class="tab-pane active wholereport">
+                    <div id="userReport" class="reports"></div>
+                </div>
+                <div class="tab-pane wholereport" id="ios">
+                    <div id="ProjectReport" class="reports"></div>
+                    <div id="UserProjectReport" class="reports"></div>
+                </div>
+                <div class="tab-pane active singlereport">
+                    <div id="SingleUserReport" class="reports"></div>
+                </div>
+                <div class="tab-pane singlereport">
+                    <div id="workingHoursReport" class="reports"></div>
+                </div>
+            </div>
+        </div>
+        <% include footer.html %>
+    </body>
+</html>

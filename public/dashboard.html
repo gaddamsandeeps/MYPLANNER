@@ -1,0 +1,192 @@
+﻿<!DOCTYPE html>
+<html ng-app="resourceTracking">
+    <head>
+        <title>Resource Tracker</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="lib/bootstrap.css" rel="stylesheet">
+        <link href="css/dashboard.css" rel="stylesheet">
+        <link href="css/progressBar.css" rel="stylesheet">
+        <script src='js/common/util.js'></script>    
+        <script src='js/progresBar.js'></script>
+        <script src='lib/jquery.js'></script>
+    </head>
+
+    <body ng-controller="genericCtrl" ng-cloak>
+        <% var pageName = 'dashboard' %>
+        <% include header.html %>
+        <div class="container-fluid">
+            <div class="row" ng-controller="projectViewController">
+                <div class="col-md-9 leftPannel">
+                    <div class="pull-right showHide">
+                        <div class="pull-left">
+                            <input type="radio" name="showHide" checked="checked" id="showall"/>
+                            <label for="showall">Show All</label>
+                        </div>
+                        <div class="pull-left">
+                            <input type="radio" name="showHide" id="hideall"/>
+                            <label for="hideall">Hide All</label>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div id="ProjectView" projectdroppable>
+                        <div ng-repeat="p in droppedProjects" class="projectSection">
+                            <div class="pv" resourcedroppable projectid="{{p.id}}">
+                                <div><h3 class="resourceTitle">Project Title :</h3>{{p.name}}</div>
+                                <div class="resourcseToProject">
+                                    <div>
+                                        <div class="timelineWrapper">
+                                            <div class="timelineDates">
+                                                <div class="pull-left">
+                                                    {{p.startdate | date : 'shortDate'}}
+                                                </div>
+                                                <div class="pull-right">
+                                                    {{p.enddate | date : 'shortDate'}}
+                                                </div>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="timeLine">
+                                                <div style="overflow: hidden; width: {{p.diff}}%;"></div>
+                                                <span class="boldDot boldDotLeft"></span>
+                                                <span class="boldDot boldDotRight"></span>
+                                            </div> 
+                                            <p class="currentDate">
+                                                <span style="left: {{p.diff-2}}%;">{{p.currentdate | date : 'shortDate'}}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="resources">
+                                        <h3 class="resourceTitle">Resources</h3>
+                                    </div>
+                                    <div class="developers">
+                                        <span resourcedraggable username="{{d.username}}" class="developer" ng-repeat="d in p.users">
+                                            {{d.firstname +" "+ d.lastname}}
+                                            <i ng-click="removeResource(p.id,d)">x</i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="close" ng-click="closeView(p.id)">x</div>
+                                <a href="javascript:void(0)" class="minimize minus" onclick="minimaxConetent(this)"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 rightPannel">
+                    <div id="Resources" class="rightPannelSection">
+                        <h4>
+                            Resources
+                            <span class="refereshIcon"></span>
+                            <span class="arrwCntrl arrwCntrlDown"></span>
+                        </h4>
+                        <div class="itemsList">
+                            <div class="searchBox">
+                                <input type="text" ng-model="searchUser" placeholder="Search" />
+                                <input type="submit" value="" class="searchBoxSubmitBtn" />
+                            </div>
+                            <div ng-repeat="r in TeamUsers | filter:searchUser">
+                                <div resourcedraggable class="item itemTooltip" tooltip="{{r.resourcelogged?r.resourcelogged: 0}}%" username="{{r.username}}" >
+                                    <div class="pull-left">
+                                        {{r.firstname +" "+ r.lastname + " ("+(r.projectCount?r.projectCount: 0) +")" }}
+                                    </div>
+                                    <div class="pull-right">
+                                        <span class="status{{r.status}} status"></span>
+                                    </div>
+                                    <div class="pull-right timesheet" title="Check Timesheet" ng-click="showUserTimesheet(r.id)">
+                                    </div>
+                                    <div class="pull-right report" title="Check Report" ng-click="showUserReport(r.id)">
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="itemLine">
+                                    <div style="overflow: hidden; width: {{r.resourcelogged}}%;"></div>
+                                </div>                               
+                            </div>
+                        </div>
+                    </div>
+                    <div id="Projects" class="rightPannelSection">
+                        <h4>
+                            Projects
+                            <span class="arrwCntrl arrwCntrlDown"></span>
+                            <span class="refereshIcon"></span>
+                            <span class="addProjectIcon"></span>
+                        </h4>
+                        <div class="itemsList">
+                            <div class="searchBox">
+                                <input type="text" ng-model="searchProject" placeholder="Search" />
+                                <input type="submit" value="" class="searchBoxSubmitBtn" />
+                            </div>
+                            <div ng-repeat="p in Projects | filter:searchProject">
+                                <div class="item itemTooltip" tooltip="{{p.projectlogged?p.projectlogged:0}}%" projectdraggable projectid="{{p.id}}" ng-click="editProject(p.id)">{{p.name +" ("+ (p.count?p.count:0)+")"}}</div>
+                                <div class="itemLine">
+                                    <div style="overflow: hidden; width: {{p.projectlogged}}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- AddProjectModal -->
+        <div class="modal fade" id="AddProjectModal" tabindex="-1" role="dialog" aria-hidden="true" ng-controller="AddProjectController">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form name="AddProjectForm" novalidate class="form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4>{{projectType}}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group" show-errors>
+                                <label for="projectname" class="col-md-3 control-label">Project Name</label>
+                                <div class="col-md-9">
+                                    <input type="text" id="projectname" name="projectname" ng-model="project.name" class="form-control" placeholder="Project Name" required>
+                                    <span class="error-message" ng-show="AddProjectForm.projectname.$error.required">Project Name is required</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="projectdescription" class="col-md-3 control-label">Description</label>
+                                <div class="col-md-9">
+                                    <textarea class="form-control" rows="3" ng-model="project.description" placeholder="Description" id="projectdescription" name="projectdescription"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group" show-errors>
+                                <label for="startdate" class="col-md-3 control-label">Start Date</label>
+                                <div class="col-md-9">
+                                    <input type="date" id="startdate" name="startdate" ng-model="project.startdate" class="form-control" placeholder="Start Date" required>
+                                    <span class="error-message" ng-show="AddProjectForm.startdate.$error.required">Please enter a valid date</span>
+                                </div>
+                            </div>
+                            <div class="form-group" show-errors>
+                                <label for="enddate" class="col-md-3 control-label">End Date</label>
+                                <div class="col-md-9">
+                                    <input type="date" id="enddate" name="enddate" ng-model="project.enddate" class="form-control" placeholder="End Date" required>
+                                    <span class="error-message" ng-show="AddProjectForm.enddate.$error.required">Please enter a valid date</span>                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="reset" class="btn btn-default" ng-click="reset()">Reset</button>
+                            <button type="submit" class="btn btn-primary" ng-click="saveProject()">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <% include footer.html %>
+        <script src="lib/jquery.js"></script>
+        <script src="lib/bootstrap.js"></script>
+        <script src="lib/angular.js"></script>
+        <script src="js/common/directives.js"></script>
+        <script src="js/dashboard.js"></script>
+        <script src="js/rightpannel.js"></script>
+        <script src="js/minimize.js"></script>
+        <script src="js/progresBar.js"></script>
+    </body>
+
+</html>

@@ -1,0 +1,14 @@
+{
+    "sqlcode": {
+        "ER_DUP_ENTRY": 1062
+    },
+    "sqlerror": {
+        "ER_DUP_ENTRY": "Duplicate values are not entered"
+    },
+    "common": {
+        "error": "Caught with some error"
+    },
+    "success": {
+        "common": "Data saved successfully"
+    }
+}

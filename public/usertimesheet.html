@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Timesheet</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="lib/bootstrap.css" rel="stylesheet">
+    <link href='lib/fullcalendar.css' rel='stylesheet'>
+    <link href='css/timesheet.css' rel='stylesheet'>
+</head>
+
+<body>
+	<% var pageName = 'usertimesheet' %>
+     <% include header.html %>
+    <div id="calContainer">
+        <div id='calendar'></div>
+    </div>
+    <div class="modal fade" id="AddTimeModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="AddTimeForm" id="AddTimeForm" novalidate class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4>Details</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="addTimeProjectId">Project</label>
+                            <div class="col-md-8">
+                                <input type="text" readonly id="addTimeProjectId" class="form-control">
+                                <input type="hidden" id="projectId" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="addTimeDescription">Description</label>
+                            <div class="col-md-8">
+                                <textarea class="form-control" readonly id="addTimeDescription" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="addTimeStartTime">Start Time</label>
+                            <div class="col-md-8">
+                                <input type="datetime-local" readonly id="addTimeStartTime" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" for="addTimeEndTime">End Time</label>
+                            <div class="col-md-8">
+                                <input type="datetime-local" readonly id="addTimeEndTime" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" id="btnUnlock">Unlock</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+	<% include footer.html %>
+
+    <script src='lib/moment.min.js'></script>
+    <script src='lib/jquery.js'></script>
+    <script src="lib/bootstrap.js"></script>
+    <script src='lib/fullcalendar.js'></script>
+    <script src='js/common/util.js'></script>
+    <script src='js/usertimesheet.js'></script>
+</body>
+
+</html>
