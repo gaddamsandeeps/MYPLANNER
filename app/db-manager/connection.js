@@ -1,4 +1,5 @@
 /**
+ * connection.js
  * create connection
  */
 var mysql = require('mysql'),

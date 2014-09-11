@@ -12,6 +12,20 @@ exports.saveTeam = function(obj, callback) {
     });
 };
 
+exports.editTeam = function(obj, callback) {
+    log.debug("editTeam");
+    teamDao.editTeam(obj, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};
+
+exports.removeTeam = function(teamId, callback) {
+    log.debug("removeTeam");
+    teamDao.removeTeam(teamId, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};
+
 exports.getTeams = function(callback) {
     log.debug("getTeams");
     teamDao.getTeams(callback);

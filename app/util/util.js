@@ -1,7 +1,9 @@
 /**
  * common utils.js  can be segregated later
  */
-var errors = require("../../errors.json");
+var dateFormat = require("dateformat"),
+    errors = require("../../errors.json"),
+    format = 'yyyy-mm-dd h:MM:ss TT';
 
 exports.mergeJSON = function(source1, source2) {
     /*
@@ -31,18 +33,43 @@ exports.mergeJSON = function(source1, source2) {
 
 exports.handleErrors = function(obj, callback) {
     var res = new Object();
+    res.data = new Object();
 
     if (obj.errno) {
-        res.errno = obj.errno;
-        res.code = obj.code;
+        res.message = 'failure';
+        res.data.errno = obj.errno;
+        res.data.code = obj.code;
         if (obj.errno === errors.sqlcode.ER_DUP_ENTRY) {
-            res.message = errors.sqlerror.ER_DUP_ENTRY;
+            res.data.message = errors.sqlerror.ER_DUP_ENTRY;
         } else {
-            res.message = errors.common.error;
+            res.data.message = errors.common.error;
         }
         callback(res);
     } else {
-        res.message = errors.success.common;
+        res.message = 'success';
+        res.data.message = errors.success.common;
+        res.data = obj;
         callback(res);
     }
+}
+
+exports.formatDate = function(val, callback) {
+    try {
+        val = dateFormat(val, format);
+        return val;
+    } catch (e) {
+        return '';
+    }
+}
+
+//empty error object to pass 
+exports.emptyFailureErrObj = function(){
+	var res = new Object();
+	 res.data = new Object();
+
+	 res.message = 'failure';
+	 res.data.errno = '';
+	 res.data.code = '';
+	 res.data.message = "Invalid details entered.";
+	return res;
 }

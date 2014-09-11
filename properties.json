@@ -15,7 +15,8 @@
         "desc": "description",
         "leadId": "leadid",
         "teamId": "teamid",
-        "userId": "userid"
+        "userId": "userid",
+	"id": "id"
     },
 
     "role": {
@@ -26,7 +27,9 @@
     "roles": {
         "manager": "MANAGER",
         "admin": "ADMIN",
-        "user": "USER"
+        "user": "USER",
+	"id": "id",
+	"roleId": "roleid"
     },
 
     "user": {
@@ -37,9 +40,9 @@
         "teamId": "teamid",
         "roleId": "roleid",
         "firstName": "firstname",
-	"lastName": "lastname",
+        "lastName": "lastname",
         "sex": "sex",
-	"dob": "dob",
+        "dob": "dob",
         "contact": "contact",
         "oldPassword": "oldpassword",
         "newPassword": "newpassword"

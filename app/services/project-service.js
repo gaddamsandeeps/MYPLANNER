@@ -39,7 +39,7 @@ exports.getProjects = function(obj, callback) {
         }
     });
 
-	projectDao.getTodayProjectsLogsByLeadId([userId,  obj[2], obj[3]], function(returnValue) {
+    projectDao.getTodayProjectsLogsByLeadId([userId, obj[2], obj[3]], function(returnValue) {
         if (returnValue.length == 0) {
             noOfFun++;
             complete();

@@ -1,11 +1,9 @@
 /**
  * log-service.js
  */
-var dateFormat = require("dateformat"),
-    logDao = require("../dao/log-dao"),
+var logDao = require("../dao/log-dao"),
     log = require('../logger/logger').logger("log-service"),
-    util = require("../util/util"),
-    format = 'yyyy-mm-dd h:MM:ss TT';
+    util = require("../util/util");
 
 exports.getLogsByUserId = function(obj, callback) {
     log.debug("getLogsByUserId");
@@ -34,6 +32,20 @@ exports.getReportLogs = function(obj, callback) {
     logDao.getReportLogs(obj, callback);
 };
 
+exports.getDetailedUserReportLogs = function(obj, callback) {
+    log.debug("getDetailedUserReportLogs");
+    logDao.getDetailedUserReportLogs(obj, function(returnValue) {
+        formatDates(returnValue, callback);
+    });
+};
+
+exports.getDetailedReportLogs = function(obj, callback) {
+    log.debug("getDetailedReportLogs");
+    logDao.getDetailedReportLogs(obj, function(returnValue) {
+        formatDates(returnValue, callback);
+    });
+};
+
 exports.unlockLog = function(obj, callback) {
     log.debug("unlockLog");
     logDao.unlockLog(obj, callback);
@@ -59,8 +71,14 @@ var formatDates = function(returnValue, callback) {
             callback([]);
         }
         for (var i = 0; i < returnValue.length; i++) {
-            returnValue[i].start = dateFormat(returnValue[i].start, format);
-            returnValue[i].end = dateFormat(returnValue[i].end, format);
+            returnValue[i].start = util.formatDate(returnValue[i].start);
+            returnValue[i].end = util.formatDate(returnValue[i].end);
+            if (returnValue[i].created) {
+                returnValue[i].created = util.formatDate(returnValue[i].created);
+            }
+            if (returnValue[i].edit) {
+                returnValue[i].edit = util.formatDate(returnValue[i].edit);
+            }
             if (i === returnValue.length - 1) {
                 callback(returnValue);
             }

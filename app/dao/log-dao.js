@@ -95,6 +95,42 @@ exports.getReportLogs = function(obj, callback) {
     }
 };
 
+exports.getDetailedUserReportLogs = function(obj, callback) {
+    try {
+        var connection = db.getConnection(),
+            getDetailedUserReportLogsSQL = queries.log.getDetailedUserReportLogs;
+
+        connection.query(getDetailedUserReportLogsSQL, obj, function(err, rows) {
+            if (err) {
+                log.error(err);
+                callback(err);
+            } else {
+                callback(rows);
+            }
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.getDetailedReportLogs = function(obj, callback) {
+    try {
+        var connection = db.getConnection(),
+            getDetailedReportLogsSQL = queries.log.getDetailedReportLogs;
+
+        var q = connection.query(getDetailedReportLogsSQL, obj, function(err, rows) {
+            if (err) {
+                log.error(err);
+                callback(err);
+            } else {
+                callback(rows);
+            }
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
 exports.unlockLog = function(obj, callback) {
     try {
         var connection = db.getConnection(),

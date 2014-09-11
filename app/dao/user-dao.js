@@ -80,20 +80,24 @@ exports.getUserById = function(userId, callback) {
 };
 
 exports.getTeamUsers = function(userId, callback) {
-    try {
-        var connection = db.getConnection(),
-            getTeamUsersSQL = queries.user.getTeamUsers;
+    if (userId) {
+        try {
+            var connection = db.getConnection(),
+                getTeamUsersSQL = queries.user.getTeamUsers;
 
-        connection.query(getTeamUsersSQL, userId, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
-        });
-    } catch (e) {
-        log.error(e);
+            connection.query(getTeamUsersSQL, userId, function(err, rows) {
+                if (err) {e
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        } catch (e) {
+            log.error(e);
+        }
+    } else {
+        callback([]);
     }
 };
 

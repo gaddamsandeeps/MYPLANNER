@@ -77,3 +77,39 @@ exports.saveRole = function(obj, callback) {
         log.error(e);
     }
 };
+
+exports.editRole = function(obj, callback) {
+    try {
+        var connection = db.getConnection(),
+            editRoleSQL = queries.role.editRole;
+        connection.query(editRoleSQL, obj,
+            function(err, rows) {
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows.insertId);
+                }
+            });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.removeRole = function(obj, callback) {
+    try {
+        var connection = db.getConnection(),
+            removeRoleSQL = queries.role.removeRole;
+        connection.query(removeRoleSQL, obj,
+            function(err, rows) {
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows.insertId);
+                }
+            });
+    } catch (e) {
+        log.error(e);
+    }
+};

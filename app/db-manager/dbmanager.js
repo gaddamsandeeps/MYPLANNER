@@ -1,4 +1,5 @@
 /**
+ * dbmanager.js
  * get connection
  */
 exports.getConnection = function() {

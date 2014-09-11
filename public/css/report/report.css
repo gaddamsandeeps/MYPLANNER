@@ -3,12 +3,24 @@
     margin: 0px auto;
 }
 .reports{
-    display: none;
-    width: 800px;  margin: 0 auto;   
+    margin: 0 auto;   
     display: block;
+	margin-top:60px;
 }
 .tab-pane{
     padding: 15px;
     border: 1px solid #ddd;
     border-top: none;
+
 }
+.gen_btn{
+	position: absolute;
+	top: 24px;
+	right: 126px; 
+}
+
+th, td { white-space: nowrap; }
+    div.dataTables_wrapper {
+        width: 800px;
+        margin: 0 auto;
+    }

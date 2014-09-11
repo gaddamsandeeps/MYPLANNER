@@ -6,13 +6,10 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="lib/bootstrap.css" rel="stylesheet">
+        <link href="css/validation.css" rel="stylesheet">
         <link href="css/dashboard.css" rel="stylesheet">
-        <link href="css/progressBar.css" rel="stylesheet">
-        <script src='js/common/util.js'></script>    
-        <script src='js/progresBar.js'></script>
-        <script src='lib/jquery.js'></script>
+        <link href="css/progressBar.css" rel="stylesheet">        
     </head>
-
     <body ng-controller="genericCtrl" ng-cloak>
         <% var pageName = 'dashboard' %>
         <% include header.html %>
@@ -86,7 +83,7 @@
                                 <input type="submit" value="" class="searchBoxSubmitBtn" />
                             </div>
                             <div ng-repeat="r in TeamUsers | filter:searchUser">
-                                <div resourcedraggable class="item itemTooltip" tooltip="{{r.resourcelogged?r.resourcelogged: 0}}%" username="{{r.username}}" >
+                                <div resourcedraggable class="item itemTooltip" tooltip="{{r.resourcelogged?r.resourcelogged: 0}}% - {{r.logged ? r.logged : 0}} Mins" username="{{r.username}}" >
                                     <div class="pull-left">
                                         {{r.firstname +" "+ r.lastname + " ("+(r.projectCount?r.projectCount: 0) +")" }}
                                     </div>
@@ -110,7 +107,7 @@
                             Projects
                             <span class="arrwCntrl arrwCntrlDown"></span>
                             <span class="refereshIcon"></span>
-                            <span class="addProjectIcon"></span>
+                            <span class="addProjectIcon" ng-click="addProject($event)"></span>
                         </h4>
                         <div class="itemsList">
                             <div class="searchBox">
@@ -130,11 +127,11 @@
         </div>
 
 
-        <!-- AddProjectModal -->
-        <div class="modal fade" id="AddProjectModal" tabindex="-1" role="dialog" aria-hidden="true" ng-controller="AddProjectController">
+        <!-- Add/Edit ProjectModal -->
+        <div class="modal fade" id="ProjectModal" tabindex="-1" role="dialog" aria-hidden="true" ng-controller="ProjectController">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form name="AddProjectForm" novalidate class="form-horizontal">
+                    <form name="ProjectForm" novalidate class="form-horizontal">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                             <h4>{{projectType}}</h4>
@@ -144,7 +141,7 @@
                                 <label for="projectname" class="col-md-3 control-label">Project Name</label>
                                 <div class="col-md-9">
                                     <input type="text" id="projectname" name="projectname" ng-model="project.name" class="form-control" placeholder="Project Name" required>
-                                    <span class="error-message" ng-show="AddProjectForm.projectname.$error.required">Project Name is required</span>
+                                    <span class="error-message" ng-show="ProjectForm.projectname.$error.required">Project Name is required</span>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -157,36 +154,35 @@
                                 <label for="startdate" class="col-md-3 control-label">Start Date</label>
                                 <div class="col-md-9">
                                     <input type="date" id="startdate" name="startdate" ng-model="project.startdate" class="form-control" placeholder="Start Date" required>
-                                    <span class="error-message" ng-show="AddProjectForm.startdate.$error.required">Please enter a valid date</span>
+                                    <span class="error-message" ng-show="ProjectForm.startdate.$error.required">Please enter a valid date</span>
                                 </div>
                             </div>
                             <div class="form-group" show-errors>
                                 <label for="enddate" class="col-md-3 control-label">End Date</label>
                                 <div class="col-md-9">
                                     <input type="date" id="enddate" name="enddate" ng-model="project.enddate" class="form-control" placeholder="End Date" required>
-                                    <span class="error-message" ng-show="AddProjectForm.enddate.$error.required">Please enter a valid date</span>                                    
+                                    <span class="error-message" ng-show="ProjectForm.enddate.$error.required">Please enter a valid date</span>                                    
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="reset" class="btn btn-default" ng-click="reset()">Reset</button>
+                            <button type="button" class="btn btn-default" ng-click="reset()">Reset</button>
                             <button type="submit" class="btn btn-primary" ng-click="saveProject()">Save</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-
         <% include footer.html %>
         <script src="lib/jquery.js"></script>
         <script src="lib/bootstrap.js"></script>
+        <script src="js/common/util.js"></script>
         <script src="lib/angular.js"></script>
         <script src="js/common/directives.js"></script>
         <script src="js/dashboard.js"></script>
         <script src="js/rightpannel.js"></script>
         <script src="js/minimize.js"></script>
-        <script src="js/progresBar.js"></script>
+        <script src="js/progresBar.js"></script>      
     </body>
-
 </html>

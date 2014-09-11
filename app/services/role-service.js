@@ -26,3 +26,17 @@ exports.saveRole = function(obj, callback) {
         util.handleErrors(returnValue, callback);
     });
 };
+
+exports.editRole = function(obj, callback) {
+    log.debug("editRole");
+    roleDao.editRole(obj, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};
+
+exports.removeRole = function(obj, callback) {
+    log.debug("removeRole");
+    roleDao.removeRole(obj, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};

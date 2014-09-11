@@ -46,6 +46,7 @@ passport.use(new LocalStrategy({
                             team) {
                             if (team) {
                                 user.teamId = team.id;
+								user.teamName = team.name;
                             }
                             return done(null, user);
                         });
@@ -96,48 +97,62 @@ if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
 
-app.get('/dashboard*', ensureAuthenticated, function(request, response) {
+app.get('/dashboard', ensureAuthenticated, function(request, response) {
     response.render('dashboard.html', {
         user: request.user,
         message: request.flash('error')
     });
 });
 
-app.get('/timesheet*', ensureAuthenticated, function(request, response) {
+app.get('/timesheet', ensureAuthenticated, function(request, response) {
     response.render('timesheet.html', {
         user: request.user,
         message: request.flash('error')
     });
 });
 
-app.get('/usertimesheet*', ensureAuthenticated, function(request, response) {
-    response.render('usertimesheet.html', {
-        user: request.user,
-        message: request.flash('error')
+app.get('/usertimesheet', ensureAuthenticated, function(request, response) {
+    requestProcesser.getUserById(request.param('id'), function(res) {
+        response.render('usertimesheet.html', {
+            user: request.user,
+            message: request.flash('error'),
+            selectedUser: res
+        });
     });
 });
 
 
-app.get('/register*', function(request, response) {
+app.get('/register', function(request, response) {
     response.render('register.html');
 });
 
-app.get('/profile*', ensureAuthenticated, function(request, response) {
+app.get('/profile', ensureAuthenticated, function(request, response) {
     response.render('profile.html', {
         user: request.user,
         message: request.flash('error')
     });
 });
 
-app.get('/forgotpassword*', function(request, response) {
+app.get('/forgotpassword', function(request, response) {
     response.render('forgotpassword.html');
 });
 
-app.get('/report*', ensureAuthenticated, function(request, response) {
-    response.render('report.html', {
-        user: request.user,
-        message: request.flash('error')
-    });
+app.get('/report', ensureAuthenticated, function(request, response) {
+    var selectedUserId = request.param('id');
+    if (selectedUserId) {
+        requestProcesser.getUserById(request.param('id'), function(res) {
+            response.render('report.html', {
+                user: request.user,
+                message: request.flash('error'),
+                selectedUser: res
+            });
+        });
+    } else {
+        response.render('report.html', {
+            user: request.user,
+            message: request.flash('error')
+        });
+    }
 });
 
 app.get('/', ensureAuthenticated, function(request, response) {
@@ -177,7 +192,7 @@ app.post('/signin',
     }));
 
 
-app.get('/signout', function(request, response){
+app.get('/signout', function(request, response) {
     request.logout();
     response.redirect('/');
 });
@@ -220,10 +235,14 @@ app.post('/userExist', requestProcesser.userExist);
 
 //TEAM SERVICES
 app.post('/saveTeam', ensureAuthenticated, requestProcesser.saveTeam);
+app.post('/editTeam', ensureAuthenticated, requestProcesser.editTeam);
+app.post('/removeTeam', ensureAuthenticated, requestProcesser.removeTeam);
 app.get('/getTeams', requestProcesser.getTeams);
 
 //ROLE SERVICES
 app.post('/saveRole', ensureAuthenticated, requestProcesser.saveRole);
+app.post('/editRole', ensureAuthenticated, requestProcesser.editRole);
+app.post('/removeRole', ensureAuthenticated, requestProcesser.removeRole);
 app.get('/getRoles', requestProcesser.getRoles);
 
 //LOG SERVICE
@@ -234,6 +253,10 @@ app.get('/getUserLogs', ensureAuthenticated, requestProcesser.getUserLogs);
 app.get('/getLog', ensureAuthenticated, requestProcesser.getLogById);
 app.get('/getUserReportLogs', ensureAuthenticated, requestProcesser.getUserReportLogs);
 app.get('/getReportLogs', ensureAuthenticated, requestProcesser.getReportLogs);
+
+app.get('/getDetailedUserReportLogs', ensureAuthenticated, requestProcesser.getDetailedUserReportLogs);
+app.get('/getDetailedReportLogs', ensureAuthenticated, requestProcesser.getDetailedReportLogs);
+
 app.get('/unlockLog', ensureAuthenticated, requestProcesser.unlockLog);
 
 d.on('error', function(err) {
@@ -251,15 +274,41 @@ function ensureAuthenticated(req, res, next) {
         if (req.url === '/loggedIn' || req.url === '/') {
             if (req.user.roleName === properties.roles.manager) {
                 res.redirect('/dashboard');
+            } else if (req.user.roleName === properties.roles.admin) {
+                res.redirect('/admin');
             } else {
                 res.redirect('/timesheet');
             }
-        } else if (req.url === '/dashboard' && req.user.roleName === properties.roles.user) {
+        } else if (restrictedPages(properties.roles.user, req.url) && req.user.roleName === properties.roles.user) {
             res.redirect('/timesheet');
+        } else if (restrictedPages(properties.roles.manager, req.url) && req.user.roleName === properties.roles.manager) {
+            res.redirect('/dashboard');
+        } else if (restrictedPages(properties.roles.admin, req.url) && req.user.roleName === properties.roles.admin) {
+            res.redirect('/admin');
         } else {
             return next();
         }
     } else {
         res.render('login.html');
     }
+}
+
+//url restrictions restrictedPages(request.user.roleName, request.url,callback);
+function restrictedPages(key, reqUrl) {
+    var urls = {};
+    urls[properties.roles.user] = ['admin', 'dashboard'];
+    urls[properties.roles.manager] = ['admin'];
+    urls[properties.roles.admin] = ['dashboard', 'timesheet', 'report'];
+    if (urls.hasOwnProperty(key)) {
+        var arr = urls[key];
+        for (var i = 0; i < arr.length; i++) {
+            if (reqUrl === '/' + arr[i]) {
+                return true;
+            }
+            if ((arr.length - 1) === i) {
+                return false;
+            }
+        }
+    }
+
 }

@@ -8,7 +8,7 @@ var req = $.ajax({
 req.done(function(data) {
     Projects = data;
     var s = '',
-            o;
+        o;
     for (i = 0; i < data.length; i++) {
         o = data[i];
         s += '<option value="' + o.id + '">' + o.name + '</option>';
@@ -19,15 +19,16 @@ var el = $('#calendar');
 var modalEl = $('#AddTimeModal');
 var calObj = {
     eventClick: function(event, element) {
-        console.log('eventClick');
+        //alert('eventClick');
         var lockStatus = event.locked
         if (lockStatus === 1) {
             $('#AddTimeForm').addClass('lockTimeForm');
-            $('.lockTimeForm *').attr({'disabled': true});
+            $('.lockTimeForm *').attr({
+                'disabled': true
+            });
             modalfooter = $('.lockTimeForm .modal-footer').remove();
             $('#lockFormCloseBtn,.close').removeAttr('disabled');
-        }
-        else {
+        } else {
             $('.lockTimeForm').append(modalfooter);
             $('.lockTimeForm *').removeAttr('disabled');
             $('#AddTimeForm').removeClass('lockTimeForm');
@@ -110,24 +111,25 @@ var calObj = {
     selectable: true,
     selectHelper: true,
     select: function(start, end) {
-        console.log('select');
+
+        var temp =start._d;
+        var day = temp.getDate();
+
+        var selected =   new Date();                 
+        selected.setDate(day);
+        var utc_selected = toUTC(selected);
+
         $('.lockTimeForm').append(modalfooter);
         $('.lockTimeForm *').removeAttr('disabled');
         $('#AddTimeForm').removeClass('lockTimeForm');
         document.getElementById('AddTimeForm').reset();
         $('#modalHeader').text('Add Time');
-        var d1 = new Date(start._d);
-        var d2 = new Date();
-        d1.setHours(d2.getHours());
-        d1.setMinutes(d2.getMinutes());
 
-        var StartTime = document.getElementById('addTimeStartTime')
-        StartTime.valueAsNumber = toUTC(d1);
+        var StartTime = document.getElementById('addTimeStartTime');
+        var EndTime = document.getElementById('addTimeEndTime');
+        StartTime.valueAsNumber = EndTime.valueAsNumber = utc_selected;
 
-        var EndTime = document.getElementById('addTimeEndTime')
-        EndTime.valueAsNumber = toUTC(d1);
-
-        var btnGroup = $('.fc-button-group');
+        var btnGroup = $('.fc-button-group');        
         var active = btnGroup.find('.fc-state-active').text().trim();
         var eventData;
         if (active === 'month') {
@@ -140,10 +142,9 @@ var calObj = {
                     "enddate": $('#addTimeEndTime').val(),
                     "description": $('#addTimeDescription').val()
                 };
-                console.log(EndTime.valueAsNumber);
-                console.log(StartTime.valueAsNumber);
-                if (EndTime.valueAsNumber > StartTime.valueAsNumber) {
-                    console.log('if');
+                var st = new Date(StartTime.valueAsNumber);
+                var et = new Date(EndTime.valueAsNumber);
+                if (sameDates(new Date(utc_selected)) && EndTime.valueAsNumber > StartTime.valueAsNumber) {                
                     var saveLog = $.ajax({
                         url: '/saveLog',
                         type: 'POST',
@@ -168,7 +169,7 @@ var calObj = {
                         console.log(e);
                     });
                 } else {
-                    alert('End Time should be Greater than Start Time');
+                    alert('End Time(Today) should be Greater than Start Time(Today)');
                 }
             });
         }

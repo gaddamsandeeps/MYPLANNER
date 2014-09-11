@@ -58,3 +58,39 @@ exports.saveTeam = function(obj, callback) {
         log.error(e);
     }
 };
+
+exports.editTeam = function(obj, callback) {
+    try {
+        var connection = db.getConnection(),
+            editTeamSQL = queries.team.editTeam;
+        connection.query(editTeamSQL, obj, function(
+            err, rows) {
+            if (err) {
+                log.error(err);
+                callback(err);
+            } else {
+                callback(rows.insertId);
+            }
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.removeTeam = function(obj, callback) {
+    try {
+        var connection = db.getConnection(),
+            removeTeamSQL = queries.team.removeTeam;
+        connection.query(removeTeamSQL, obj, function(
+            err, rows) {
+            if (err) {
+                log.error(err);
+                callback(err);
+            } else {
+                callback(rows.insertId);
+            }
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};

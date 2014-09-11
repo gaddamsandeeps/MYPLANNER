@@ -1,11 +1,7 @@
 <% if (typeof user !="undefined" ) { %>
-
-
-<script>
-    var userid = '<%= user.id %>';
-</script>
-
-
+	<script>
+		var userid = '<%= user.id %>';
+	</script>
 <% } %>
 <link rel="stylesheet" type="text/css" href="css/navigation.css" />
 <div class="navbar topNavBg navbar-static-top" role="navigation">
@@ -34,7 +30,7 @@
             <% } %>
             <% if (pageName === "dashboard" || pageName === "usertimesheet"  || pageName === "editprofile") { %>
             <li>
-                <a data-toggle="modal" href="/reports">Reports</a>
+                <a data-toggle="modal" href="/report">Reports</a>
             </li>
             <% }} else if (user.roleName === "USER" ) {%>
             <% if (pageName === "report" || pageName === "editprofile") { %>
@@ -44,7 +40,7 @@
             <% }%>
             <% if (pageName === "timesheet" || pageName === "editprofile") { %>
             <li>
-                <a data-toggle="modal" href="/reports?id=<%=user.id%>">Reports</a>
+                <a data-toggle="modal" href="/report?id=<%=user.id%>">Reports</a>
             </li>
             <% }%>
             <% }%>

@@ -1,6 +1,6 @@
 var app = angular.module('resourceTracking', ['resourceTracking.directives']);
 app.controller('NewUserController', function($scope, $http) {
-    $scope.validRole = false;
+    $scope.validTeam = false;
     //Roles
     $http.get('/getRoles').then(function(obj) {
         $scope.Roles = obj.data;
@@ -19,9 +19,9 @@ app.controller('NewUserController', function($scope, $http) {
         roleid: null,
         teamid: null,
         firstname: '',
-		lastname: '',
+        lastname: '',
         sex: 'M',
-		dob: '',
+        dob: '',
         contact: ''
     };
     $scope.newUser = empty;
@@ -30,12 +30,14 @@ app.controller('NewUserController', function($scope, $http) {
         if ($scope.Form.$valid) {
             var model = JSON.parse(angular.toJson($scope.newUser));
             delete model.confirmPassword;
-            model.roleid = model.roleid.id;
-            model.teamid = model.teamid.id;
-            $http.post('/saveUser', model).success(function(d, status, headers, config) {
-                console.log(d);
-                document.forms['Form'].reset();
-            }).error(function(e, status, headers, config) {
+            model.roleid = (model.roleid) ? model.roleid.id : null;
+            model.teamid = (model.teamid) ? model.teamid.id : null;
+            $http.post('/saveUser', model).then(function(obj) {
+                if (obj.data.message === "success") {
+                    alert('New User Created Successfully');
+                    location.href = '/';
+                }
+            }, function(e) {
                 console.log(e);
             });
         }
@@ -46,9 +48,9 @@ app.controller('NewUserController', function($scope, $http) {
     };
     $scope.roleChange = function() {
         if ($scope.newUser.roleid && $scope.newUser.roleid.id == 3) {
-            $scope.validRole = true;
+            $scope.validTeam = true;
         } else {
-            $scope.validRole = false;
+            $scope.validTeam = false;
             $scope.newUser.teamid = null;
         }
     };

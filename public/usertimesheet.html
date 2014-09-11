@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Timesheet</title>
+    <title>UserTimesheet</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,6 +14,7 @@
 <body>
 	<% var pageName = 'usertimesheet' %>
      <% include header.html %>
+<b><%= selectedUser.firstname %> <%= selectedUser.lastname %></b>
     <div id="calContainer">
         <div id='calendar'></div>
     </div>

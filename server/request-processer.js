@@ -10,12 +10,13 @@ var log = require('../app/logger/logger').logger("request-processor"),
     teamResourceService = require("../app/services/team-resource-service"),
     roleService = require("../app/services/role-service"),
     encrypt = require("../app/util/encrypt"),
+	util = require("../app/util/util"),
     startTime = ' 00:00:00',
     endTime = ' 23:59:59';
 
 
 exports.auth = function(name, pwd, callback) {
-    log.debug("auth");
+    log.debug("auth : name is " + name);
     try {
         userService.auth([name, encrypt.encrypt(pwd)], function(returnValue) {
             callback(returnValue)
@@ -27,28 +28,28 @@ exports.auth = function(name, pwd, callback) {
 };
 
 exports.getRoleByUserName = function(userName, callback) {
-    log.debug("getRoleByUserName");
+    log.debug("getRoleByUserName : userName is " + userName);
     roleService.getRoleByUserName(userName, function(returnValue) {
         callback(returnValue)
     });
 };
 
 exports.getTeamByUserId = function(userId, callback) {
-    log.debug("getTeamByUserName");
+    log.debug("getTeamByUserName : userId is " + userId);
     teamService.getTeam(userId, function(returnValue) {
         callback(returnValue);
     });
 };
 
 exports.getUsersAvailabilityTeamId = function(request, response, callback) {
-    log.debug("getUsersAvailabilityTeamId");
+    log.debug("getUsersAvailabilityTeamId : logged in user is " + (request.user.id));
 
     var teamId = request.user.teamId;
     userService.getUsersAvailabilityTeamId([teamId, startTime, endTime], callback);
 };
 
 exports.getUser = function(request, response, callback) {
-    log.debug("getUser");
+    log.debug("getUser : logged in user is " + (request.user.id));
     var userId = request.param(properties.user.userId);
 
     userService.getUser(userId, function(returnValue) {
@@ -64,7 +65,7 @@ exports.getUserById = function(userId, callback) {
 };
 
 exports.getTeamUsersAndAvailability = function(request, response, callback) {
-    log.debug("getTeamUsers");
+    log.debug("getTeamUsersAndAvailability : logged in user is " + (request.user.id));
     var teamId = request.user.teamId;
 
     userService.getTeamUsersAndAvailability([teamId, startTime, endTime], function(returnValue) {
@@ -73,7 +74,7 @@ exports.getTeamUsersAndAvailability = function(request, response, callback) {
 };
 
 exports.getTeamUsers = function(request, response, callback) {
-    log.debug("getTeamUsers");
+    log.debug("getTeamUsers : logged in user is " + (request.user.id));
 
     var teamId = request.user.teamId;
     userService.getTeamUsers(teamId, function(returnValue) {
@@ -82,7 +83,7 @@ exports.getTeamUsers = function(request, response, callback) {
 };
 
 exports.getNonTeamUsers = function(request, response, callback) {
-    log.debug("getNonTeamUsers");
+    log.debug("getNonTeamUsers : logged in user is " + (request.user.id));
     var teamId = request.user.teamId;
     userService.getNonTeamUsers(teamId, function(returnValue) {
         response.json(returnValue);
@@ -90,7 +91,7 @@ exports.getNonTeamUsers = function(request, response, callback) {
 };
 
 exports.getLeads = function(request, response, callback) {
-    log.debug("getLeads");
+    log.debug("getLeads : logged in user is " + (request.user.id));
     userService.getLeads(function(returnValue) {
         response.json(returnValue);
     });
@@ -104,36 +105,36 @@ exports.getTeams = function(request, response, callback) {
 };
 
 exports.getTeamsAsObj = function(request, response, callback) {
-    log.debug("getTeamsAsObj");
+    log.debug("getTeamsAsObj : logged in user is " + (request.user.id));
     teamService.getTeams(function(returnValue) {
         callback(returnValue);
     });
 };
 
 exports.getTeam = function(userId, request, response, callback) {
-    log.debug("getTeam");
+    log.debug("getTeam : logged in user is " + (request.user.id));
     module.exports.getTeamByUserId(userId, function(returnValue) {
         response.json(returnValue);
     });
 };
 
 exports.getProjects = function(request, response) {
-    log.debug("getProjects");
+    log.debug("getProjects : logged in user is " + (request.user.id));
     var userId = request.user.id;
-	var teamId = request.user.teamId;
-    projectService.getProjects([userId, teamId,  startTime, endTime], function(returnValue) {
+    var teamId = request.user.teamId;
+    projectService.getProjects([userId, teamId, startTime, endTime], function(returnValue) {
         response.json(returnValue);
     });
 };
 
 exports.getUserMappedProjectCountByTeamId = function(request, response, callback) {
-    log.debug("getUserMappedProjectCount");
+    log.debug("getUserMappedProjectCountByTeamId : logged in user is " + (request.user.id));
     var teamId = request.user.teamId;
     projectService.getUserMappedProjectCountByTeamId(teamId, callback);
 };
 
 exports.getMyProjects = function(request, response) {
-    log.debug("getMyProjects");
+    log.debug("getMyProjects : logged in user is " + (request.user.id));
     var userId = request.user.id;
     projectService.getMyProjects(userId, function(returnValue) {
         response.json(returnValue);
@@ -141,7 +142,7 @@ exports.getMyProjects = function(request, response) {
 };
 
 exports.getUserProjects = function(request, response) {
-    log.debug("getUserProjects");
+    log.debug("getUserProjects : logged in user is " + (request.user.id));
     var userId = request.user.id;
     projectService.getUserProjects(userId, function(returnValue) {
         response.json(returnValue);
@@ -149,7 +150,7 @@ exports.getUserProjects = function(request, response) {
 };
 
 exports.removeMyProject = function(request, response) {
-    log.debug("removeMyProject");
+    log.debug("removeMyProject : logged in user is " + (request.user.id));
     var userId = request.user.id;
     var projectId = request.param(properties.project.id);
     projectService.removeMyProject([userId, projectId], function(returnValue) {
@@ -198,7 +199,7 @@ exports.userExist = function(request, response, callback) {
 };
 
 exports.editUser = function(request, response, callback) {
-    log.debug("editUser");
+    log.debug("editUser : logged in user is " + (request.user.id));
     var userId = request.user.id;
     var teamId = request.param(properties.user.teamId);
     var roleId = request.param(properties.user.roleId);
@@ -214,19 +215,18 @@ exports.editUser = function(request, response, callback) {
 };
 
 exports.changePassword = function(request, response, callback) {
-    log.debug("changePassword");
+    log.debug("changePassword : logged in user is " + (request.user.id));
     var userId = request.user.id;
     var userName = request.user.username;
     var oldPwd = request.param(properties.user.oldPassword);
     var newPwd = request.param(properties.user.newPassword);
     userService.auth([userName, encrypt.encrypt(oldPwd)], function(res) {
-        if (res.length == 0) {
-            response.json({
-                "Error": "Invalid old password."
-            });
+        if (!res) {
+            response.json(util.emptyFailureErrObj());
         } else {
             userService.editPassword([encrypt.encrypt(newPwd), userName], function(returnValue) {
-                response.json(returnValue);
+                request.logout();
+			    response.redirect('/');
             });
         }
     });
@@ -234,16 +234,14 @@ exports.changePassword = function(request, response, callback) {
 
 exports.resetPassword = function(request, response, callback) {
     log.debug("resetPassword");
-    //var userId = request.user.id;
+
     var pwd = request.param(properties.user.password);
     var contact = request.param(properties.user.contact);
     var username = request.param(properties.user.userName);
 
     userService.contactExist([username, contact], function(res) {
         if (res.length == 0) {
-            response.json({
-                "Error": "Invalid details entered."
-            });
+            response.json(util.emptyFailureErrObj());
         } else {
             userService.editPassword([encrypt.encrypt(pwd), username], function(returnValue) {
                 response.json(returnValue);
@@ -253,7 +251,8 @@ exports.resetPassword = function(request, response, callback) {
 };
 
 exports.mapUser = function(request, response, callback) {
-    log.debug("mapUser");
+    log.debug("mapUser : logged in user is " + (request.user.id));
+
     var teamId = request.user.teamId;
     var userId = request.param(properties.team.userId);
     var description = request.param(properties.team.desc);
@@ -264,7 +263,8 @@ exports.mapUser = function(request, response, callback) {
 };
 
 exports.saveTeam = function(request, response, callback) {
-    log.debug("saveTeam");
+    log.debug("saveTeam : logged in user is " + (request.user.id));
+
     var name = request.param(properties.team.name);
     var desc = request.param(properties.team.desc);
     var leadId = request.param(properties.team.leadId);
@@ -274,8 +274,31 @@ exports.saveTeam = function(request, response, callback) {
     });
 };
 
+exports.editTeam = function(request, response, callback) {
+    log.debug("editTeam : logged in user is " + (request.user.id));
+
+    var id = request.param(properties.team.id);
+    var name = request.param(properties.team.name);
+    var desc = request.param(properties.team.desc);
+    var leadId = request.param(properties.team.leadId);
+
+    teamService.editTeam([name, desc, leadId, id], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.removeTeam = function(request, response, callback) {
+    log.debug("removeTeam : logged in user is " + (request.user.id));
+
+    var teamId = request.param(properties.team.id);
+
+    teamService.removeTeam(teamId, function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
 exports.saveProject = function(request, response, callback) {
-    log.debug("saveProject");
+    log.debug("saveProject : logged in user is " + (request.user.id));
 
     var userId = request.user.id;
     var name = request.param(properties.project.name);
@@ -289,7 +312,7 @@ exports.saveProject = function(request, response, callback) {
 };
 
 exports.editProject = function(request, response, callback) {
-    log.debug("editProject");
+    log.debug("editProject : logged in user is " + (request.user.id));
 
     var id = request.param(properties.project.id);
     var desc = request.param(properties.project.desc);
@@ -302,7 +325,8 @@ exports.editProject = function(request, response, callback) {
 };
 
 exports.saveRole = function(request, response, callback) {
-    log.debug("saveRole");
+    log.debug("saveRole : logged in user is " + (request.user.id));
+
     var name = request.param(properties.role.name);
     var desc = request.param(properties.role.desc);
     roleService.saveRole([name, desc], function(returnValue) {
@@ -310,9 +334,30 @@ exports.saveRole = function(request, response, callback) {
     });
 };
 
+exports.editRole = function(request, response, callback) {
+    log.debug("editRole : logged in user is " + (request.user.id));
+
+    var roleId = request.param(properties.role.id);
+    var name = request.param(properties.role.name);
+    var desc = request.param(properties.role.desc);
+    roleService.editRole([name, desc, roleId], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.removeRole = function(request, response, callback) {
+    log.debug("removeRole : logged in user is " + (request.user.id));
+
+    var roleId = request.param(properties.role.id);
+    roleService.removeRole(roleId, function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
 exports.addMyProject = function(request, response, callback) {
+    log.debug("addMyProject : logged in user is " + (request.user.id));
+
     var pid = request.param(properties.project.id);
-    log.debug("addMyProject : " + pid);
     var userId = request.user.id;
 
     projectService.addMyProject([pid, userId], function(returnValue) {
@@ -321,15 +366,16 @@ exports.addMyProject = function(request, response, callback) {
 };
 
 exports.getProject = function(request, response, callback) {
+    log.debug("getProject : logged in user is " + (request.user.id));
+
     var pid = request.param(properties.project.id);
-    log.debug("getProject : " + pid);
     projectService.getProject(pid, function(returnValue) {
         response.json(returnValue);
     });
 };
 
 exports.addResourceToProject = function(request, response, callback) {
-    log.debug("addResourceToProject");
+    log.debug("addResourceToProject : logged in user is " + (request.user.id));
     var pid = request.param(properties.project.id);
     var uid = request.param(properties.project.userId);
 
@@ -339,7 +385,7 @@ exports.addResourceToProject = function(request, response, callback) {
 };
 
 exports.removeResourceFromProject = function(request, response, callback) {
-    log.debug("removeResourceFromProject");
+    log.debug("removeResourceFromProject : logged in user is " + (request.user.id));
     var pid = request.param(properties.project.id);
     var uid = request.param(properties.project.userId);
 
@@ -349,7 +395,8 @@ exports.removeResourceFromProject = function(request, response, callback) {
 };
 
 exports.addNRemoveResourceFromProject = function(request, response, callback) {
-    log.debug("addNRemoveResourceFromProject");
+    log.debug("addNRemoveResourceFromProject : logged in user is " + (request.user.id));
+
     var removePid = request.param(properties.project.removePid);
     var updatePid = request.param(properties.project.updatePid);
     var uid = request.param(properties.project.userId);
@@ -360,7 +407,8 @@ exports.addNRemoveResourceFromProject = function(request, response, callback) {
 };
 
 exports.saveLog = function(request, response, callback) {
-    log.debug("saveLog");
+    log.debug("saveLog : logged in user is " + (request.user.id));
+
     var userId = request.user.id;
     var projectId = request.param(properties.logs.projectId);
     var startDate = request.param(properties.logs.startDate);
@@ -373,7 +421,8 @@ exports.saveLog = function(request, response, callback) {
 };
 
 exports.editLog = function(request, response, callback) {
-    log.debug("editLog");
+    log.debug("editLog : logged in user is " + (request.user.id));
+
     var id = request.param(properties.logs.id);
     var projectId = request.param(properties.logs.projectId);
     var startDate = request.param(properties.logs.startDate);
@@ -386,7 +435,8 @@ exports.editLog = function(request, response, callback) {
 };
 
 exports.getLogs = function(request, response, callback) {
-    log.debug("getLogs");
+    log.debug("getLogs : logged in user is " + (request.user.id));
+
     var userId = request.user.id;
     var startDate = request.param(properties.logs.startDate);
     var endDate = request.param(properties.logs.endDate);
@@ -397,10 +447,11 @@ exports.getLogs = function(request, response, callback) {
 };
 
 exports.getUserReportLogs = function(request, response, callback) {
-    log.debug("getUserReportLogs");
+    log.debug("getUserReportLogs : logged in user is " + (request.user.id));
+
     var userId = request.param(properties.team.userId);
     var startDate = request.param(properties.logs.startDate);
-    var endDate = request.param(properties.logs.endDate);	
+    var endDate = request.param(properties.logs.endDate);
 
     logService.getUserReportLogs([startDate + startTime, endDate + endTime, userId], function(returnValue) {
         response.json(returnValue);
@@ -408,7 +459,8 @@ exports.getUserReportLogs = function(request, response, callback) {
 };
 
 exports.getReportLogs = function(request, response, callback) {
-    log.debug("getReportLogs");
+    log.debug("getReportLogs : logged in user is " + (request.user.id));
+
     var userId = request.user.id;
     //var projectId = request.param(properties.project.id);
     var startDate = request.param(properties.logs.startDate);
@@ -419,18 +471,45 @@ exports.getReportLogs = function(request, response, callback) {
     });
 };
 
+exports.getDetailedUserReportLogs = function(request, response, callback) {
+    log.debug("getDetailedUserReportLogs : logged in user is " + (request.user.id));
+
+    var userId = request.param(properties.team.userId);
+    var startDate = request.param(properties.logs.startDate);
+    var endDate = request.param(properties.logs.endDate);
+
+    logService.getDetailedUserReportLogs([startDate + startTime, endDate + endTime, userId], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.getDetailedReportLogs = function(request, response, callback) {
+    log.debug("getDetailedReportLogs : logged in user is " + (request.user.id));
+
+    var userId = request.user.id;
+    //var projectId = request.param(properties.project.id);
+    var startDate = request.param(properties.logs.startDate);
+    var endDate = request.param(properties.logs.endDate);
+
+    logService.getDetailedReportLogs([startDate + startTime, endDate + endTime], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
 exports.unlockLog = function(request, response, callback) {
-    log.debug("unlockLog");
+    log.debug("unlockLog : logged in user is " + (request.user.id));
+
     var logId = request.param(properties.logs.id);
-	var userId = request.param(properties.user.userId);
-    
+    var userId = request.param(properties.user.userId);
+
     logService.unlockLog([userId, logId], function(returnValue) {
         response.json(returnValue);
     });
 };
 
 exports.getUserLogs = function(request, response, callback) {
-    log.debug("getUserLogs");
+    log.debug("getUserLogs : logged in user is " + (request.user.id));
+
     var userId = request.param(properties.user.userId);
     var startDate = request.param(properties.logs.startDate);
     var endDate = request.param(properties.logs.endDate);
@@ -441,7 +520,8 @@ exports.getUserLogs = function(request, response, callback) {
 };
 
 exports.getLogById = function(request, response, callback) {
-    log.debug("getLog");
+    log.debug("getLogById : logged in user is " + (request.user.id));
+
     var logId = request.param(properties.logs.id);
 
     logService.getLog(logId, function(returnValue) {

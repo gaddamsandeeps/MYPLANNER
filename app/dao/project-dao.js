@@ -24,20 +24,24 @@ exports.getProjects = function(userId, callback) {
 };
 
 exports.getUserMappedProjectCountByTeamId = function(teamId, callback) {
-    try {
-        var connection = db.getConnection(),
-            getUserMappedProjectCountByTeamIdSQL = queries.project.getUserMappedProjectCountByTeamId;
+    if (teamId) {
+        try {
+            var connection = db.getConnection(),
+                getUserMappedProjectCountByTeamIdSQL = queries.project.getUserMappedProjectCountByTeamId;
 
-        connection.query(getUserMappedProjectCountByTeamIdSQL, teamId, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
-        });
-    } catch (e) {
-        log.error(e);
+            connection.query(getUserMappedProjectCountByTeamIdSQL, teamId, function(err, rows) {
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        } catch (e) {
+            log.error(e);
+        }
+    } else {
+        callback([]);
     }
 };
 
@@ -60,20 +64,24 @@ exports.getTodayProjectsLogsByLeadId = function(obj, callback) {
 };
 
 exports.getProjectMappedUserCountByTeamId = function(teamId, callback) {
-    try {
-        var connection = db.getConnection(),
-            getProjectMappedUserCountByTeamIdSQL = queries.project.getProjectMappedUserCountByTeamId;
+    if (teamId) {
+        try {
+            var connection = db.getConnection(),
+                getProjectMappedUserCountByTeamIdSQL = queries.project.getProjectMappedUserCountByTeamId;
 
-        connection.query(getProjectMappedUserCountByTeamIdSQL, teamId, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
-        });
-    } catch (e) {
-        log.error(e);
+            connection.query(getProjectMappedUserCountByTeamIdSQL, teamId, function(err, rows) {
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        } catch (e) {
+            log.error(e);
+        }
+    } else {
+        callback([]);
     }
 };
 

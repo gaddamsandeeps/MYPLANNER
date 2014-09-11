@@ -44,9 +44,12 @@ app.directive("resourcedraggable", function() {
             element.bind("dragstart", function(e) {
                 e.originalEvent.dataTransfer.setData("username", attributes.username);
                 e.originalEvent.dataTransfer.setData("type", 'resource');
-                if (element[0].tagName === 'SPAN') {
+
+                var span = element[0];
+
+                if (span.tagName === 'SPAN') {
                     e.originalEvent.dataTransfer.setData("operation", 'move');
-                    e.originalEvent.dataTransfer.setData("sourceProjectId", element[0].parentElement.getAttribute('projectid'));
+                    e.originalEvent.dataTransfer.setData("sourceProjectId", span.parentElement.parentElement.parentElement.getAttribute('projectid'));
                 } else {
                     e.originalEvent.dataTransfer.setData("operation", 'copy');
                 }
@@ -74,8 +77,7 @@ app.directive("resourcedroppable", function() {
                     e.stopPropagation();
                     e.preventDefault();
                     //location.reload();
-                }
-                else {
+                } else {
                     return;
                 }
             });
@@ -147,7 +149,7 @@ app.controller('genericCtrl', function($rootScope, Services) {
         location.href = url;
     };
     $rootScope.showUserReport = function(id) {
-        var url = '/reports?id=' + id;
+        var url = '/report?id=' + id;
         location.href = url;
     };
 });
@@ -157,7 +159,7 @@ app.controller('projectViewController', function($scope, $rootScope, Services, $
     Services.getURL('/getMyProjects').then(function(d) {
         for (var i = 0; i <= d.length - 1; i++) {
             d[i].diff = currentDateStatus(d[i].enddate, d[i].startdate);
-            d[i].currentdate=todaysDate();
+            d[i].currentdate = todaysDate();
         }
         $scope.droppedProjects = d;
     }, function(e) {
@@ -195,7 +197,7 @@ app.controller('projectViewController', function($scope, $rootScope, Services, $
             };
             Services.postURL('/removeMyProject', obj);
         }
-		////location.reload();
+        ////location.reload();
     }
     $scope.copyResource = function(projectid, resourcename) {
         var pindex = -1;
@@ -236,6 +238,11 @@ app.controller('projectViewController', function($scope, $rootScope, Services, $
                 t = i;
             }
         }
+        var tArr = $scope.droppedProjects[t].users;
+        var tcheck = $filter('filter')(tArr, {
+            username: resourcename
+        });
+        if (tcheck.length) return;
         var sArr = $scope.droppedProjects[s].users;
         for (i = 0, j = sArr.length; i < j; i++) {
             var tObj = sArr[i];
@@ -245,7 +252,7 @@ app.controller('projectViewController', function($scope, $rootScope, Services, $
             }
         }
         sArr.splice(sPos, 1);
-        var tArr = $scope.droppedProjects[t].users;
+
         tArr.push(tObj);
         var obj = {
             removepid: spid,
@@ -257,7 +264,7 @@ app.controller('projectViewController', function($scope, $rootScope, Services, $
     };
     $scope.removeResource = function(projectid, userObj) {
         var pindex = -1,
-                i, l, p, resArr, dindex;
+            i, l, p, resArr, dindex;
         for (i = 0, l = $scope.droppedProjects.length; i < l; i++) {
             p = $scope.droppedProjects[i];
             if (p['id'] == projectid) {
@@ -287,13 +294,18 @@ app.controller('projectViewController', function($scope, $rootScope, Services, $
         $rootScope.projectId = id;
         $rootScope.$broadcast('editProject');
     };
-    $rootScope.projectType = 'Add Project';
-    $rootScope.projectId = null;
+    $scope.addProject = function(e) {
+    	e.stopPropagation();
+        $rootScope.projectType = 'Add Project';
+        $rootScope.projectId = null;
+        $rootScope.$broadcast('editProject');
+        $('#addproject').trigger('click');
+    };
 });
 
-app.controller('AddProjectController', function($scope, $rootScope, Services) {
+app.controller('ProjectController', function($scope, $rootScope, Services) {
+    var tempObj = null;
     $rootScope.$on('editProject', function() {
-
         Services.getURL('/getProject?id=' + $rootScope.projectId).then(function(d) {
             var s1 = new Date(d.startdate);
             var s2 = new Date(d.enddate);
@@ -308,9 +320,9 @@ app.controller('AddProjectController', function($scope, $rootScope, Services) {
                 enddate: e2.value,
                 id: d.id
             };
-
+            tempObj = JSON.parse(angular.toJson(obj));
             $scope.project = obj;
-            $('#AddProjectModal').modal('show');
+            $('#ProjectModal').modal('show');
         }, function(e) {
             console.log(e);
         });
@@ -324,7 +336,7 @@ app.controller('AddProjectController', function($scope, $rootScope, Services) {
     $scope.project = empty;
     $scope.saveProject = function() {
         $scope.$broadcast('show-errors-check-validity');
-        if ($scope.AddProjectForm.$valid) {
+        if ($scope.ProjectForm.$valid) {
             if (document.getElementById('enddate').valueAsNumber > document.getElementById('startdate').valueAsNumber) {
                 var url;
                 if ($rootScope.projectType === 'Edit Project') {
@@ -333,20 +345,36 @@ app.controller('AddProjectController', function($scope, $rootScope, Services) {
                     url = '/saveProject';
                 }
                 var model = JSON.parse(angular.toJson($scope.project));
-                Services.postURL(url, model).then(function (d) {
+                Services.postURL(url, model).then(function(d) {
                     console.log(d);
-                }, function (e) {
+                }, function(e) {
                     console.log(e);
                 });
-                $('#AddProjectModal').modal('hide');
-                document.forms['AddProjectForm'].reset();
+                $('#ProjectModal').modal('hide');
+                document.forms['ProjectForm'].reset();
             } else {
                 alert('End Date should be Greater than Start Date');
-            }            
+            }
         }
     };
+    /*
     $scope.reset = function() {
         $scope.$broadcast('show-errors-reset');
         $scope.project = empty;
+    };
+    */
+    $scope.reset = function() {
+        console.log('reset-------------------');
+        $scope.$broadcast('show-errors-reset');
+        if ($rootScope.projectType === 'Edit Project') {
+            if (tempObj) {
+                var o = JSON.parse(angular.toJson(tempObj));
+                console.log(o);
+                $scope.$broadcast('show-errors-reset');
+                $scope.project = o;
+            }
+        }else{
+        	document.forms['ProjectForm'].reset();
+        }
     };
 });

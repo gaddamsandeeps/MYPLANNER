@@ -1,5 +1,5 @@
 /**
- * Logger.js
+ * logger.js
  */
 var log4js = require('log4js'),
     commonPror = require("../../config.json").logger,

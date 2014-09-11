@@ -1,6 +1,5 @@
 ﻿<!DOCTYPE html>
 <html ng-app="resourceTracking">
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -15,7 +14,6 @@
         }
     </style>
 </head>
-
 <body>
     <% var pageName = 'register' %>
     <% include header.html %>
@@ -28,8 +26,8 @@
                 <div class="form-group" show-errors>
                     <label class="col-md-4 control-label" for="name">User Name</label>
                     <div class="col-md-8">
-                        <input type="text" id="name" name="name" ng-model="newUser.username" class="form-control" placeholder="User Name" required>Ex : user@nisum.com
-                        <span class="error-message" ng-show="Form.name.$error.required">User Name is required</span>
+                        <input type="email" id="name" name="name" ng-model="newUser.username" class="form-control" placeholder="user@nisum.com" required>
+                        <span class="error-message" ng-show="!Form.name.$error.email">Enter Valid Email</span>
                     </div>
                 </div>
                 <div class="form-group" show-errors>
@@ -58,10 +56,9 @@
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="teamid">Team</label>
                     <div class="col-md-8">
-                        <select ng-disabled="!validRole" ng-model="newUser.teamid" ng-options="opt as opt.name for opt in Teams" id="teamid" name="teamid" class="form-control" required>
+                        <select ng-disabled="!validTeam" ng-model="newUser.teamid" ng-options="opt as opt.name for opt in Teams" id="teamid" name="teamid" class="form-control">
                             <option value="">Choose Team</option>
-                        </select>
-                        <span class="error-message" ng-show="Form.teamid.$dirty && Form.teamid.$invalid">Select Team</span>
+                        </select>                        
                     </div>
                 </div>
                 <div class="form-group" show-errors>
