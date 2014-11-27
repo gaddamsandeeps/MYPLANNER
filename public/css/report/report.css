@@ -1,11 +1,11 @@
  .reportGenerator{
-    width: 850px;
     margin: 0px auto;
 }
 .reports{
+	width: 90%;
     margin: 0 auto;   
     display: block;
-	margin-top:60px;
+    margin-top:60px;
 }
 .tab-pane{
     padding: 15px;
@@ -20,7 +20,91 @@
 }
 
 th, td { white-space: nowrap; }
-    div.dataTables_wrapper {
-        width: 800px;
-        margin: 0 auto;
-    }
+div.dataTables_wrapper {    
+    margin: 0 auto;
+}
+
+h3
+{
+	padding:0 0 15px 10px;
+	border-bottom:1px solid #d0d0d0;
+	margin-bottom:15px;
+}
+.rep-btn
+{
+	margin-right:15px;
+    font-size:14px;
+}
+.fixed-header
+{
+	margin-top:63px;
+}
+.wholereport a
+{
+    background:#f3f7f9;
+    border:1px solid #cdd6dd !important;
+    border-bottom-color:#ddd !important;
+    margin-left:10px !important;
+    font-family: "OpenSans-Semibold","Arial","Sans-serif";
+    font-weight:normal;
+    font-size:15px;
+}
+.wholereport a:hover
+{
+    background: #ece0d1 !important;
+    border:1px solid #d5c3af !important;
+    color:#222;    
+}
+
+.singlereport a {
+	background: #f3f7f9;
+	border: 1px solid #cdd6dd !important;
+	border-bottom-color: #ddd !important;
+	margin-left: 10px !important;
+	font-family: "OpenSans-Semibold","Arial","Sans-serif";
+	font-weight: normal;
+	font-size: 15px;
+}
+
+.singlereport a:hover
+{
+    background: #ece0d1 !important;
+    border:1px solid #d5c3af !important;
+    color:#222;    
+}
+li.active a
+{
+    color:#222 !important;
+    border-bottom-color:#fff !important;
+}
+.hform-label
+{
+    text-align:right; 
+    padding:6px 0 0 0;
+}
+.datePickers
+{
+    padding:10px 0;
+}
+h4
+{
+    border-bottom:1px solid #d0d0d0;
+    font-family: "OpenSans-Semibold","Arial","Sans-serif";
+    padding-bottom: 10px;
+}
+
+#teamusers-container{
+    text-align: right;
+    margin-right: 100px
+}
+
+table.dataTable thead th,
+table.dataTable thead td {
+  padding: 0px 39.5px !important;
+}
+.dataTables_scrollHeadInner  {
+    width:100% !important;
+}
+ .display  {
+    width:100% !important;
+}

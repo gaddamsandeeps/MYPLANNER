@@ -63,13 +63,13 @@ exports.formatDate = function(val, callback) {
 }
 
 //empty error object to pass 
-exports.emptyFailureErrObj = function(){
-	var res = new Object();
-	 res.data = new Object();
+exports.emptyFailureErrObj = function() {
+    var res = new Object();
+    res.data = new Object();
 
-	 res.message = 'failure';
-	 res.data.errno = '';
-	 res.data.code = '';
-	 res.data.message = "Invalid details entered.";
-	return res;
+    res.message = 'failure';
+    res.data.errno = '';
+    res.data.code = '';
+    res.data.message = "Invalid details entered.";
+    return res;
 }

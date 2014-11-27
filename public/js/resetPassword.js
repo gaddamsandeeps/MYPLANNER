@@ -13,7 +13,6 @@ app.controller('forgotPasswordController', function($scope, $http) {
             var model = JSON.parse(angular.toJson($scope.forgotPassword));
             delete model.confirmPassword;
             $http.post('/resetPassword', model).success(function(d, status, headers, config) {
-                console.log(d);
                 document.forms['Form'].reset();
             }).error(function(e, status, headers, config) {
                 console.log(e);

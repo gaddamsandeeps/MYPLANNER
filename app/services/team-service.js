@@ -35,3 +35,17 @@ exports.getTeam = function(userId, callback) {
     log.debug("getTeam");
     teamDao.getTeam(userId, callback);
 };
+
+exports.setPermissions = function(obj, callback) {
+    teamDao.setPermissions(obj, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};
+
+exports.hasLogAccess = function(userId, callback) {
+    teamDao.hasLogAccess(userId, callback);
+};
+
+exports.getTeamMembersByRole = function(roleId, callback) {
+    teamDao.getTeamMembersByRole(roleId, callback);
+};

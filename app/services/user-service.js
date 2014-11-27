@@ -15,76 +15,77 @@ exports.getTeamUsers = function(userId, callback) {
 exports.getTeamUsersAndAvailability = function(obj, callback) {
     log.debug("getTeamUsersAndAvailability");
     var noOfFun = 0,
+        userObj = null,
         teamId = obj[0];
-    var userObj = null;
 
-    module.exports.getTeamUsers(teamId, function(returnValue) {
-        if (returnValue.length == 0) {
-            callback(returnValue);
+    module.exports.getTeamUsers(teamId, function(users) {
+        if (users.length == 0) {
+            callback(users);
         }
-        userObj = returnValue;
-        noOfFun++;
-        complete();
-    });
+        userObj = users;
 
-    module.exports.getUsersAvailabilityTeamId(obj, function(returnValue) {
-        if (returnValue.length == 0) {
-            noOfFun++;
-            complete();
-        }
-        for (var i = 0; i < returnValue.length; i++) {
-            if (returnValue[i].valid > 0) {
-                for (var j = 0; j < userObj.length; j++) {
-                    if (userObj[j].id === returnValue[i].userid) {
-                        userObj[j].status = 0;
+
+
+        module.exports.getUsersAvailabilityTeamId(obj, function(usersAvailability) {
+            if (usersAvailability.length == 0) {
+                noOfFun++;
+                complete();
+            }
+            for (var i = 0; i < usersAvailability.length; i++) {
+                if (usersAvailability[i].valid > 0) {
+                    for (var j = 0; j < userObj.length; j++) {
+                        if (userObj[j].id === usersAvailability[i].userid) {
+                            userObj[j].status = 0;
+                        }
                     }
                 }
-            }
-            if (i === returnValue.length - 1) {
-                noOfFun++;
-                complete();
-            }
-        }
-    });
-
-    projectService.getUserMappedProjectCountByTeamId(teamId, function(returnValue) {
-        if (returnValue.length == 0) {
-            noOfFun++;
-            complete();
-        }
-        for (var i = 0; i < returnValue.length; i++) {
-            for (var j = 0; j < userObj.length; j++) {
-                if (userObj[j].id === returnValue[i].userid) {
-                    userObj[j].projectCount = returnValue[i].count;
+                if (i === usersAvailability.length - 1) {
+                    noOfFun++;
+                    complete();
                 }
             }
-            if (i === returnValue.length - 1) {
+        });
+
+        projectService.getUserMappedProjectCountByTeamId(teamId, function(projectCount) {
+            if (projectCount.length == 0) {
                 noOfFun++;
                 complete();
             }
-        }
-    });
-
-    logService.getTodayUsersLogsByTeamId(obj, function(returnValue) {
-        if (returnValue.length == 0) {
-            noOfFun++;
-            complete();
-        }
-        for (var i = 0; i < returnValue.length; i++) {
-            for (var j = 0; j < userObj.length; j++) {
-                if (userObj[j].id === returnValue[i].userid) {
-                    userObj[j].logged = returnValue[i].logged;
+            for (var i = 0; i < projectCount.length; i++) {
+                for (var j = 0; j < userObj.length; j++) {
+                    if (userObj[j].id === projectCount[i].userid) {
+                        userObj[j].projectCount = projectCount[i].count;
+                    }
+                }
+                if (i === projectCount.length - 1) {
+                    noOfFun++;
+                    complete();
                 }
             }
-            if (i === returnValue.length - 1) {
+        });
+
+        logService.getTodayUsersLogsByTeamId(obj, function(userLogs) {
+            if (userLogs.length == 0) {
                 noOfFun++;
                 complete();
             }
-        }
+            for (var i = 0; i < userLogs.length; i++) {
+                for (var j = 0; j < userObj.length; j++) {
+                    if (userObj[j].id === userLogs[i].userid) {
+                        userObj[j].logged = userLogs[i].logged;
+                    }
+                }
+                if (i === userLogs.length - 1) {
+                    noOfFun++;
+                    complete();
+                }
+            }
+        });
+
     });
 
     function complete() {
-        if (noOfFun === 4) {
+        if (noOfFun === 3) {
             callback(userObj);
         }
     }

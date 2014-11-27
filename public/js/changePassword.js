@@ -12,7 +12,6 @@ app.controller('changePasswordController', function($scope, $http) {
             var model = JSON.parse(angular.toJson($scope.changePassword));
             delete model.confirmnewpassword;
             $http.post('/changePassword', model).success(function(d, status, headers, config) {
-                console.log(d);
                 document.forms['changePasswordForm'].reset();
             }).error(function(e, status, headers, config) {
                 console.log(e);

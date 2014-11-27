@@ -36,7 +36,7 @@ d.directive('validPassword', function() {
         require: 'ngModel',
         link: function(scope, elm, attrs, ctrl) {
             ctrl.$parsers.unshift(function(viewValue, $scope) {
-                var noMatch = viewValue != scope.Form.password.$viewValue
+                var noMatch = (viewValue != scope.Form.password.$viewValue);
                 ctrl.$setValidity('noMatch', !noMatch)
             });
         }

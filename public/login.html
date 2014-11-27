@@ -12,25 +12,30 @@
 
 <body>
 	<% var pageName = 'login' %>
-    <% include header.html %>
-        <div class="container-fluid">
-            <form id="signin" role="form" action="/signin" method="post">
-                <h2 class="form-signin-heading">Login</h2>
-                <input type="text" name="userName" class="form-control" placeholder="Username" required autofocus>
-                <input type="password" name="password" class="form-control" placeholder="Password" required>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" value="remember-me">Remember me
-                    </label>
-                </div>
-                <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-                <div id="links">
-                    <a href="/register">Register</a>
-                    <a href="/forgotpassword">Forgot Password</a>
-                </div>
-            </form>
+    <% include header.html %>    
+    <div class="container-fluid fixed-header">
+        
+      <form id="signin" role="form" action="/signin" method="post">
+        <h2 class="form-signin-heading">Sign In</h2>
+        <% if (message) { %>
+        <h5><%= message %></h5>
+        <% } %>
+        <input type="email" name="userName" class="form-control" placeholder="Username" required autofocus>
+        <input type="password" name="password" class="form-control" placeholder="Password" required>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" value="remember-me">Remember me
+            </label>
         </div>
-        <% include footer.html %>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign In</button>
+        <div id="links">
+            <a href="/forgotpassword">Forgot Password?</a>
+            <br><br>
+            New to Nisum Planner? <a href="/register">Register</a>
+        </div>
+    </form>
+</div>
+<% include footer.html %>
 </body>
 
 </html>

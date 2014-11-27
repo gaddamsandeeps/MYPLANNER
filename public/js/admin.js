@@ -1,24 +1,24 @@
 var app = angular.module('resourceTracking', ['resourceTracking.directives']);
-app.controller('TeamCtrl', function($scope, $http, $filter) {
+app.controller('TeamCtrl', function ($scope, $http, $filter) {
     $scope.mode = '';
     //Teams
-    $http.get('getTeams').then(function(obj) {
+    $http.get('getTeams').then(function (obj) {
         $scope.Teams = obj.data;
-    }, function(e) {
+    }, function (e) {
         console.log(e);
     });
     //Leads
-    $http.get('getLeads').then(function(obj) {
+    $http.get('getLeads').then(function (obj) {
         $scope.Leads = obj.data;
-    }, function(e) {
+    }, function (e) {
         console.log(e);
     });
-    $scope.addTeam = function() {
+    $scope.addTeam = function () {
         $scope.mode = 'Add';
         document.forms['AddTeamForm'].reset();
         $('#AddTeamModal').modal('show');
     };
-    $scope.editTeam = function(item_id) {
+    $scope.editTeam = function (item_id) {
         var tcheck = $filter('filter')($scope.Teams, {
             id: item_id
         });
@@ -36,10 +36,11 @@ app.controller('TeamCtrl', function($scope, $http, $filter) {
         $scope.mode = 'Edit';
         $('#AddTeamModal').modal('show');
     };
-    $scope.removeTeam = function(item_id) {
-        $http.post('/removeTeam', {id:item_id}).then(function(obj) {
+    $scope.removeTeam = function (item_id) {
+        $http.post('/removeTeam', {
+            id: item_id
+        }).then(function (obj) {
             var d = obj.data;
-            console.log(d);
             var msg = d.message;
             if (msg === "success") {
                 var index;
@@ -50,9 +51,9 @@ app.controller('TeamCtrl', function($scope, $http, $filter) {
                         break;
                     }
                 }
-                $scope.Teams.splice(index,1);
+                $scope.Teams.splice(index, 1);
             }
-        }, function(e) {
+        }, function (e) {
             console.log(e);
         });
     };
@@ -62,7 +63,7 @@ app.controller('TeamCtrl', function($scope, $http, $filter) {
         leadid: ''
     };
     $scope.team = empty;
-    $scope.saveTeam = function() {
+    $scope.saveTeam = function () {
         $scope.$broadcast('show-errors-check-validity');
         if ($scope.AddTeamForm.$valid) {
             var model = JSON.parse(angular.toJson($scope.team));
@@ -75,16 +76,17 @@ app.controller('TeamCtrl', function($scope, $http, $filter) {
             } else {
                 url = '/editTeam';
             }
-            console.log(model);
-            $http.post(url, model).then(function(obj) {
+            $http.post(url, model).then(function (obj) {
                 var d = obj.data;
-                var msg = d.message;
+                var msg = d.message;				
                 if ($scope.mode === 'Add') {
+					showStatus(d, model.name+' Team   added' );
                     if (msg === "success") {
                         model.id = d.data;
                         $scope.Teams.push(model);
                     }
                 } else {
+					showStatus(d, model.name+' Team   edited' );
                     if (msg === "success") {
                         var index;
                         for (i = 0, l = $scope.Teams.length; i < l; i++) {
@@ -97,31 +99,31 @@ app.controller('TeamCtrl', function($scope, $http, $filter) {
                         $scope.Teams[index] = model;
                     }
                 }
-            }, function(e) {
+            }, function (e) {
                 console.log(e);
             });
             $('#AddTeamModal').modal('hide');
         }
     };
-    $scope.reset = function() {
+    $scope.reset = function () {
         $scope.$broadcast('show-errors-reset');
         $scope.team = empty;
     };
 });
-app.controller('RoleCtrl', function($scope, $http, $filter) {
+app.controller('RoleCtrl', function ($scope, $http, $filter) {
     $scope.mode = '';
     //Roles
-    $http.get('getRoles').then(function(obj) {
+    $http.get('getRoles').then(function (obj) {
         $scope.Roles = obj.data;
-    }, function(e) {
+    }, function (e) {
         console.log(e);
     });
-    $scope.addRole = function() {
+    $scope.addRole = function () {
         $scope.mode = 'Add';
         document.forms['AddRoleForm'].reset();
         $('#AddRoleModal').modal('show');
     };
-    $scope.editRole = function(item_id) {
+    $scope.editRole = function (item_id) {
         var tcheck = $filter('filter')($scope.Roles, {
             id: item_id
         });
@@ -132,23 +134,24 @@ app.controller('RoleCtrl', function($scope, $http, $filter) {
         $scope.mode = 'Edit';
         $('#AddRoleModal').modal('show');
     };
-    $scope.removeRole = function(item_id) {
-        $http.post('removeRole', {id:item_id}).then(function(obj) {
+    $scope.removeRole = function (item_id) {
+        $http.post('removeRole', {
+            id: item_id
+        }).then(function (obj) {
             var d = obj.data;
-            console.log(d);
             var msg = d.message;
             if (msg === "success") {
                 var index;
-                for (i = 0, l = $scope.Roles.length; i < l; i++) {
+                for (var i = 0, l = $scope.Roles.length; i < l; i++) {
                     var r = $scope.Roles[i];
                     if (r.id == item_id) {
                         index = i;
                         break;
                     }
                 }
-                $scope.Roles.splice(index,1);
+                $scope.Roles.splice(index, 1);
             }
-        }, function(e) {
+        }, function (e) {
             console.log(e);
         });
     };
@@ -157,10 +160,9 @@ app.controller('RoleCtrl', function($scope, $http, $filter) {
         description: ''
     };
     $scope.role = empty;
-    $scope.saveRole = function() {
+    $scope.saveRole = function () {
         $scope.$broadcast('show-errors-check-validity');
         if ($scope.AddRoleForm.$valid) {
-            console.log('saveRole');
             var model = JSON.parse(angular.toJson($scope.role));
             var url;
             if ($scope.mode === 'Add') {
@@ -168,16 +170,17 @@ app.controller('RoleCtrl', function($scope, $http, $filter) {
             } else {
                 url = '/editRole';
             }
-            console.log(model);
-            $http.post(url, model).then(function(obj) {
+            $http.post(url, model).then(function (obj) {
                 var d = obj.data;
                 var msg = d.message;
                 if ($scope.mode === 'Add') {
+					showStatus(d, model.name+' Role   added' );
                     if (msg === "success") {
                         model.id = d.data;
                         $scope.Roles.push(model);
                     }
                 } else {
+					showStatus(d, model.name+' Role   edited' );
                     if (msg === "success") {
                         var index;
                         for (i = 0, l = $scope.Roles.length; i < l; i++) {
@@ -190,14 +193,92 @@ app.controller('RoleCtrl', function($scope, $http, $filter) {
                         $scope.Roles[index] = model;
                     }
                 }
-            }, function(e) {
+            }, function (e) {
                 console.log(e);
             });
             $('#AddRoleModal').modal('hide');
         }
     };
-    $scope.reset = function() {
+    $scope.reset = function () {
         $scope.$broadcast('show-errors-reset');
         $scope.role = empty;
     };
 });
+
+app.controller('ProjectCtrl', function($scope, $http, $filter) {
+    $scope.mode = '';
+    //Projects
+    $http.get('/getAdminProjects').then(function(obj) {
+        $scope.Projects = obj.data;
+    }, function(e) {
+        console.log(e);
+    });
+    $scope.addProject = function() {
+        $scope.mode = 'Add';
+        document.forms['ProjectForm'].reset();
+        $('#ProjectModal').modal('show');
+    };
+    $scope.editProject = function(item_id) {
+        var tcheck = $filter('filter')($scope.Projects, {
+            id: item_id
+        });
+        if (tcheck.length) {
+            var o = tcheck[0];
+            $scope.project = JSON.parse(angular.toJson(o));
+        }
+        $scope.mode = 'Edit';
+        $('#ProjectModal').modal('show');
+    };
+    var empty = {
+        name: '',
+        description: ''
+    };
+    $scope.project = empty;
+    $scope.saveProject = function() {
+        $scope.$broadcast('show-errors-check-validity');
+        if ($scope.ProjectForm.$valid) {
+            var model = JSON.parse(angular.toJson($scope.project));
+            console.log(model);
+            var url;
+            if ($scope.mode === 'Add') {
+                url = '/saveAdminProject';
+            } else {
+                url = '/editAdminProject';
+            }
+            $http.post(url, model).then(function(obj) {
+                var d = obj.data;
+                var msg = d.message;
+                if ($scope.mode === 'Add') {
+					showStatus(d, 'Project ' + model.name + ' added' );
+                    if (msg === "success") {
+                        model.id = d.data;
+                        $scope.Projects.push(model);						
+                    }
+                } else {
+					showStatus(d, 'Project ' + model.name + ' edited' );
+                    if (msg === "success") {
+                        var index;
+                        for (i = 0, l = $scope.Projects.length; i < l; i++) {
+                            var r = $scope.Projects[i];
+                            if (r.id == model.id) {
+                                index = i;
+                                break;
+                            }
+                        }
+                        $scope.Projects[index] = model;						
+                    }
+                }
+            }, function(e) {
+                console.log(e);
+            });
+            $('#ProjectModal').modal('hide');
+
+
+        }
+    };
+    $scope.reset = function() {
+        $scope.$broadcast('show-errors-reset');
+        $scope.project = empty;
+    };
+});
+

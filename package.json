@@ -1,6 +1,6 @@
 {
-    "name": "RESOURCETRACKER",
-    "description": "RESOURCE TRACKER project is a resource management tool",
+    "name": "NISUMPLANNER",
+    "description": "NISUM PLANNER app is a resource management tool",
     "author": "Sandeep G",
     "version": "0.0.1",
     "private": true,
@@ -17,6 +17,7 @@
         "passport-local": "1.0.0",
         "connect-flash": "0.1.1",
         "dateformat": "1.0.8-1.2.3",
-        "domain": "0.2.8"
+        "jasmine-core": "~2.0.1",
+        "glob": "^3.2.11"
     }
 }

@@ -3,8 +3,8 @@ var Service = require('node-windows').Service,
 
 // Create a new service object
 var svc = new Service({
-    name: 'Resource Tracker',
-    description: config.common.projectName + " project is a resource management tool.",
+    name: 'Nisum Planner',
+    description: config.common.projectName + " app is a resource management tool.",
     script: require('path').join(__dirname, 'server/server.js')
 });
 

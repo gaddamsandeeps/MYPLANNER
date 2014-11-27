@@ -5,16 +5,25 @@ var logDao = require("../dao/log-dao"),
     log = require('../logger/logger').logger("log-service"),
     util = require("../util/util");
 
+
+exports.getLogStatuses = function(callback) {
+    log.debug("getLogStatuses");
+    logDao.getLogStatuses(callback);
+};
+
 exports.getLogsByUserId = function(obj, callback) {
     log.debug("getLogsByUserId");
-    logDao.getLogsByUserId(obj, function(returnValue) {
-        formatDates(returnValue, callback);
-    });
+    logDao.getLogsByUserId(obj, callback);
 };
 
 exports.getLogById = function(logId, callback) {
     log.debug("getLogById");
     logDao.getLogById(logId, callback);
+};
+
+exports.getLogHistoryById = function(logId, callback) {
+    log.debug("getLogHistoryById");
+    logDao.getLogHistoryById(logId, callback);
 };
 
 exports.getTodayUsersLogsByTeamId = function(teamId, callback) {
@@ -34,21 +43,26 @@ exports.getReportLogs = function(obj, callback) {
 
 exports.getDetailedUserReportLogs = function(obj, callback) {
     log.debug("getDetailedUserReportLogs");
-    logDao.getDetailedUserReportLogs(obj, function(returnValue) {
-        formatDates(returnValue, callback);
-    });
+    logDao.getDetailedUserReportLogs(obj, callback);
 };
 
 exports.getDetailedReportLogs = function(obj, callback) {
     log.debug("getDetailedReportLogs");
-    logDao.getDetailedReportLogs(obj, function(returnValue) {
-        formatDates(returnValue, callback);
-    });
+    logDao.getDetailedReportLogs(obj, callback);
 };
 
 exports.unlockLog = function(obj, callback) {
     log.debug("unlockLog");
-    logDao.unlockLog(obj, callback);
+    logDao.unlockLog(obj, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};
+
+exports.unlockLogRequest = function(obj, callback) {
+    log.debug("unlockLogRequest");
+    logDao.unlockLogRequest(obj, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
 };
 
 exports.saveLog = function(obj, callback) {
@@ -65,12 +79,18 @@ exports.editLog = function(obj, callback) {
     });
 };
 
-var formatDates = function(returnValue, callback) {
+var formatLogs = function(returnValue, callback) {
     try {
         if (returnValue.length == 0) {
             callback([]);
         }
         for (var i = 0; i < returnValue.length; i++) {
+            if (returnValue[i].iteration === 0) {
+                returnValue[i].iteration = '';
+            }
+            if (returnValue[i].story === 0) {
+                returnValue[i].story = '';
+            }
             returnValue[i].start = util.formatDate(returnValue[i].start);
             returnValue[i].end = util.formatDate(returnValue[i].end);
             if (returnValue[i].created) {

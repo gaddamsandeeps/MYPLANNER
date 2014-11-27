@@ -13,61 +13,113 @@
 
 <body>
 	<% var pageName = 'timesheet' %>
-     <% include header.html %>
-    <div id="calContainer">
+   <% include header.html %>
+   <div class="fixed-header">   
+    <h3>Timesheet</h3>    
+</div>
+
+<div class="container-fluid">
+    <div id="calContainer" class="col-md-10">
         <div id='calendar'></div>
     </div>
-    <div class="modal fade" id="AddTimeModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form name="AddTimeForm" id="AddTimeForm" novalidate class="form-horizontal">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 id="modalHeader"></h4>
+</div>
+
+<div class="modal fade" id="AddTimeModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form name="AddTimeForm" id="AddTimeForm" novalidate class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 id="modalHeader"></h4>
+                </div>
+                <div class="modal-body">
+                  <UL id="errorContainer"></UL>
+                  <div class="form-group">
+                    <label class="col-md-4 control-label" for="addTimeProjectId">Project</label>
+                    <div class="col-md-8">
+                        <select id="addTimeProjectId" name="addTimeProjectId" class="form-control">
+                            <option value="">Select Project</option>
+                        </select>
                     </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label class="col-md-4 control-label" for="addTimeProjectId">Project</label>
-                            <div class="col-md-8">
-                                <select id="addTimeProjectId" name="addTimeProjectId" class="form-control"></select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label" for="addTimeDescription">Description</label>
-                            <div class="col-md-8">
-                                <textarea class="form-control" name="addTimeDescription" id="addTimeDescription" rows="3" placeholder="Description"></textarea>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label" for="addTimeStartTime">Start Time</label>
-                            <div class="col-md-8">
-                                <input type="datetime-local" id="addTimeStartTime" name="addTimeStartTime" class="form-control" placeholder="Start Time" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label" for="addTimeEndTime">End Time</label>
-                            <div class="col-md-8">
-                                <input type="datetime-local" id="addTimeEndTime" name="addTimeEndTime" class="form-control" placeholder="End Time" required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal" id="lockFormCloseBtn">Close</button>
-                        <button type="reset" class="btn btn-default">Reset</button>
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </div>
-                </form>
+                </div>
+                <div class="form-group" id="teamMembersWrapper" style="display:none">
+                  <label class="col-md-4 control-label" for="addTimeProjectId">Type</label>
+                  <div class="col-md-4">
+                    <select class="form-control" id="resourceType">
+                        <option value="self">Self</option>
+                        <option value="team">Team</option>
+                    </select>
+                </div>				
+                <div class="col-md-4"  >
+                    <select class="form-control" id="teamMembers" style="display:none"><option value="">Select Employee</option>	
+                    </select>
+                </div>				
+            </div>
+            
+            <!-- fields to add iteration and story for logs-->
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="addTimeIterationNo">Iteration</label>
+                <div class="col-md-8">
+                    <input type="text" id="addTimeIterationNo" name="addTimeIterationNo" class="form-control" placeholder="Iteration No" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="addTimeStoryDescription">Story</label>
+                <div class="col-md-8">
+                    <input type="text" id="addTimeStoryDescription" name="addTimeStoryDescription" class="form-control" placeholder="Story Description" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="addTimeStoryDescription">Status</label>
+                <div class="col-md-8">
+                    <select class="form-control" id="logStatuses">
+                        <option value="">Select Status</option>
+                    </select>
+                </div>
+            </div>
+            <!-- end of fields to add iteration and story for logs-->
+
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="addTimeDescription">Description</label>
+                <div class="col-md-8">
+                    <textarea class="form-control" name="addTimeDescription" id="addTimeDescription" rows="3" placeholder="Description"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="addTimeStartTime">Start Time</label>
+                <div class="col-md-8">
+                    <input type="datetime-local" id="addTimeStartTime" name="addTimeStartTime" class="form-control" placeholder="Start Time" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="addTimeEndTime">End Time</label>
+                <div class="col-md-8">
+                    <input type="datetime-local" id="addTimeEndTime" name="addTimeEndTime" class="form-control" placeholder="End Time" required>
+                </div>
             </div>
         </div>
-    </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="reset" class="btn btn-default">Reset</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" id="lockFormCloseBtn">Close</button>
+        </div>
+        <div class="requestunlock" style="display:none;">
+          <button type="button" class="btn btn-primary" id="unlockRequest">Unlock Request</button>
+      </div>
+  </form>
+</div>
+</div>
+</div>
 
-	<% include footer.html %>
-    <script src='lib/moment.min.js'></script>
-    <script src='lib/jquery.js'></script>
-    <script src="lib/bootstrap.js"></script>
-    <script src='lib/fullcalendar.js'></script>
-    <script src='js/common/util.js'></script>
-    <script src='js/timesheet.js'></script>
+<% include footer.html %>
+<script src='lib/moment.min.js'></script>
+<script src='lib/jquery.js'></script>
+<script src="lib/bootstrap.js"></script>
+<script src='lib/fullcalendar.js'></script>
+<script src='js/common/util.js'></script>
+<script src='js/timesheet.js'></script>
 </body>
 
 </html>

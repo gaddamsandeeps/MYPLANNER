@@ -5,6 +5,26 @@ var projectDao = require("../dao/project-dao"),
     util = require("../util/util"),
     log = require('../logger/logger').logger("project-service");
 
+
+exports.getAdminProjects = function(userId, callback) {
+    log.debug("getAdminProjects");
+    projectDao.getAdminProjects(userId, callback);
+};
+
+exports.saveAdminProject = function(obj, callback) {
+    log.debug("saveAdminProject");
+    projectDao.saveAdminProject(obj, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};
+
+exports.editAdminProject = function(obj, callback) {
+    log.debug("editAdminProject");
+    projectDao.editAdminProject(obj, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};
+
 exports.getProjects = function(obj, callback) {
     log.debug("getProjects");
 
@@ -12,56 +32,57 @@ exports.getProjects = function(obj, callback) {
         userId = obj[0];
     var projObj = null;
 
-    projectDao.getProjects(userId, function(returnValue) {
-        if (returnValue.length == 0) {
-            callback(returnValue);
+    projectDao.getProjects(userId, function(projects) {
+        if (projects.length == 0) {
+            callback(projects);
         }
-        projObj = returnValue;
-        noOfFun++;
-        complete();
-    });
+        projObj = projects;
 
-    projectDao.getProjectMappedUserCountByTeamId(obj[1], function(returnValue) {
-        if (returnValue.length == 0) {
-            noOfFun++;
-            complete();
-        }
-        for (var i = 0; i < returnValue.length; i++) {
-            for (var j = 0; j < projObj.length; j++) {
-                if (projObj[j].id === returnValue[i].projectid) {
-                    projObj[j].count = returnValue[i].count;
-                }
-            }
-            if (i === returnValue.length - 1) {
+
+        projectDao.getProjectMappedUserCountByTeamId(obj[1], function(userCount) {
+            if (userCount.length == 0) {
                 noOfFun++;
                 complete();
             }
-        }
-    });
-
-    projectDao.getTodayProjectsLogsByLeadId([userId, obj[2], obj[3]], function(returnValue) {
-        if (returnValue.length == 0) {
-            noOfFun++;
-            complete();
-        }
-        for (var i = 0; i < returnValue.length; i++) {
-            for (var j = 0; j < projObj.length; j++) {
-                if (projObj[j].id === returnValue[i].projectid) {
-                    projObj[j].logged = returnValue[i].logged;
+            for (var i = 0; i < userCount.length; i++) {
+                for (var j = 0; j < projObj.length; j++) {
+                    if (projObj[j].id === userCount[i].projectid) {
+                        projObj[j].count = userCount[i].count;
+                    }
+                }
+                if (i === userCount.length - 1) {
+                    noOfFun++;
+                    complete();
                 }
             }
-            if (i === returnValue.length - 1) {
+        });
+
+        projectDao.getTodayProjectsLogsByLeadId([userId, obj[2], obj[3]], function(projectLogs) {
+            if (projectLogs.length == 0) {
                 noOfFun++;
                 complete();
             }
-        }
+            for (var i = 0; i < projectLogs.length; i++) {
+                for (var j = 0; j < projObj.length; j++) {
+                    if (projObj[j].id === projectLogs[i].projectid) {
+                        projObj[j].logged = projectLogs[i].logged;
+                    }
+                }
+                if (i === projectLogs.length - 1) {
+                    noOfFun++;
+                    complete();
+                }
+            }
+        });
+
     });
 
     function complete() {
-        if (noOfFun === 3) {
+        if (noOfFun === 2) {
             callback(projObj);
         }
     }
+
 };
 
 exports.getUserMappedProjectCountByTeamId = function(teamId, callback) {
@@ -81,7 +102,9 @@ exports.getUserProjects = function(userId, callback) {
 
 exports.removeMyProject = function(obj, callback) {
     log.debug("removeMyProject");
-    projectDao.removeMyProject(obj, callback);
+    projectDao.removeMyProject(obj, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
 };
 
 exports.addMyProject = function(obj, callback) {

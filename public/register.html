@@ -7,18 +7,12 @@
     <title>Register</title>
     <link href="lib/bootstrap.css" rel="stylesheet">
     <link href="css/validation.css" rel="stylesheet">
-    <style>
-        #Form {
-            width: 600px;
-            margin: 0 auto;
-        }
-    </style>
 </head>
 <body>
     <% var pageName = 'register' %>
     <% include header.html %>
     <div class="container">
-        <form name="Form" id="Form" novalidate class="form-horizontal" ng-controller="NewUserController">
+        <form name="Form" id="Form" novalidate class="form-horizontal register" ng-controller="NewUserController">
             <div class="modal-header">
                 <h4>Create User</h4>
             </div>
@@ -53,12 +47,13 @@
                         <span class="error-message" ng-show="Form.roleid.$dirty && Form.roleid.$invalid">Select Role</span>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" show-errors>
                     <label class="col-md-4 control-label" for="teamid">Team</label>
                     <div class="col-md-8">
-                        <select ng-disabled="!validTeam" ng-model="newUser.teamid" ng-options="opt as opt.name for opt in Teams" id="teamid" name="teamid" class="form-control">
+                        <select ng-disabled="!validTeam" ng-model="newUser.teamid" ng-required="validTeam" ng-options="opt as opt.name for opt in Teams" id="teamid" name="teamid" class="form-control">
                             <option value="">Choose Team</option>
-                        </select>                        
+                        </select>
+                        <span class="error-message" ng-show="Form.teamid.$dirty && Form.teamid.$error.required">Select Team</span>
                     </div>
                 </div>
                 <div class="form-group" show-errors>
@@ -98,8 +93,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="reset" class="btn btn-default" ng-click="reset()">Reset</button>
                 <button type="submit" class="btn btn-primary" ng-click="save()">Save</button>
+                <button type="reset" class="btn btn-default" ng-click="reset()">Reset</button>
             </div>
         </form>
     </div>

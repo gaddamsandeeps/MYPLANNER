@@ -2,18 +2,12 @@
 #ProjectView {
     min-height: 500px;
 }
-/*#Projects, #ProjectView, #Resources {
-    border: 1px solid #ccc;
-    border-width: 4px 1px 1px 1px;
-}*/
-
-/*.item {
-    border: 1px dashed #146fb4;
-    margin: 5px;
-    padding: 5px;
-    cursor: pointer;
-    font-weight: bold;
-}*/
+#ProjectView h5{
+    padding:5px 0 0 5px;
+}
+.check-permissions {
+ margin: 4px 10px 0px 0px !important;
+}
 
 .item i {
     font-style: normal;
@@ -25,44 +19,82 @@
 }
 
 .pv {
-    border: 1px solid #ccc;
-    margin: 0px;
-    padding: 10px;
-    background-color: #fafafa;
+    border: 1px solid #cdd6dd;
+    margin: 0;
+    padding: 5px 10px;
     position: relative;
+    background: #f3f7f9;
+}
+.pv:hover
+{
+    background: #ece0d1;
+    border:1px solid #d5c3af;
+}
+.right-overflow {
+    max-height: 350px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.left-overflow {
+    max-height: 865px;
+    overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
+.open{
+	box-shadow: 0px 1px 3px 2px #ccc;
+	background: #fff;
+}
+.open:hover
+{
+    background: #fff;
+    border-color:#5b717f;
+}
 .pv .close {
     position: absolute;
     top: 0;
     right: 5px;
+    color:#56574F;
+    cursor: pointer;
 }
+.pv .expand {
+    position: absolute;
+    top: 15px;
+    left: -5px;
+    color:#bec7ca;
+    cursor: pointer;
+}
+.pv .expand:hover {
 
+    color:#a19b90;
+}
 .pv > div {
     padding: 5px 0;
 }
 
 .developers {
-    /*border: 1px dashed #146fb4;*/
     min-height: 38px;
 }
-
+/*
 .developer {
     display: inline-block;
-    padding: 3px 20px 3px 10px;
-    margin: 0 5px;
-    background-color: #ddd;
+    padding: 3px 10px;
+    margin:5px;
+    background-color: #eee;
     border-radius: 5px;
     position: relative;
 }
-
+*/
 .developer i {
-    font-style: normal;
+    /*font-style: normal;
     position: absolute;
-    cursor: pointer;
+    
     top: 0;
     right: 5px;
     font-size: 11px;
+    cursor: pointer;
+    margin-left:10px;*/
 }
 
 .over {
@@ -102,3 +134,125 @@ input.ng-valid.has-visited {
 .form-group.has-error .error-message {
     display: block;
 }
+.right-inside-icn
+{
+	font-size:14px !important;
+	background:none !important;
+	padding:0 !important;
+	margin-right:10px;
+}
+.size-large
+{
+    font-size:17px !important;
+}
+.resource-name
+{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right:5px;
+}
+
+@media (min-width: 990px) {
+    .resource-name
+    {
+       width:100px;
+   }
+}
+@media (min-width: 1024px) {
+    .resource-name
+    {
+       width:114px;
+   }
+}
+@media (min-width: 1100px) {
+    .resource-name
+    {
+       width:130px;
+   }
+}
+@media (min-width: 1200px) {
+    .resource-name
+    {
+       width:150px;
+   }
+}
+@media (min-width: 1280px) {
+    .resource-name
+    {
+       width:175px;
+   }
+}
+.res-padding
+{
+    padding:0;
+}
+.align-center
+{
+    text-align: center;
+}
+.align-right
+{
+	text-align:right;
+}
+.res-close
+{
+	color:#d3d6d7;
+	cursor:pointer;
+	margin-left:10px;
+}
+.res-close:hover
+{
+	color:#56574F;
+}
+.res-close i
+{
+	font-size:14px;
+	background:none;
+}
+.left-section
+{
+	cursor:default;
+	font-family: 'OpenSans-Semibold';
+}
+.rightPannelSection, 
+.leftPannelSection h4,
+.leftPannelSection h5
+{
+	font-family: 'OpenSans-Semibold';
+}
+.text-light
+{
+	color:#666;
+}
+
+.billable,
+.non-billable
+{
+	display:inline-block;
+	height:16px;
+	width:16px;
+	background:url('/images/billable16.png');
+	margin-right:5px;
+}
+.non-billable
+{
+	background:none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

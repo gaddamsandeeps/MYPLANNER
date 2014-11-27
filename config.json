@@ -3,9 +3,10 @@
         "host": "localhost",
         "port": "3307",
 
-        "dbName": "RESOURCETRACKER",
+        "dbName": "nisumplanner",
         "uName": "root",
-        "pwd": "root"
+        "pwd": "root",
+	"connectionLimit":15
     },
 
     "server_config": {
@@ -14,21 +15,21 @@
 
     "logger": {
         "logAppender": "file",
-        "logFilename": "D:/Resource-Tracker/logs/RESOURCETRACKER.log",
-        "logCategory": "RESOURCETRACKING",
+        "logFilename": "D:/Nisum-Planner/logs/NISUMPLANNER.log",
+        "logCategory": "NISUMPLANNER",
         "logLevel": "DEBUG",
         "maxLogSize": "75MB",
         "backups": 10
     },
 
     "common": {
-        "parentPath": "D:/Resource-Tracking/RESOURCETRACKER",
-        "projectName": "Resource Tracker"
+        "parentPath": "D:/Nisum-Planner/NISUMPLANNER",
+        "projectName": "Nisum Planner"
     },
 
     "session": {
         "key": "asdklghakjhsadd21721973hsa1892",
-        "maxAge": 900000,
-        "expires": 900000
+        "maxAge": 1800000,
+        "expires": 1800000
     }
 }

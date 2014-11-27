@@ -1,7 +1,7 @@
 /**
  * CURD operations on users
  */
-var db = require("../db-manager/dbmanager"),
+var pool = require("../db-manager/dbmanager").getPool(),
     queries = require("../sql/sql.json"),
     teamResourceDao = require("./team-resource-dao"),
     log = require('../logger/logger').logger("user-dao");
@@ -9,16 +9,18 @@ var db = require("../db-manager/dbmanager"),
 
 exports.getUsersAvailabilityTeamId = function(obj, callback) {
     try {
-        var connection = db.getConnection(),
-            getUsersAvailabilityTeamIdSQL = queries.user.getUsersAvailabilityTeamId;
+        var getUsersAvailabilityTeamIdSQL = queries.user.getUsersAvailabilityTeamId;
 
-        connection.query(getUsersAvailabilityTeamIdSQL, obj, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(getUsersAvailabilityTeamIdSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -27,16 +29,18 @@ exports.getUsersAvailabilityTeamId = function(obj, callback) {
 
 exports.getUser = function(userId, callback) {
     try {
-        var connection = db.getConnection(),
-            getUserSQL = queries.user.getUser;
+        var getUserSQL = queries.user.getUser;
 
-        connection.query(getUserSQL, userId, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows[0]);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(getUserSQL, userId, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows[0]);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -45,16 +49,18 @@ exports.getUser = function(userId, callback) {
 
 exports.getUserByName = function(userName, callback) {
     try {
-        var connection = db.getConnection(),
-            getUserByNameSQL = queries.user.getUserByName;
+        var getUserByNameSQL = queries.user.getUserByName;
 
-        connection.query(getUserByNameSQL, userName, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows[0]);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(getUserByNameSQL, userName, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows[0]);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -63,16 +69,18 @@ exports.getUserByName = function(userName, callback) {
 
 exports.getUserById = function(userId, callback) {
     try {
-        var connection = db.getConnection(),
-            getUserByIdSQL = queries.user.getUserById;
+        var getUserByIdSQL = queries.user.getUserById;
 
-        connection.query(getUserByIdSQL, userId, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows[0]);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(getUserByIdSQL, userId, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows[0]);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -82,16 +90,19 @@ exports.getUserById = function(userId, callback) {
 exports.getTeamUsers = function(userId, callback) {
     if (userId) {
         try {
-            var connection = db.getConnection(),
-                getTeamUsersSQL = queries.user.getTeamUsers;
+            var getTeamUsersSQL = queries.user.getTeamUsers;
 
-            connection.query(getTeamUsersSQL, userId, function(err, rows) {
-                if (err) {e
-                    log.error(err);
-                    callback(err);
-                } else {
-                    callback(rows);
-                }
+            pool.getConnection(function(err, connection) {
+                connection.query(getTeamUsersSQL, userId, function(err, rows) {
+                    connection.release();
+                    if (err) {
+                        e
+                        log.error(err);
+                        callback(err);
+                    } else {
+                        callback(rows);
+                    }
+                });
             });
         } catch (e) {
             log.error(e);
@@ -103,16 +114,18 @@ exports.getTeamUsers = function(userId, callback) {
 
 exports.getNonTeamUsers = function(userId, callback) {
     try {
-        var connection = db.getConnection(),
-            getNonTeamUsersSQL = queries.user.getNonTeamUsers;
+        var getNonTeamUsersSQL = queries.user.getNonTeamUsers;
 
-        connection.query(getNonTeamUsersSQL, userId, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(getNonTeamUsersSQL, userId, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -121,16 +134,18 @@ exports.getNonTeamUsers = function(userId, callback) {
 
 exports.getLeads = function(callback) {
     try {
-        var connection = db.getConnection(),
-            getLeadsSQL = queries.user.getLeads;
+        var getLeadsSQL = queries.user.getLeads;
 
-        connection.query(getLeadsSQL, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(getLeadsSQL, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -139,16 +154,18 @@ exports.getLeads = function(callback) {
 
 exports.auth = function(obj, callback) {
     try {
-        var connection = db.getConnection(),
-            authUserSQL = queries.user.authUser;
+        var authUserSQL = queries.user.authUser;
 
-        connection.query(authUserSQL, obj, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows[0]);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(authUserSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows[0]);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -157,16 +174,18 @@ exports.auth = function(obj, callback) {
 
 exports.contactExist = function(obj, callback) {
     try {
-        var connection = db.getConnection(),
-            contactExistSQL = queries.user.contactExist;
+        var contactExistSQL = queries.user.contactExist;
 
-        connection.query(contactExistSQL, obj, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows[0]);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(contactExistSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows[0]);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -175,16 +194,18 @@ exports.contactExist = function(obj, callback) {
 
 exports.userExist = function(uName, callback) {
     try {
-        var connection = db.getConnection(),
-            userExistSQL = queries.user.userExist;
+        var userExistSQL = queries.user.userExist;
 
-        connection.query(userExistSQL, uName, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(userExistSQL, uName, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -193,16 +214,18 @@ exports.userExist = function(uName, callback) {
 
 exports.saveUser = function(obj, callback) {
     try {
-        var connection = db.getConnection(),
-            saveUserProSQL = queries.user.saveUserPro;
+        var saveUserProSQL = queries.user.saveUserPro;
 
-        connection.query(saveUserProSQL, obj, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(saveUserProSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -211,16 +234,18 @@ exports.saveUser = function(obj, callback) {
 
 exports.editUser = function(obj, callback) {
     try {
-        var connection = db.getConnection(),
-            editUserDetailsProSQL = queries.user.editUserDetailsPro;
+        var editUserDetailsProSQL = queries.user.editUserDetailsPro;
 
-        connection.query(editUserDetailsProSQL, obj, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(editUserDetailsProSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -229,16 +254,18 @@ exports.editUser = function(obj, callback) {
 
 exports.editPassword = function(obj, callback) {
     try {
-        var connection = db.getConnection(),
-            editPasswordSQL = queries.user.editPassword;
+        var editPasswordSQL = queries.user.editPassword;
 
-        connection.query(editPasswordSQL, obj, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(editPasswordSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
     } catch (e) {
         log.error(e);

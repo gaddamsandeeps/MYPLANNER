@@ -1,105 +1,100 @@
 ﻿<!DOCTYPE html>
 <html ng-app="resourceTracking">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>My Profile</title>
-        <link href="lib/bootstrap.css" rel="stylesheet">
-        <link href="css/validation.css" rel="stylesheet">
-        <style>
-        form {
-        width: 600px;
-        margin: 0 auto;
-        }
-        </style>
-    </head>
-    <body>
-        <% var pageName = 'editprofile' %>
-        <% include header.html %>
-        <div class="container">
-            <form name="EditUserForm" id="EditUserForm" novalidate class="form-horizontal" ng-controller="EditUserController">
-                <div class="modal-header">
-                    <h4>Edit Profile</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label class="col-md-4 control-label" for="editusername">Username</label>
-                        <div class="col-md-8">
-                            <input type="text" readonly id="editusername" name="editusername" ng-model="editUser.username" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-group" show-errors>
-                        <label class="col-md-4 control-label" for="roleid">Role</label>
-                        <div class="col-md-8">
-                            <select ng-change="roleChange()" ng-model="editUser.roleid" ng-options="opt as opt.name for opt in Roles" id="roleid" name="roleid" class="form-control" required>
-                                <option value="">Choose Role</option>
-                            </select>
-                            <span class="error-message" ng-show="EditUserForm.roleid.$dirty && EditUserForm.roleid.$invalid">Select Role</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label" for="teamid">Team</label>
-                        <div class="col-md-8">
-                            <select ng-disabled="!validTeam" ng-model="editUser.teamid" ng-options="opt as opt.name for opt in Teams" id="teamid" name="teamid" class="form-control">
-                                <option value="">Choose Team</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group" show-errors>
-                        <label class="col-md-4 control-label" for="firstname">First Name</label>
-                        <div class="col-md-8">
-                            <input type="text" id="firstname" name="firstname" ng-model="editUser.firstname" class="form-control" placeholder="First Name" required>
-                            <span class="error-message" ng-show="EditUserForm.firstname.$error.required">FirstName is required</span>
-                        </div>
-                    </div>
-                    <div class="form-group" show-errors>
-                        <label class="col-md-4 control-label" for="lastname">Last Name</label>
-                        <div class="col-md-8">
-                            <input type="text" id="lastname" name="lastname" ng-model="editUser.lastname" class="form-control" placeholder="Last Name" required>
-                            <span class="error-message" ng-show="EditUserForm.lastname.$error.required">LastName is required</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label" for="editusersex">Sex</label>
-                        <div class="col-md-8">
-                            <input type="radio" value="M" ng-model="editUser.sex">male
-                            <input type="radio" value="F" ng-model="editUser.sex">female
-                        </div>
-                    </div>
-                    <div class="form-group" show-errors>
-                        <label class="col-md-4 control-label" for="dob">Date Of Birth</label>
-                        <div class="col-md-8">
-                            <input type="date" id="dob" name="dob" ng-model="editUser.dob" class="form-control" placeholder="Date Of Birth" required>
-                            <span class="error-message" ng-show="EditUserForm.dob.$error.required">Date Of Birth is required</span>
-                        </div>
-                    </div>
-                    <div class="form-group" show-errors>
-                        <label class="col-md-4 control-label" for="edituserphone">Contact</label>
-                        <div class="col-md-8">
-                            <input type="tel" ng-pattern="/\d{10,}/" id="edituserphone" name="edituserphone" ng-model="editUser.contact" class="form-control" placeholder="Phone" required>
-                            <span class="error-message" ng-show="!EditUserForm.edituserphone.$error.pattern">Minimum 10 digits</span>
-                        </div>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Profile</title>
+    <link href="lib/bootstrap.css" rel="stylesheet">
+    <link href="css/validation.css" rel="stylesheet">
+</head>
+<body>
+    <% var pageName = 'editprofile' %>
+    <% include header.html %>
+    <div class="container">
+        <form name="EditUserForm" id="EditUserForm" novalidate class="form-horizontal register" ng-controller="EditUserController">
+            <div class="modal-header">
+                <h4>Edit Profile</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="editusername">Username</label>
+                    <div class="col-md-8">
+                        <input type="email" readonly id="editusername" name="editusername" ng-model="editUser.username" class="form-control">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" ng-click="reset()">Reset</button>
-                    <button type="submit" class="btn btn-primary" ng-click="save()">Edit</button>
-                </div>
-            </form>
-            <form name="Form" id="Form" novalidate class="form-horizontal" ng-controller="changePasswordController">
-                <div class="modal-header">
-                    <h4>Change Password</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group" show-errors>
-                        <label class="col-md-4 control-label" for="oldpassword">Old Password</label>
-                        <div class="col-md-8">
-                            <input type="password" id="oldpassword" name="oldpassword" ng-model="changePassword.oldpassword" class="form-control" placeholder="Password" required>
-                            <span class="error-message" ng-show="Form.oldpassword.$error.required">Old Password is required</span>
-                        </div>
+                <div class="form-group" show-errors>
+                    <label class="col-md-4 control-label" for="roleid">Role</label>
+                    <div class="col-md-8">
+                        <select ng-disabled="!validRole" ng-change="roleChange()" ng-model="editUser.roleid" ng-options="opt as opt.name for opt in Roles" id="roleid" name="roleid" class="form-control" required>
+                            <option value="">Choose Role</option>
+                        </select>
+                        <span class="error-message" ng-show="EditUserForm.roleid.$dirty && EditUserForm.roleid.$invalid">Select Role</span>
                     </div>
-                    <div class="form-group" show-errors>
+                </div>
+                <div class="form-group" show-errors>
+                    <label class="col-md-4 control-label" for="teamid">Team</label>
+                    <div class="col-md-8">
+                        <select ng-disabled="!validTeam" ng-model="editUser.teamid" ng-required="validTeam" ng-options="opt as opt.name for opt in Teams" id="teamid" name="teamid" class="form-control" required>
+                            <option value="">Choose Team</option>
+                        </select>							
+                        <span class="error-message" ng-show="Form.teamid.$dirty && Form.teamid.$error.required">Select Team</span>
+                    </div>
+                </div>
+                <div class="form-group" show-errors>
+                    <label class="col-md-4 control-label" for="firstname">First Name</label>
+                    <div class="col-md-8">
+                        <input type="text" id="firstname" name="firstname" ng-model="editUser.firstname" class="form-control" placeholder="First Name" required>
+                        <span class="error-message" ng-show="EditUserForm.firstname.$error.required">FirstName is required</span>
+                    </div>
+                </div>
+                <div class="form-group" show-errors>
+                    <label class="col-md-4 control-label" for="lastname">Last Name</label>
+                    <div class="col-md-8">
+                        <input type="text" id="lastname" name="lastname" ng-model="editUser.lastname" class="form-control" placeholder="Last Name" required>
+                        <span class="error-message" ng-show="EditUserForm.lastname.$error.required">LastName is required</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="editusersex">Sex</label>
+                    <div class="col-md-8">
+                        <input type="radio" value="M" ng-model="editUser.sex">male
+                        <input type="radio" value="F" ng-model="editUser.sex">female
+                    </div>
+                </div>
+                <div class="form-group" show-errors>
+                    <label class="col-md-4 control-label" for="dob">Date Of Birth</label>
+                    <div class="col-md-8">
+                        <input type="date" id="dob" name="dob" ng-model="editUser.dob" class="form-control" placeholder="Date Of Birth" required>
+                        <span class="error-message" ng-show="EditUserForm.dob.$error.required">Date Of Birth is required</span>
+                    </div>
+                </div>
+                <div class="form-group" show-errors>
+                    <label class="col-md-4 control-label" for="edituserphone">Contact</label>
+                    <div class="col-md-8">
+                        <input type="tel" ng-pattern="/\d{10,}/" id="edituserphone" name="edituserphone" ng-model="editUser.contact" class="form-control" placeholder="Phone" required>
+                        <span class="error-message" ng-show="!EditUserForm.edituserphone.$error.pattern">Minimum 10 digits</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" ng-click="save()">Edit</button>
+                <button type="button" class="btn btn-default" ng-click="reset()">Reset</button>
+            </div>
+        </form>
+        <form name="Form" id="Form" novalidate class="form-horizontal register" ng-controller="changePasswordController">
+            <div class="modal-header">
+                <h4>Change Password</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group" show-errors>
+                    <label class="col-md-4 control-label" for="oldpassword">Old Password</label>
+                    <div class="col-md-8">
+                        <input type="password" id="oldpassword" name="oldpassword" ng-model="changePassword.oldpassword" class="form-control" placeholder="Password" required>
+                        <span class="error-message" ng-show="Form.oldpassword.$error.required">Old Password is required</span>
+                    </div>
+                </div>
+                <div class="form-group" show-errors>
                     <label class="col-md-4 control-label" for="password">New Password</label>
                     <div class="col-md-8">
                         <input type="password" id="password" name="password" ng-model="changePassword.password" class="form-control" placeholder="Password" required>
@@ -110,19 +105,19 @@
                     <label class="col-md-4 control-label" for="confirmpassword">Confirm Password</label>
                     <div class="col-md-8">
                         <input type="password" id="confirmpassword" name="confirmpassword" ng-model="changePassword.confirmpassword" class="form-control" valid-password placeholder="Confirm Password" required>
-                        <span class="error-message" ng-show="!Form.confirmpassword.$error.required && Form.confirmpassword.$error.noMatch && Form.confirmpassword.$dirty">Passwords do not match</span>                        
+                        <span class="error-message" ng-show="!Form.confirmpassword.$error.required && Form.confirmpassword.$error.noMatch && Form.confirmpassword.$dirty">Passwords do not match</span>
                     </div>
                 </div>
-                </div>
-                <div class="modal-footer">                    
-                    <button type="submit" class="btn btn-primary" ng-click="save()">Save</button>
-                </div>
-            </form>
-        </div>
-        <% include footer.html %>
-        <script src="lib/jquery.js"></script>
-        <script src="lib/angular.js"></script>
-        <script src="js/common/directives.js"></script>
-        <script src="js/profile.js"></script>
-    </body>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" ng-click="save()">Save</button>
+            </div>
+        </form>
+    </div>
+    <% include footer.html %>
+    <script src="lib/jquery.js"></script>
+    <script src="lib/angular.js"></script>
+    <script src="js/common/directives.js"></script>
+    <script src="js/profile.js"></script>
+</body>
 </html>

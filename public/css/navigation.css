@@ -1,5 +1,7 @@
+@import 'fonts.css';
 .topNavBg{
     background: #004C7E;
+
 }
 .headerNav{
     margin:4px 0px;
@@ -10,12 +12,12 @@
     border-left: 1px solid #5D6F79;
     float: left;
     list-style: none;
-    padding: 0px 10px;
+    padding: 0 0 0 20px;
     color: #fff;
     position: relative;
 }
 .headerNav > li:first-child{
-    border-left: none;
+    border-left: 0;
 }
 .headerNav > li:last-child{
     border-right: none;
@@ -25,14 +27,16 @@
     font-size: 16px;
     line-height: 42px;
 }
+.headerNav li a:first-child{
+	padding-right:20px;
+}
 .headerNav li a span{
     position: relative;
     top: -2px;
     margin-right: 5px;
 }
 .headerNav > li a:hover{
-    text-shadow: 1px 1px 2px #ccc;
-    text-decoration: none
+    text-decoration: underline;
 }
 .headerNav > li ul.topNavSubmenu{
     position: absolute;
@@ -45,7 +49,7 @@
     width:130px;
     border-radius: 0px 0px 5px 5px;
     display: none;
-        
+    
 }
 ul.topNavSubmenu li{
     list-style: none;
@@ -72,9 +76,15 @@ ul.topNavSubmenu li a{
     border-radius: 15px;
     display: inline-block;
     top: 8px !important;
+    margin-left:5px;
 }
 .usernavIcon img{
     position: absolute;
     top: 1px;
     left: 2px;
+}
+@media (min-width: 600px) {
+    .navbar-header {
+        float: left;
+    }
 }

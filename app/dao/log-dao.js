@@ -1,22 +1,45 @@
 /**
  * CURD operations on logs
  */
-var db = require("../db-manager/dbmanager"),
+var pool = require("../db-manager/dbmanager").getPool(),
     queries = require("../sql/sql.json"),
     log = require('../logger/logger').logger("log-dao");
 
+
+exports.getLogStatuses = function(callback) {
+    try {
+        var getLogStatusesSQL = queries.logstatus.getLogStatuses;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getLogStatusesSQL, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
 exports.getLogsByUserId = function(obj, callback) {
     try {
-        var connection = db.getConnection(),
-            getLogsByUserIdSQL = queries.log.getLogsByUserId;
+        var getLogsByUserIdSQL = queries.log.getLogsByUserId;
 
-        connection.query(getLogsByUserIdSQL, obj, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(getLogsByUserIdSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -25,16 +48,18 @@ exports.getLogsByUserId = function(obj, callback) {
 
 exports.getTodayUsersLogsByTeamId = function(teamId, callback) {
     try {
-        var connection = db.getConnection(),
-            getTodayUsersLogsByTeamIdSQL = queries.log.getTodayUsersLogsByTeamId;
+        var getTodayUsersLogsByTeamIdSQL = queries.log.getTodayUsersLogsByTeamId;
 
-        connection.query(getTodayUsersLogsByTeamIdSQL, teamId, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(getTodayUsersLogsByTeamIdSQL, teamId, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -43,16 +68,38 @@ exports.getTodayUsersLogsByTeamId = function(teamId, callback) {
 
 exports.getLogById = function(logId, callback) {
     try {
-        var connection = db.getConnection(),
-            getLogByIdSQL = queries.log.getLogById;
+        var getLogByIdSQL = queries.log.getLogById;
 
-        connection.query(getLogByIdSQL, logId, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows[0]);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(getLogByIdSQL, logId, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows[0]);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.getLogHistoryById = function(logId, callback) {
+    try {
+        var getLogHistoryByIdSQL = queries.log.getLogHistoryById;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getLogHistoryByIdSQL, logId, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -61,16 +108,18 @@ exports.getLogById = function(logId, callback) {
 
 exports.getUserReportLogs = function(obj, callback) {
     try {
-        var connection = db.getConnection(),
-            getUserReportLogsSQL = queries.log.getUserReportLogs;
+        var getUserReportLogsSQL = queries.log.getUserReportLogs;
 
-        connection.query(getUserReportLogsSQL, obj, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(getUserReportLogsSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -79,16 +128,18 @@ exports.getUserReportLogs = function(obj, callback) {
 
 exports.getReportLogs = function(obj, callback) {
     try {
-        var connection = db.getConnection(),
-            getReportLogsSQL = queries.log.getReportLogs;
+        var getReportLogsSQL = queries.log.getReportLogs;
 
-        connection.query(getReportLogsSQL, obj, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(getReportLogsSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -97,16 +148,18 @@ exports.getReportLogs = function(obj, callback) {
 
 exports.getDetailedUserReportLogs = function(obj, callback) {
     try {
-        var connection = db.getConnection(),
-            getDetailedUserReportLogsSQL = queries.log.getDetailedUserReportLogs;
+        var getDetailedUserReportLogsSQL = queries.log.getDetailedUserReportLogs;
 
-        connection.query(getDetailedUserReportLogsSQL, obj, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(getDetailedUserReportLogsSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -115,16 +168,18 @@ exports.getDetailedUserReportLogs = function(obj, callback) {
 
 exports.getDetailedReportLogs = function(obj, callback) {
     try {
-        var connection = db.getConnection(),
-            getDetailedReportLogsSQL = queries.log.getDetailedReportLogs;
+        var getDetailedReportLogsSQL = queries.log.getDetailedReportLogs;
 
-        var q = connection.query(getDetailedReportLogsSQL, obj, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(getDetailedReportLogsSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -133,16 +188,38 @@ exports.getDetailedReportLogs = function(obj, callback) {
 
 exports.unlockLog = function(obj, callback) {
     try {
-        var connection = db.getConnection(),
-            unlockLogSQL = queries.log.unlockLog;
+        var unlockLogSQL = queries.log.unlockLog;
 
-        connection.query(unlockLogSQL, obj, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(unlockLogSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.unlockLogRequest = function(obj, callback) {
+    try {
+        var unlockLogSQL = queries.log.unlockLogRequest;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(unlockLogSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
     } catch (e) {
         log.error(e);
@@ -152,16 +229,18 @@ exports.unlockLog = function(obj, callback) {
 
 exports.saveLog = function(obj, callback) {
     try {
-        var connection = db.getConnection(),
-            saveLogSQL = queries.log.saveLog;
+        var saveLogSQL = queries.log.saveLog;
 
-        connection.query(saveLogSQL, obj, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        pool.getConnection(function(err, connection) {
+            connection.query(saveLogSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
         });
 
     } catch (e) {
@@ -171,16 +250,45 @@ exports.saveLog = function(obj, callback) {
 
 exports.editLog = function(obj, callback) {
     try {
-        var connection = db.getConnection(),
-            editLogSQL = queries.log.editLog;
+        var editLogSQL = queries.log.editLog;
 
-        connection.query(editLogSQL, obj, function(err, rows) {
-            if (err) {
-                log.error(err);
-                callback(err);
-            } else {
-                callback(rows);
-            }
+        var logId = obj[8];
+        saveLogHistory(logId);
+
+        pool.getConnection(function(err, connection) {
+            connection.query(editLogSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        });
+
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+var saveLogHistory = function(logId) {
+    try {
+        var saveLogHistorySQL = queries.log.saveLogHistory;
+
+        module.exports.getLogById(logId, function(val) {
+            var obj = [val.id, val.projectid, val.iteration, val.story, val.status, val.startdate, val.enddate, val.userid, val.loggeduser, val.description,
+                val.createddate, val.editdate, val.locked, val.lockrequest
+            ];
+
+            pool.getConnection(function(err, connection) {
+                connection.query(saveLogHistorySQL, obj, function(err, rows) {
+                    connection.release();
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+            });
         });
 
     } catch (e) {

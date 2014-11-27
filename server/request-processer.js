@@ -10,7 +10,7 @@ var log = require('../app/logger/logger').logger("request-processor"),
     teamResourceService = require("../app/services/team-resource-service"),
     roleService = require("../app/services/role-service"),
     encrypt = require("../app/util/encrypt"),
-	util = require("../app/util/util"),
+    util = require("../app/util/util"),
     startTime = ' 00:00:00',
     endTime = ' 23:59:59';
 
@@ -82,6 +82,15 @@ exports.getTeamUsers = function(request, response, callback) {
     });
 };
 
+exports.getTeamUsersByTeamId = function(request, response, callback) {
+    log.debug("getTeamUsers : logged in user is " + (request.user.id));
+
+    var teamId = request.param(properties.team.id);
+    userService.getTeamUsers(teamId, function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
 exports.getNonTeamUsers = function(request, response, callback) {
     log.debug("getNonTeamUsers : logged in user is " + (request.user.id));
     var teamId = request.user.teamId;
@@ -126,6 +135,43 @@ exports.getProjects = function(request, response) {
         response.json(returnValue);
     });
 };
+
+exports.getAdminProjects = function(request, response) {
+    log.debug("getAdminProjects : logged in user is " + (request.user.id));
+    var userId = request.user.id;
+    projectService.getAdminProjects([userId], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.saveAdminProject = function(request, response, callback) {
+    log.debug("saveAdminProject : logged in user is " + (request.user.id));
+
+    var userId = request.user.id;
+    var name = request.param(properties.project.name);
+    var desc = request.param(properties.project.desc);
+    var strtDte = request.param(properties.project.startDate);
+    var endDte = request.param(properties.project.endDate);
+
+    projectService.saveAdminProject([name, desc, strtDte, endDte, userId], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.editAdminProject = function(request, response, callback) {
+    log.debug("editAdminProject : logged in user is " + (request.user.id));
+
+    var id = request.param(properties.project.id);
+    var name = request.param(properties.project.name);
+    var desc = request.param(properties.project.desc);
+    var strtDte = request.param(properties.project.startDate);
+    var endDte = request.param(properties.project.endDate);
+
+    projectService.editAdminProject([name, desc, strtDte, endDte, id], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
 
 exports.getUserMappedProjectCountByTeamId = function(request, response, callback) {
     log.debug("getUserMappedProjectCountByTeamId : logged in user is " + (request.user.id));
@@ -210,7 +256,11 @@ exports.editUser = function(request, response, callback) {
     var contact = request.param(properties.user.contact);
 
     userService.editUser([userId, roleId, firstName, lastName, sex, dob, contact, (teamId === '' ? '0' : teamId)], function(returnValue) {
-        response.json(returnValue);
+        if (returnValue.message === 'success') {
+            request.user.firstname = firstName;
+            request.user.lastname = lastName;
+            response.json(returnValue);
+        }
     });
 };
 
@@ -226,7 +276,7 @@ exports.changePassword = function(request, response, callback) {
         } else {
             userService.editPassword([encrypt.encrypt(newPwd), userName], function(returnValue) {
                 request.logout();
-			    response.redirect('/');
+                response.json(returnValue);
             });
         }
     });
@@ -315,11 +365,12 @@ exports.editProject = function(request, response, callback) {
     log.debug("editProject : logged in user is " + (request.user.id));
 
     var id = request.param(properties.project.id);
+    var name = request.param(properties.project.name);
     var desc = request.param(properties.project.desc);
     var strtDte = request.param(properties.project.startDate);
     var endDte = request.param(properties.project.endDate);
 
-    projectService.editProject([desc, strtDte, endDte, id], function(returnValue) {
+    projectService.editProject([name, desc, strtDte, endDte, id], function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -378,8 +429,12 @@ exports.addResourceToProject = function(request, response, callback) {
     log.debug("addResourceToProject : logged in user is " + (request.user.id));
     var pid = request.param(properties.project.id);
     var uid = request.param(properties.project.userId);
+    var startDate = request.param(properties.project.sowstartdate);
+    var endDate = request.param(properties.project.sowenddate);
+    var description = request.param(properties.project.sowprojectdescription);
+    var billable = request.param(properties.project.billable);
 
-    projectService.addResourceToProject([pid, uid], function(returnValue) {
+    projectService.addResourceToProject([pid, uid, startDate, endDate, description, billable], function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -409,13 +464,21 @@ exports.addNRemoveResourceFromProject = function(request, response, callback) {
 exports.saveLog = function(request, response, callback) {
     log.debug("saveLog : logged in user is " + (request.user.id));
 
-    var userId = request.user.id;
+    var userId = request.body.userid || request.user.id;
+    var loggedUserId = request.user.id;
+
     var projectId = request.param(properties.logs.projectId);
+    var iterationNo = request.param(properties.logs.iterationno);
+    var storyDescription = request.param(properties.logs.storydescription);
+    var logStatuses = request.param(properties.logs.logstatuses);
     var startDate = request.param(properties.logs.startDate);
     var endDate = request.param(properties.logs.endDate);
     var desc = request.param(properties.logs.desc);
 
-    logService.saveLog([projectId, startDate, endDate, userId, desc], function(returnValue) {
+	logStatuses = (logStatuses == '' ? null : logStatuses);
+	iterationNo = (iterationNo == '' ? null : iterationNo);
+
+    logService.saveLog([projectId, iterationNo, storyDescription, logStatuses, startDate, endDate, userId, loggedUserId, desc], function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -423,13 +486,21 @@ exports.saveLog = function(request, response, callback) {
 exports.editLog = function(request, response, callback) {
     log.debug("editLog : logged in user is " + (request.user.id));
 
+    var loggedUserId = request.user.id;
+
     var id = request.param(properties.logs.id);
     var projectId = request.param(properties.logs.projectId);
+    var iterationNo = request.param(properties.logs.iterationno);
+    var storydescription = request.param(properties.logs.storydescription);
+    var logStatuses = request.param(properties.logs.logstatuses);
     var startDate = request.param(properties.logs.startDate);
     var endDate = request.param(properties.logs.endDate);
     var desc = request.param(properties.logs.desc);
 
-    logService.editLog([projectId, startDate, endDate, desc, id], function(returnValue) {
+	logStatuses = (logStatuses == '' ? null : logStatuses);
+	iterationNo = (iterationNo == '' ? null : iterationNo);
+
+    logService.editLog([projectId, iterationNo, storydescription, logStatuses, startDate, endDate, loggedUserId, desc, id], function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -442,6 +513,13 @@ exports.getLogs = function(request, response, callback) {
     var endDate = request.param(properties.logs.endDate);
 
     logService.getLogsByUserId([startDate + startTime, endDate + endTime, userId], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.getLogStatuses = function(request, response, callback) {
+    log.debug("getLogStatuses");
+    logService.getLogStatuses(function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -490,8 +568,9 @@ exports.getDetailedReportLogs = function(request, response, callback) {
     //var projectId = request.param(properties.project.id);
     var startDate = request.param(properties.logs.startDate);
     var endDate = request.param(properties.logs.endDate);
+    var teamId = request.user.teamId;
 
-    logService.getDetailedReportLogs([startDate + startTime, endDate + endTime], function(returnValue) {
+    logService.getDetailedReportLogs([startDate + startTime, endDate + endTime, teamId], function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -503,6 +582,17 @@ exports.unlockLog = function(request, response, callback) {
     var userId = request.param(properties.user.userId);
 
     logService.unlockLog([userId, logId], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.unlockLogRequest = function(request, response, callback) {
+    log.debug("unlockLogRequest : logged in user is " + (request.user.id));
+
+    var logId = request.param(properties.logs.id);
+    var userId = request.user.id;
+
+    logService.unlockLogRequest([userId, logId], function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -525,6 +615,40 @@ exports.getLogById = function(request, response, callback) {
     var logId = request.param(properties.logs.id);
 
     logService.getLog(logId, function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.getLogHistoryById = function(request, response, callback) {
+    log.debug("getLogHistoryById : logged in user is " + (request.user.id));
+
+    var logId = request.param(properties.logs.id);
+
+    logService.getLogHistoryById(logId, function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.setPermissions = function(request, response) {
+    var accessLevel = request.body.accesslevel;
+    var userId = request.body.id;
+    var permissionsObj = [];
+    permissionsObj.push(accessLevel, userId);
+    teamService.setPermissions(permissionsObj, function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.hasLogAccess = function(request, response) {
+    var userId = request.user.id;
+    teamService.hasLogAccess(userId, function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.getTeamMembersByRole = function(request, response) {
+    var roleId = request.query.roleId;
+    teamService.getTeamMembersByRole(roleId, function(returnValue) {
         response.json(returnValue);
     });
 };

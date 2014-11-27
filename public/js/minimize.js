@@ -1,23 +1,13 @@
 function minimaxConetent(obj) {
-    var rsrcevisibility = $(obj).siblings('.resourcseToProject').css('display');
-    if (rsrcevisibility == 'none') {
-        $(obj).siblings('.resourcseToProject').show();
-        $(obj).removeClass('plus');
-        $(obj).addClass('minus');
-    }
-    else {
-        $(obj).siblings('.resourcseToProject').hide();
-        $(obj).removeClass('minus');
-        $(obj).addClass('plus');
-    }
+	if($(obj).children().children().hasClass('fa-minus-square-o')){
+		$(obj).children().children().addClass('fa-plus-square-o');
+		$(obj).children().children().removeClass('fa-minus-square-o');
+		$(obj).parent().removeClass('open');
+		$(obj).siblings('.resourcseToProject').hide();
+	}else{
+		$(obj).children().children().addClass('fa-minus-square-o');
+		$(obj).children().children().removeClass('fa-plus-square-o');
+		$(obj).parent().addClass('open');
+		$(obj).siblings('.resourcseToProject').show();	
+	}
 }
-$('#showall').click(function() {
-    $('.resourcseToProject').show();
-    $('.minimize').removeClass('plus');
-    $('.minimize').addClass('minus');
-});
-$('#hideall').click(function() {
-    $('.resourcseToProject').hide();
-    $('.minimize').removeClass('minus');
-    $('.minimize').addClass('plus');
-});

@@ -3,7 +3,7 @@
         "ER_DUP_ENTRY": 1062
     },
     "sqlerror": {
-        "ER_DUP_ENTRY": "Duplicate values are not entered"
+        "ER_DUP_ENTRY": "Duplicate data not accepted"
     },
     "common": {
         "error": "Caught with some error"

@@ -36,7 +36,7 @@ passport.use(new LocalStrategy({
         requestProcesser.auth(username, password, function(user) {
             if (!user) {
                 return done(null, false, {
-                    message: 'Unknown user ' + username
+                    message: 'Login failed  for ' + username
                 });
             } else {
                 requestProcesser.getRoleByUserName(username,
@@ -46,7 +46,7 @@ passport.use(new LocalStrategy({
                             team) {
                             if (team) {
                                 user.teamId = team.id;
-								user.teamName = team.name;
+                                user.teamName = team.name;
                             }
                             return done(null, user);
                         });
@@ -68,7 +68,7 @@ app.engine('html', require('ejs').renderFile);
 
 
 app.use(express.cookieParser());
-app.use(express.bodyParser());
+
 app.use(express.methodOverride());
 
 app.use(express.session({
@@ -83,7 +83,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // all environments
-app.set('port', config.server_config.port);
+app.set('port', process.env.PORT || config.server_config.port);
 // app.set('view engine', 'jade');
 app.use(express.favicon());
 //app.use(express.logger('dev'));
@@ -96,6 +96,13 @@ app.use(app.router);
 if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
+
+app.get('/teams', ensureAuthenticated, function(request, response) {
+    response.render('teams.html', {
+        user: request.user,
+        message: request.flash('error')
+    });
+});
 
 app.get('/dashboard', ensureAuthenticated, function(request, response) {
     response.render('dashboard.html', {
@@ -219,6 +226,10 @@ app.get('/getProjects', ensureAuthenticated, requestProcesser.getProjects);
 app.get('/getProject', ensureAuthenticated, requestProcesser.getProject);
 app.get('/addMyProject', ensureAuthenticated, requestProcesser.addMyProject);
 
+app.get('/getAdminProjects', ensureAuthenticated, requestProcesser.getAdminProjects);
+app.post('/saveAdminProject', ensureAuthenticated, requestProcesser.saveAdminProject);
+app.post('/editAdminProject', ensureAuthenticated, requestProcesser.editAdminProject);
+
 app.post('/saveProject', ensureAuthenticated, requestProcesser.saveProject);
 app.post('/editProject', ensureAuthenticated, requestProcesser.editProject);
 
@@ -239,6 +250,11 @@ app.post('/editTeam', ensureAuthenticated, requestProcesser.editTeam);
 app.post('/removeTeam', ensureAuthenticated, requestProcesser.removeTeam);
 app.get('/getTeams', requestProcesser.getTeams);
 
+//give temp permissions
+app.post('/setPermissions', ensureAuthenticated, requestProcesser.setPermissions);
+app.get('/hasLogAccess', ensureAuthenticated, requestProcesser.hasLogAccess);
+app.get('/getTeamUsersByTeamId', ensureAuthenticated, requestProcesser.getTeamUsersByTeamId);
+
 //ROLE SERVICES
 app.post('/saveRole', ensureAuthenticated, requestProcesser.saveRole);
 app.post('/editRole', ensureAuthenticated, requestProcesser.editRole);
@@ -251,13 +267,27 @@ app.post('/editLog', ensureAuthenticated, requestProcesser.editLog);
 app.get('/getLogs', ensureAuthenticated, requestProcesser.getLogs);
 app.get('/getUserLogs', ensureAuthenticated, requestProcesser.getUserLogs);
 app.get('/getLog', ensureAuthenticated, requestProcesser.getLogById);
+app.get('/getLogHistoryById', ensureAuthenticated, requestProcesser.getLogHistoryById);
+
+app.get('/getLogStatuses', ensureAuthenticated, requestProcesser.getLogStatuses);
+
 app.get('/getUserReportLogs', ensureAuthenticated, requestProcesser.getUserReportLogs);
 app.get('/getReportLogs', ensureAuthenticated, requestProcesser.getReportLogs);
 
 app.get('/getDetailedUserReportLogs', ensureAuthenticated, requestProcesser.getDetailedUserReportLogs);
 app.get('/getDetailedReportLogs', ensureAuthenticated, requestProcesser.getDetailedReportLogs);
 
+
+//method to get logs of any team
+app.get('/getTeamReport', ensureAuthenticated, function(request, response){
+	var teamId = request.param('teamId');	
+	request.user.teamId = teamId;
+	response.redirect('/report');
+});
+
+
 app.get('/unlockLog', ensureAuthenticated, requestProcesser.unlockLog);
+app.get('/unlockLogRequest', ensureAuthenticated, requestProcesser.unlockLogRequest);
 
 d.on('error', function(err) {
     console.log("Caught with some error : " + err)
@@ -276,6 +306,8 @@ function ensureAuthenticated(req, res, next) {
                 res.redirect('/dashboard');
             } else if (req.user.roleName === properties.roles.admin) {
                 res.redirect('/admin');
+            } else if (req.user.roleName === properties.roles.seniormanager) {
+                res.redirect('/teams');
             } else {
                 res.redirect('/timesheet');
             }
@@ -289,7 +321,9 @@ function ensureAuthenticated(req, res, next) {
             return next();
         }
     } else {
-        res.render('login.html');
+        res.render('login.html', {
+            message: req.flash('error')
+        });
     }
 }
 
@@ -299,6 +333,7 @@ function restrictedPages(key, reqUrl) {
     urls[properties.roles.user] = ['admin', 'dashboard'];
     urls[properties.roles.manager] = ['admin'];
     urls[properties.roles.admin] = ['dashboard', 'timesheet', 'report'];
+	urls[properties.roles.seniormanager] = ['dashboard', 'timesheet','admin'];
     if (urls.hasOwnProperty(key)) {
         var arr = urls[key];
         for (var i = 0; i < arr.length; i++) {
