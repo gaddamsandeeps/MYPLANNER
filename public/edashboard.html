@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<html ng-app="resourceTracking">
+<head>
+   <title>Executive Dashboard</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="lib/bootstrap.css" rel="stylesheet">
+    <link href="css/validation.css" rel="stylesheet">
+    <link href="css/edashboard.css" rel="stylesheet">
+    <link href="css/progressBar.css" rel="stylesheet">
+    <script src='lib/jquery-1.11.1.min.js'></script>
+	<script type="text/javascript">
+		$(function () {
+			$('.resourcseToProject').hide();
+		});
+    </script>
+</head>
+<body ng-controller="genericCtrl" ng-cloak>
+    
+    <% var pageName = 'edashboard' %>
+    <% include header.html %>
+    <br><br><br><br><br>
+    
+    <div class="row">
+        <div class="col-md-12">
+            
+            <div class="group-tab-container">
+                    <ul>
+                        <% for(var i=0; i<teams.length; i++) {%>
+                             <li data-teamid="<%= teams[i].id %>" ed-tab class="group-name"> <%= teams[i].name %> </li>
+                        <% } %>
+                    </ul>    
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 leftPannelSection fixed-title-e">
+                
+                <div class="row page-title">
+                    <div class="col-md-3 npr">  
+                        <h4>Projects ({{droppedProjects.length}})</h4>
+                    </div>
+                
+                    <div class="col-md-9 npl "> 
+                        <h4 class="ed-title">Executive Dashboard</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 leftPannelSection ed-fixed-header">
+                <div class="clearfix"></div>
+                <div id="ProjectView" class="">
+                    <div ng-repeat="p in droppedProjects" class="projectSection">
+                        <div class="pv" resourcedroppable projectid="{{p.id}}" projectname="{{p.name}}">
+							<input type="button" class="btn btn-primary btn-xs showchart" id="showreports" ng-click="displayChart(p.id,p.name)" value="Show Report"/>
+                                <div onclick="minimaxConetent(this)">
+                                <div class="expand">
+                                    <i class="fa fa-plus-square-o fa-lg pull-right"></i>
+                                </div>
+                                <h3 class="resourceTitle">{{p.name}}</h3>
+                            </div>
+                            <div class="resourcseToProject">
+                                <div>
+                                    <p>{{p.description}}</p>
+                                </div>
+                                <div>
+                                    <div class="timelineWrapper">
+                                        <div class="timelineDates">
+                                            <div class="pull-left">
+                                                {{p.startdate | date : 'shortDate'}}
+                                            </div>
+                                            <div class="pull-right">
+                                                {{p.enddate | date : 'shortDate'}}
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="timeLine">
+                                            <div style="overflow: hidden; width: {{p.diff}}%;"></div>
+                                            <span class="boldDot boldDotLeft"></span>
+                                            <span class="boldDot boldDotRight"></span>
+                                        </div>
+                                        <p class="currentDate">
+                                            <span style="left: {{p.diff-2}}%;">{{p.currentdate | date : 'shortDate'}}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="resources">
+                                    <h5 class="resourceTitle">Developers</h5>
+                                    <div class="row container-fluid res-headers">
+                                    <div class="col-md-3">Name</div>
+                                    <div class="col-md-1">#Sow</div>
+                                    <div class="col-md-2">Start</div>
+                                    <div class="col-md-2">End</div>
+                                    <div class="col-md-2">Total</div>
+                                    <div class="col-md-2">Spent</div>
+                                    </div>
+                                </div>
+                                <div class="developers">
+                                    <div username="{{d.username}}" prid="{{d.projectresourceid}}" ng-repeat="d in p.users">
+                                        <div class="item left-section">
+                                            <div class="container-fluid res-padding">
+                                                <div class="col-md-3 res-padding">
+                                                <span class="billing-control {{d.validityCtrlClass}}" title="{{d.validityStatus}}"></span>
+                                                    {{d.firstname +" "+ d.lastname}}
+                                                </div>
+                                                <div class="col-md-1 res-padding">
+                                                    <span class="text-light"></span><span>{{d.sowno}}</span>
+                                                </div>                                                
+                                                <div class="col-md-2 res-padding">
+                                                    <span class="text-light"></span><span>{{d.startdate }}</span>
+                                                </div>
+                                                <div class="col-md-2 res-padding">
+                                                    <span class="text-light"></span><span>{{d.enddate }}</span>
+                                                </div>
+                                                
+                                                <div class="col-md-2 res-padding">
+                                                    <span class="text-light"> </span><span>  {{d.total + 'h' }}</span>
+                                                </div>
+                                                <div class="col-md-2 res-padding">
+                                                    <div class="pull-left">
+                                                    <span class="text-light"> </span><span>  {{d.logged + 'h' }}</span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="itemLine" data-toggle="tooltip" data-original-title='{{d.percent}}%'>
+                                        <div style="overflow: hidden; width: {{d.percent}}%;"></div>
+                                    </div>
+                                </div>                                
+                            </div>
+                        </div>               
+                    </div>
+					<div id="{{p.id}}" class="hidechart"></div>
+                </div>
+            </div>
+        </div>
+		       
+    </div>
+</div>
+
+<% include footer.html %>
+
+<script src="lib/jquery.js"></script>
+<script src="lib/bootstrap.js"></script>
+<script src="lib/bootbox.min.js"></script>
+<script src="js/common/util.js"></script>
+<script src="lib/angular.js"></script>
+<script src="js/common/directives.js"></script>
+<script src="js/edashboard.js"></script>
+<script src="lib/report/highstock.js"></script>
+<script src="lib/report/exporting.js"></script>
+<script src="js/rightpannel.js"></script>
+<script src="js/minimize.js"></script>
+<script src="js/progresBar.js"></script>
+</body>
+</html>

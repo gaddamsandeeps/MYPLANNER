@@ -9,6 +9,17 @@
 	"connectionLimit":15
     },
 
+    "mail_config": {
+        "host": "smtp.gmail.com",
+        "port": "587",
+	"enabled": false,
+
+        "uName": "",
+        "pwd": "",
+        "service": "gmail",
+        "from": "testmail@nisumplanner.com"
+    },
+
     "server_config": {
         "port": "9999"
     },

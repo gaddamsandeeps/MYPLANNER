@@ -27,6 +27,26 @@ exports.getUsersAvailabilityTeamId = function(obj, callback) {
     }
 };
 
+exports.getExecutives = function(callback) {
+    try {
+        var getExecutivesSQL = queries.user.getExecutives;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getExecutivesSQL, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
 exports.getUser = function(userId, callback) {
     try {
         var getUserSQL = queries.user.getUser;
@@ -87,13 +107,33 @@ exports.getUserById = function(userId, callback) {
     }
 };
 
-exports.getTeamUsers = function(userId, callback) {
+exports.getUserByTeamId = function(teamId, callback) {
+    try {
+        var getUserByTeamIdSQL = queries.user.getUserByTeamId;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getUserByTeamIdSQL, teamId, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows[0]);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.getTeamUsersByTeamId = function(userId, callback) {
     if (userId) {
         try {
-            var getTeamUsersSQL = queries.user.getTeamUsers;
+            var getTeamUsersByTeamIdSQL = queries.user.getTeamUsersByTeamId;
 
             pool.getConnection(function(err, connection) {
-                connection.query(getTeamUsersSQL, userId, function(err, rows) {
+                connection.query(getTeamUsersByTeamIdSQL, userId, function(err, rows) {
                     connection.release();
                     if (err) {
                         e

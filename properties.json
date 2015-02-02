@@ -1,6 +1,7 @@
 {
     "project": {
         "id": "id",
+        "projectResourceId": "projectresourceid",
         "userId": "userid",
         "name": "name",
         "desc": "description",
@@ -8,10 +9,12 @@
         "endDate": "enddate",
         "updatePid": "updatepid",
         "removePid": "removepid",
+        "sowNo": "sowno",
         "sowstartdate": "sowstartdate",
         "sowenddate": "sowenddate",
         "sowprojectdescription": "sowprojectdescription",
-        "billable":"billable"
+        "billable":"billable",
+        "projectname":"projectname"
     },
 
     "team": {
@@ -20,7 +23,34 @@
         "leadId": "leadid",
         "teamId": "teamid",
         "userId": "userid",
-        "id": "id"
+        "id": "id",
+        "executives":"executives"
+    },
+
+    "iteration": {
+        "id": "id",
+        "name": "name",
+        "desc": "description",
+        "startDate": "startdate",
+        "endDate": "enddate"
+    },
+
+    "story": {
+        "id": "id",
+        "name": "name",
+        "projectId": "projectid",
+        "desc": "description",
+        "hrs": "hours",
+        "type": "type"
+    },
+
+    "task": {
+        "id": "id",
+        "name": "name",
+        "storyId": "storyid",
+        "desc": "description",
+        "hrs": "hours",
+        "prevHrs":"prevTaskHours"
     },
 
     "role": {
@@ -30,7 +60,7 @@
     },
 
     "roles": {
-	"seniormanager": "SENIOR MANAGER",
+	   "seniormanager": "SENIOR MANAGER",
         "manager": "MANAGER",
         "admin": "ADMIN",
         "user": "USER",
@@ -58,10 +88,14 @@
         "id": "id",
         "projectId": "projectid",
         "iterationno": "iterationno",
-        "storydescription": "storydescription",
-        "logstatuses":"logstatuses",
+        "story": "story",
+        "task": "task",
+        "storyStatus":"storyStatus",
+        "plannedStartDate" : "plannedStartDate",
+        "plannedEndDate" : "plannedEndDate",
         "startDate": "startdate",
         "endDate": "enddate",
-        "desc": "description"
+        "desc": "description",
+        "status": "status"
     }
 }

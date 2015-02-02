@@ -6,9 +6,19 @@ var logDao = require("../dao/log-dao"),
     util = require("../util/util");
 
 
+exports.getStoryStatuses = function(callback) {
+    log.debug("getStoryStatuses");
+    logDao.getStoryStatuses(callback);
+};
+
 exports.getLogStatuses = function(callback) {
     log.debug("getLogStatuses");
     logDao.getLogStatuses(callback);
+};
+
+exports.getUserDetailsByLogid = function(logid, callback) {
+    log.debug("getUserDetailsByLogid");
+    logDao.getUserDetailsByLogid(logid, callback);
 };
 
 exports.getLogsByUserId = function(obj, callback) {
@@ -41,6 +51,11 @@ exports.getReportLogs = function(obj, callback) {
     logDao.getReportLogs(obj, callback);
 };
 
+exports.getTeamsReportLogs = function(obj, callback) {
+    log.debug("getTeamsReportLogs");
+    logDao.getTeamsReportLogs(obj, callback);
+};
+
 exports.getDetailedUserReportLogs = function(obj, callback) {
     log.debug("getDetailedUserReportLogs");
     logDao.getDetailedUserReportLogs(obj, callback);
@@ -65,16 +80,23 @@ exports.unlockLogRequest = function(obj, callback) {
     });
 };
 
-exports.saveLog = function(obj, callback) {
-    log.debug("saveLog");
-    logDao.saveLog(obj, function(returnValue) {
+exports.savePlannedLog = function(obj, callback) {
+    log.debug("savePlannedLog");
+    logDao.savePlannedLog(obj, function(returnValue) {
         util.handleErrors(returnValue, callback);
     });
 };
 
-exports.editLog = function(obj, callback) {
+exports.saveActualLog = function(obj, callback) {
+    log.debug("saveActualLog");
+    logDao.saveActualLog(obj, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};
+
+exports.editLog = function(obj, logid, callback) {
     log.debug("editLog");
-    logDao.editLog(obj, function(returnValue) {
+    logDao.editLog(obj, logid, function(returnValue) {
         util.handleErrors(returnValue, callback);
     });
 };

@@ -19,6 +19,7 @@
 <body ng-controller="genericCtrl" ng-cloak>
     <% var pageName = 'dashboard' %>
     <% include header.html %>
+    <%if(user.hasTeam){%>
     <div class="container-fluid">
         <div class="row" ng-controller="projectViewController">
             <div class="col-md-9 leftPannelSection fixed-title">
@@ -29,6 +30,7 @@
                 <div id="ProjectView" projectdroppable class="">
                     <div ng-repeat="p in droppedProjects" class="projectSection">
                         <div class="pv" resourcedroppable projectid="{{p.id}}" projectname="{{p.name}}">
+                            
                             <div onclick="minimaxConetent(this)">
                                 <div class="expand">
                                     <i class="fa fa-plus-square-o fa-lg pull-right"></i>
@@ -60,38 +62,56 @@
                                         </p>
                                     </div>
                                 </div>
-                                <div class="resources">
+                               <div class="resources">
                                     <h5 class="resourceTitle">Developers</h5>
+                                    <div class="row container-fluid res-headers">
+										<div class="col-md-3">Name</div>
+										<div class="col-md-1">#Sow</div>
+										<div class="col-md-2">Start</div>
+										<div class="col-md-2">End</div>
+										<div class="col-md-2">Total</div>
+										<div class="col-md-2">Spent</div>
+                                    </div>
                                 </div>
                                 <div class="developers">
-                                    <div resourcedraggable username="{{d.username}}" ng-repeat="d in p.users">
+                                    <div resourcedraggable username="{{d.username}}" prid="{{d.projectresourceid}}" ng-repeat="d in p.users">
                                         <div class="item left-section">
                                             <div class="container-fluid res-padding">
-                                                <div class="col-md-4 res-padding">
-												<span class="{{d.billable == 1 ? 'billable' : 'non-billable'}}"></span>
-													{{d.firstname +" "+ d.lastname}}
+                                                <div class="col-md-3 res-padding">
+												<span class="billing-control {{d.validityCtrlClass}}" title="{{d.validityStatus}}"></span>
+                                                    {{d.firstname +" "+ d.lastname}}
+                                                </div>
+												<div class="col-md-1 res-padding">
+														<span>{{d.sowno }}</span>
                                                 </div>
                                                 <div class="col-md-2 res-padding">
-                                                    <span class="text-light">Start: </span><span>{{d.startdate }}</span>
+														<span>{{d.startdate }}</span>
                                                 </div>
                                                 <div class="col-md-2 res-padding">
-                                                    <span class="text-light">End: </span><span>{{d.enddate }}</span>
+														<span>{{d.enddate }}</span>
                                                 </div>
                                                 
                                                 <div class="col-md-2 res-padding">
-                                                    <span class="text-light">Total: </span><span>  {{d.total + 'h' }}</span>
+														<span>  {{d.total + 'h' }}</span>
                                                 </div>
                                                 <div class="col-md-2 res-padding">
                                                     <div class="pull-left">
-                                                    <span class="text-light">Spent: </span><span>  {{d.logged + 'h' }}</span>
+														<span>  {{d.logged + 'h' }}</span>
                                                 </div>
                                                 <!--<div class="col-md-2 res-padding">
                                                    <div class="pull-left">
-                                                    <span class="text-light">Bal: </span><span>  {{d.bal + 'h' }}</span>
+														<span>  {{d.bal + 'h' }}</span>
                                                 </div>  -->
+                                                
+
                                                 <div class="pull-right res-close">
                                                     <i ng-click="removeResource(p,d)" class="fa fa-times"></i>
                                                 </div>
+                                            
+                                                <div class="pull-right res-edit">
+                                                    <i ng-click="editResource(p,d)" class="fa fa-pencil-square-o"></i>
+                                                </div>
+       
                                             </div>
                                         </div>
                                         <div class="clearfix"></div>
@@ -101,7 +121,7 @@
                                     </div>
                                 </div>                                
                             </div>
-                        </div>
+                        </div>               
                         <div class="close" ng-click="closeView(p)">
                             <i class="fa fa-close pull-right"></i>
                         </div>
@@ -132,7 +152,7 @@
                                     </div>
                                     <div class="pull-right">
                                         <div class="pull-left res-padding user-settings align-center">
-                                            <input type="checkbox" ng-model="r.accesslevel" ng-change="setPermissions(r)" class="check-permissions"/>
+                                            <input type="checkbox" ng-model="r.check" ng-change="setPermissions(r)" class="check-permissions"/>
                                         </div>
                                         <div class="pull-left res-padding align-center" title="Check Report" ng-click="showUserReport(r.id)">
                                             <i class="fa fa-bar-chart right-inside-icn"></i>
@@ -170,10 +190,19 @@
                     </div>
                     <div class="right-overflow">
                         <div ng-repeat="p in Projects | filter:searchProject" bs-popover>
-                            <div class="item" projectdraggable projectid="{{p.id}}" projectname="{{p.name}}" ng-click="editProject(p.id)">
+                            <div class="item" projectdraggable projectid="{{p.id}}" projectname="{{p.name}}">
                                 <text data-toggle="tooltip" data-original-title="{{p.projectlogged?p.projectlogged:0}}% - {{p.logged ? p.logged : 0}} Mins">
                                     {{p.name +" ("+ p.count +")"}}
                                 </text>
+
+                                <span class="project-edit-icon-wrapper">
+                                        <span ng-click="editProject(p, p.id)"><i class="fa fa-pencil-square-o"></i></span>
+
+                                        <span ng-click="removeProject(p, p.id, Projects, $index)"><i class="fa fa-times"></i></span>
+
+                                </span>
+
+
                             </div>
                             <div class="itemLine">
                                 <div style="overflow: hidden; width: {{p.projectlogged}}%;"></div>
@@ -191,7 +220,7 @@
         <div class="modal-content">
             <form name="ProjectForm" id="ProjectForm" novalidate class="form-horizontal">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="close()">&times;</button>
                     <h4>{{projectType}}</h4>
                 </div>
                 <div class="modal-body">
@@ -231,7 +260,7 @@
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary" ng-click="saveProject()">Save</button>
                     <button type="button" class="btn btn-default" ng-click="reset()">Reset</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="close()">Close</button>
                 </div>
             </form>
         </div>
@@ -283,18 +312,30 @@
                         <label for="billable" class="col-md-4 control-label">Billable</label>
 
                         <div class="col-md-8">
-                            <input type="checkbox" ng-model="sowproject.billable" name="billable" id="billable" class="check-permissions"/>
+                            <input type="checkbox" ng-model="sowproject.billable" name="billable" id="billable" ng-click="getSowNumber()" class="check-billable"/>
                         </div>
                     </div>
+					<div class="form-group sowdisplay" id="sownodisplay">
+							<label for="sownumber" class="col-md-4 control-label">Sow Number</label>
+							<div class="col-md-8">
+								<input type="text" ng-model="sowproject.sowno" id="sowno"  name="sowno" class="form-control" placeholder="Sow Number"/>
+								<span class="error-message" ng-show="SowForm.sowno.$error.required">Please enter Sow Number</span>
+							</div>
+					</div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" ng-click="saveSow()">Save</button>
+                    <button type="submit" class="btn btn-primary" id="saveSow" ng-click="saveSow()">Save</button>
+                    <button type="submit" class="btn btn-primary" id="editSow" ng-click="updateSow()" style="display:none">Update</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeSow()" id="lockFormCloseBtn">Close</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+<%}else{%>
+<br><br><br><br>
+    <div>Team not Yet created.</div>
+<%}%>
 <% include footer.html %>
 <script src="lib/jquery.js"></script>
 <script src="lib/bootstrap.js"></script>

@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="lib/bootstrap.css" rel="stylesheet">
     <link href="css/validation.css" rel="stylesheet">
+    <link href="css/admin.css" rel="stylesheet">
+
 </head>
 <body>
 <% var pageName='admin' %>
@@ -18,7 +20,7 @@
                 <h4>Teams</h4>
             </div>
             <div class="col-md-1">
-                <button type="button" class="btn btn-primary btn-xs" ng-click="addTeam()">Add</button>
+                <button type="button" class="btn btn-primary " ng-click="addTeam()">Add</button>
             </div>
         </div>
         <table class="table table-striped">
@@ -28,23 +30,40 @@
                 <th>Name</th>
                 <th>Description</th>
                 <th>Lead</th>
-                <th></th>
-                <th></th>
+                <th>Executives</th>
+                <th>Action</th>
+                
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="t in Teams">
+            <tr ng-repeat-start="t in Teams">
                 <td>{{t.id}}</td>
                 <td>{{t.name}}</td>
                 <td>{{t.description}}</td>
-                <td>{{t.username}}</td>
+                <td>{{t.username}}</td>               
                 <td>
-                    <img alt="Edit" src="images/edit.png" ng-click="editTeam(t.id)">
+                    <i class="fa fa-chevron-down view-task" title="View sub-tasks" ng-click="showExecutives($event)"></i>                   
                 </td>
                 <td>
-                    <img alt="Delete" src="images/delete.png">
-                </td>
+                    <img alt="Edit Team" title="Edit team" src="images/edit.png" ng-click="editTeam($event,t.id)">
+                </td>                
             </tr>
+
+            <tr ng-repeat-end style="display:none">
+                    <td colspan="7">
+                             <table class="executiveTable">
+                                <tr>
+                                    <th>Executive Id</th>
+                                    <th>Executive Email</th>                            
+                                </tr>
+                                <tr ng-repeat="k in t.executives">
+                                    <td>{{k.id}}</td>                            
+                                    <td>{{k.username}}</td>
+                                </tr>
+                            </table>
+                    </td>  
+            </tr>
+
             </tbody>
         </table>
 		<div class="row modal-footer "></div>
@@ -54,7 +73,7 @@
                 <div class="modal-content">
                     <form name="AddTeamForm" novalidate class="form-horizontal">
                         <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="reset()">&times;</button>
                             <h4>{{mode}} Team</h4>
                         </div>
                         <div class="modal-body">
@@ -77,17 +96,35 @@
                                 <label for="teamlead" class="col-md-3 control-label">Lead</label>
 
                                 <div class="col-md-9">
-                                    <select ng-model="team.leadid" ng-options="opt as opt.username for opt in Leads" id="teamlead" name="teamlead" class="form-control" required>
+                                    <select ng-model="team.leadid" ng-options="lead as lead.username for lead in Leads" id="teamlead" name="teamlead" class="form-control" required>
                                         <option value="">Choose Lead</option>
                                     </select>
                                     <span class="error-message" ng-show="AddTeamForm.teamlead.$dirty && AddTeamForm.teamlead.$invalid">Select Lead</span>
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <label for="teamlead" class="col-md-3 control-label">Executive</label>
+
+                                <div class="col-md-9">
+                                    <select multiple="multiple" ng-model="team.executives" ng-options="opt as opt.username for opt in Executives track by opt.id" 
+                                    id="executive" name="executive" class="form-control">
+                                        <option value="">Choose Executive</option>
+                                    </select>
+                                    <span class="error-message" ng-show="AddTeamForm.executive.$dirty && AddTeamForm.executive.$invalid">Select Executive</span>
+                                </div>
+                            </div>
                         </div>
+                       
+                        <div class="reset-executive">
+                            <button type="button" class="btn btn-primary" ng-click="resetExecutives()">Reset Selection</button>
+                        </div>
+
+
+
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary" ng-click="saveTeam()">Save</button>
                             <button type="reset" class="btn btn-default" ng-click="reset()">Reset</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="reset()">Close</button>
                         </div>
                     </form>
                 </div>
@@ -100,7 +137,7 @@
                 <h4>Roles</h4>
             </div>
             <div class="col-md-1">
-                <button type="button" class="btn btn-primary btn-xs" ng-click="addRole()">Add</button>
+                <button type="button" class="btn btn-primary " ng-click="addRole()">Add</button>
             </div>
         </div>
         <table class="table table-striped">
@@ -109,7 +146,7 @@
                 <th>Id</th>
                 <th>Name</th>
                 <th>Description</th>
-                <th></th>
+                <th>Action</th>
             </tr>
             </thead>
             <tbody>
@@ -119,9 +156,6 @@
                 <td>{{r.description}}</td>
                 <td>
                     <img alt="Edit" src="images/edit.png" ng-click="editRole(r.id)">
-                </td>
-                <td>
-                    <img alt="Delete" src="images/delete.png">
                 </td>
             </tr>
             </tbody>
@@ -133,7 +167,7 @@
                 <div class="modal-content">
                     <form name="AddRoleForm" novalidate class="form-horizontal">
                         <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="reset()">&times;</button>
                             <h4>{{mode}} Role</h4>
                         </div>
                         <div class="modal-body">
@@ -156,7 +190,7 @@
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary" ng-click="saveRole()">Save</button>
                             <button type="reset" class="btn btn-default" ng-click="reset()">Reset</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="reset()">Close</button>
                         </div>
                     </form>
                 </div>
@@ -169,7 +203,7 @@
                 <h4>Projects</h4>
             </div>
             <div class="col-md-1">
-                <button type="button" class="btn btn-primary btn-xs" ng-click="addProject()">Add</button>
+                <button type="button" class="btn btn-primary " ng-click="addProject()">Add</button>
             </div>
         </div>
         <table class="table table-striped">
@@ -199,7 +233,7 @@
                 <div class="modal-content">
                     <form name="ProjectForm" id="ProjectForm" novalidate class="form-horizontal">
                         <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="reset()">&times;</button>
                             <h4>{{mode}} Project</h4>
                         </div>
                         <div class="modal-body">
@@ -224,13 +258,108 @@
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary" ng-click="saveProject()">Save</button>
                             <button type="button" class="btn btn-default" ng-click="reset()">Reset</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="reset()">Close</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+
+
+ <div id="IterationWrapper" ng-controller="IterationCtrl">
+        <div class="row modal-header">
+            <div class="col-md-1 ">
+                <h4>Iterations</h4>
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-primary " ng-click="addIteration()">Add</button>
+            </div>
+        </div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Iteration No.</th>
+                <th>Description</th>
+                <th>Start date</th>
+                <th>End date</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="iteration in Iterations">
+                <td ng-bind="iteration.id"></td>
+                <td ng-bind="iteration.name"></td>
+                <td ng-bind="iteration.description"></td>
+                <td ng-bind="iteration.startdate"></td>
+                <td ng-bind="iteration.enddate"></td>
+<!--                 <td> 
+                    <img alt="Edit" src="images/edit.png" ng-click="editProject(p.id)">
+                </td>
+ -->            </tr>
+            </tbody>
+        </table>
+        <div class="row modal-footer "></div>
+        <!-- Add/Edit Iterations -->
+        <div class="modal fade" id="IterationModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form name="IterationForm" id="IterationForm" novalidate class="form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="reset()">&times;</button>
+                            <h4>{{mode}} Iteration</h4>
+                        </div>
+                        <div class="modal-body">
+                            <UL id="errorContainer"></UL>
+                            <div class="form-group" show-errors>
+                                <label for="projectname" class="col-md-3 control-label">Iteration Number</label>
+
+                                <div class="col-md-9">
+                                    <input type="number" id="iterationNumber" name="iterationnumber" ng-model="iteration.name" class="form-control" placeholder="Iteration Number" required>
+                                    <span class="error-message" ng-show="ProjectForm.projectname.$error.required">Iteration number is required</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="iterationDescription" class="col-md-3 control-label">Description</label>
+
+                                <div class="col-md-9">
+                                    <textarea class="form-control" rows="3" ng-model="iteration.description" placeholder="Description" id="iterationDescription" name="iterationdescription"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="iterationDescription" class="col-md-3 control-label">Start date</label>
+
+                                <div class="col-md-9">
+                                    <input type="date" id="iterationNumber" name="iterationnumber" ng-model="iteration.startdate" class="form-control" placeholder="Iteration start date" required>
+                                    <span class="error-message" ng-show="ProjectForm.projectname.$error.required">Iteration number is required</span>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="iterationDescription" class="col-md-3 control-label">End date</label>
+
+                                <div class="col-md-9">
+                                   <input type="date" id="iterationNumber" name="iterationnumber" ng-model="iteration.enddate" class="form-control" placeholder="Iteration end date" required>
+                                    <span class="error-message" ng-show="ProjectForm.projectname.$error.required">Iteration number is required</span>
+                                </div>
+                            </div>
+  
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" ng-click="saveIteration()">Save</button>
+                            <button type="button" class="btn btn-default" ng-click="reset()">Reset</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="reset()">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 <script src="lib/jquery.js"></script>
 <script src="lib/bootstrap.js"></script>

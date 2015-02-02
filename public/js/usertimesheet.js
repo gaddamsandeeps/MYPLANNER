@@ -1,7 +1,7 @@
 var el = $('#calendar'),selectedEvent;
 var modalEl = $('#AddTimeModal');
 var calObj = {
-  eventClick: function(event, element) {       
+  eventClick: function(event, element) {
     var btnGroup = $('.fc-button-group');
     var active = btnGroup.find('.fc-state-active').text().trim();
     var eventData;
@@ -9,29 +9,33 @@ var calObj = {
     if (active === 'month') {
       $('#addTimeProjectId').val(event.title);
       $('#projectId').val(event.id);
-      $('#logStatuses').val(event.status);
+      $('#storyStatus').val(event.storystatusname);
 
       $('#addTimeIterationNo').val(event.iteration);
-      $('#addTimeStoryDescription').val(event.story);
+      $('#addTimeStory').val(event.storyname);
+      $('#addTimeTask').val(event.taskname);
 
-      document.getElementById('addTimeStartTime').valueAsNumber = toUTC(new Date(event.start._i));
-      document.getElementById('addTimeEndTime').valueAsNumber = toUTC(new Date(event.end._i));
+      document.getElementById('addTimeStartTime').valueAsNumber = toUTC(new Date(event.start._d));
+      document.getElementById('addTimeEndTime').valueAsNumber = toUTC(new Date(event.end._d));
+      document.getElementById('addTimePlannedStartTime').valueAsNumber = toUTC(new Date(event.plannedstart));
+      document.getElementById('addTimePlannedEndTime').valueAsNumber = toUTC(new Date(event.plannedend));
+
       $('#addTimeDescription').val(event.description);
       modalEl.modal('show');
-      var lockStatus = event.locked;
-      var lockRequest = event.lockrequest;
+      var logstatus = event.logstatusid;
+      $('#btnUnlock').hide();
 
-      if (lockRequest===0){
-        $('#btnUnlock').hide();
-      }
-      else{
+      if (logstatus === 3){
+        $('#modalHeader').text("Unlock log to edit");
         $('#btnUnlock').show();
         $('#btnUnlock').removeAttr('disabled');
-                //$('#btnUnlock').text('Unlock');
                 $('#btnUnlock').click(function(){
                  $('#btnUnlock').attr('disabled','disabled');
                })
-              }
+      }
+      else{
+          $('#modalHeader').text("Log Details");
+      }
             }
           },
           timezone: 'local',
@@ -56,47 +60,74 @@ var calObj = {
               data: obj
             });
             $('#btnUnlock').click(function() {
-              var logid=$('#projectId').val()
-              var userid=id;
+              var projectdetails={
+                  id        : $('#projectId').val(),
+                  userid    : id,
+                  startdate : selectedEvent.start._d,
+                  status    : 4 };
               var unlock = $.ajax({
-                url:'/unlockLog?id='+logid+'&userid='+userid,
-                type:'get'
+                url: '/unlockLog',
+                type: 'get',
+                contentType: 'application/json',
+                data: projectdetails
               });
-              unlock.done(function(d){   
+              unlock.done(function(d){
+                      //change event color starts here
+                      el.fullCalendar('removeEvents', [selectedEvent.id]);
+                      var eventData = {
+                        title: selectedEvent.title,
+                        start: selectedEvent.start._d,
+                        end: selectedEvent.end._d,
+                        plannedstart: selectedEvent.plannedstart,
+                        plannedend: selectedEvent.plannedend,
+                        iteration: selectedEvent.iteration,
 
-            //change event color starts here
-            el.fullCalendar('removeEvents', [selectedEvent.id]);
-            var eventData = {
-              title: selectedEvent.title,
-              start: selectedEvent.start._d,
-              end: selectedEvent.end._d,
-              iteration: selectedEvent.iteration,
-              story: selectedEvent.story,
-              status: selectedEvent.status,
-              description: selectedEvent.description,
-              id: selectedEvent.id,
-              backgroundColor: 'green',
-              borderColor : 'green',
-              locked: 0,
-              lockrequest: 0
-            };
-            el.fullCalendar('renderEvent', eventData, true);
-            el.fullCalendar('unselect');
-    //change event color ends here
+                        storystatusname: selectedEvent.storystatusname,
+                        storyname: selectedEvent.storyname,
+                        taskname: selectedEvent.taskname,
+                        description: selectedEvent.description,
+                        id: selectedEvent.id,
+                        className : 'log-unlocked'
+                      };
+                      el.fullCalendar('renderEvent', eventData, true);
+                      el.fullCalendar('unselect');
+                      //change event color ends here
 
-    modalEl.modal('hide');
-    showStatus(d, 'Log unlocked');
-
-
-  });
+                      modalEl.modal('hide');
+                      showStatus(d, 'Log unlocked');
+            });
               return false;
             });
-req.done(function(Events) {
-  callback(Events);
-});
-req.fail(function(e) {
-  callback(e);
-});
-}
-};
+            req.done(function(events) {
+              for (var i = 0; i < events.length; i++) {
+                      if (events[i].logstatusid === 1) {
+                          events[i].start = events[i].plannedstart;
+                          events[i].end = events[i].plannedend;
+                      }
+                      events[i].className = getClassName(events[i].logstatusid);
+                    }
+              callback(events);
+            });
+            req.fail(function(e) {
+              callback(e);
+            });
+  }
+  };
 el.fullCalendar(calObj);
+
+function getClassName(logstatusid){  
+  switch(logstatusid){
+    case 1:
+    return "log-planned";
+    break;
+    case 2: 
+    return "";
+    break;
+    case 3:
+    return "log-unlockrequest";  
+    break;
+    case 4:
+    return "log-unlocked";
+    break;
+  }
+}

@@ -15,8 +15,9 @@
   <script src='lib/jquery-1.11.1.min.js'></script>
   <script src='lib/jquery.dataTables.min.js'></script>
 
-  <script src="js/report/highcharts.js"></script>
-  <script src="js/report/exporting.js"></script>
+  <script src="lib/report/highstock.js"></script>
+  <script src="lib/report/exporting.js"></script>
+  
   <script src='js/common/util.js'></script>    
   <script src='js/common/dateformat.js'></script>    
   <script src="js/report/report.js"></script>
@@ -34,27 +35,27 @@
      var userId = getUrlVars()["id"];
      var url;
      var titlePrefix, titleSuffix = ' logs from ' + $("#reportStartTime").val() + ' to ' + $("#reportEndTime").val();
-     var cols = 13;
+     var cols = 16;
      if (userId) {
-       cols--; <%
-       if (typeof selectedUser != "undefined") { %>
-         titlePrefix = '<%= selectedUser.firstname +" "+ selectedUser.lastname %>'; <%
+       cols--; 
+       <% if (typeof selectedUser != "undefined") { %>
+         titlePrefix = '<%= selectedUser.firstname +" "+ selectedUser.lastname %>'; 
+       <%}%>
+          // user report log ajax cal
+          url = "/getDetailedUserReportLogs?startdate=" + $("#reportStartTime").val() + "&enddate=" + $("#reportEndTime").val() + "&userid=" + userId;
+       } else { <% if (typeof user.teamName != "undefined") { %>
+         titlePrefix = '<%= user.teamName+" " %>'; <%
        } %>
-			            // user report log ajax cal
-			            url = "/getDetailedUserReportLogs?startdate=" + $("#reportStartTime").val() + "&enddate=" + $("#reportEndTime").val() + "&userid=" + userId;
-               } else { <% if (typeof user.teamName != "undefined") { %>
-                 titlePrefix = '<%= user.teamName+" " %>'; <%
-               } %>
-               titlePrefix += 'Team';
-			            // team report log ajax cal
-			            url = "/getDetailedReportLogs?startdate=" + $("#reportStartTime").val() + "&enddate=" + $("#reportEndTime").val();
-               }
-               var data = $.getValues(url);
-               if (data == '') {
-                 return;
-               }
-               JSONToCSVConvertor(data, titlePrefix + titleSuffix, true, cols);
-             });
+       titlePrefix += 'Team';
+          // team report log ajax cal
+          url = "/getDetailedReportLogs?startdate=" + $("#reportStartTime").val() + "&enddate=" + $("#reportEndTime").val();
+       }
+       var data = $.getValues(url);
+       if (data == '') {
+         return;
+       }
+       JSONToCSVConvertor(data, titlePrefix + titleSuffix, true, cols);
+     });
 });
 </script>
 </head>
@@ -137,6 +138,15 @@
             <div class="col-md-2">
               <select class="form-control"  id="teamMembers">
                 <option>All</option>
+                <% for(var i=0; i<teamMembers.length; i++) {
+                  if( selectedUser.id  === teamMembers[i].id){%>
+                  <option selected value="<%= teamMembers[i].id %>">
+                <% } else{%>
+                  <option  value="<%= teamMembers[i].id %>">
+                <% }%>
+                  <%= teamMembers[i].firstname+" "+teamMembers[i].lastname %>                
+                </option>
+                <% } %>   
               </select>
             </div>
             <% } %>
@@ -145,28 +155,37 @@
         <div class="col-md-12">
           <h4>Report name</h4>
         </div>
-        <div class="tab-pane active wholereport">
-		<label class="hform-label">Chart Type :&nbsp;</label> 
-		<select id="chartType">
-		  <option value="pie">Pie Chart</option>
-		  <option value="bar">Bar Chart</option>
-		  <option value="line">Line Chart</option>
-		</select>
-          <div id="userReport" class="reports"></div>
-		  <div id="userReportBarChart" class="reports" style="display: none;"></div>
-		  <div id="userReportLineChart" class="reports" style="display: none;"></div>
+        <% if (typeof selectedUser === "undefined") { %>
+        <label class="hform-label">Chart Type :&nbsp;</label> 
+        <select id="chartType">
+          <option value="pie">Pie Chart</option>
+          <option value="bar" selected>Bar Chart</option>
+          <option value="line">Line Chart</option>
+        </select>
+        <%}%>
+        <div id="parent">
+        <div class="tab-pane active wholereport">		
+          <div id="userReport" class="reports" style="display: none;"></div>
+    		  <div id="userReportBarChart" class="reports" ></div>
+    		  <div id="userReportLineChart" class="reports" style="display: none;"></div>
         </div>
         <div class="tab-pane wholereport" id="ios">
-          <div id="projectReport" class="reports"></div>
+          <div id="projectReport" class="reports" style="display: none;"></div>
+          <div id="projectReportBarChart" class="reports" ></div>
+          <div id="projectReportLineChart" class="reports" style="display: none;"></div>
           <div id="userProjectReport" class="reports"></div>
         </div>
         <div class="tab-pane wholereport" id="ios">
-          <div id="iterationReport" class="reports"></div>
+          <div id="iterationReport" class="reports" style="display: none;"></div>
+          <div id="iterationReportBarChart" class="reports" ></div>
+          <div id="iterationReportLineChart" class="reports" style="display: none;"></div>
           <div id="iterationStoryReport" class="reports"></div>
           <div id="iterationStoryUserReport" class="reports"></div>                
         </div>
         <div class="tab-pane wholereport" id="ios">
-          <div id="storyReport" class="reports"></div>
+          <div id="storyReport" class="reports" style="display: none;"></div>
+          <div id="storyReportBarChart" class="reports" ></div>
+          <div id="storyReportLineChart" class="reports" style="display: none;"></div>
           <div id="individualStoryReport" class="reports"></div>
         </div>
         <div class="tab-pane active singlereport">
@@ -175,17 +194,22 @@
         <div class="tab-pane singlereport">
           <div id="workingHoursReport" class="reports"></div>
         </div>
+        </div>
         <div class="tab-pane wholereport">
           <div id="excelReport" class="reports"></div>
-          <table id="excelReportTable" class="display" cellspacing="0" width="100%">
+          <table id="excelReportTable" class="display" cellspacing="0" width="auto">
             <thead>
              <tr>
               <th>ID</th>	
               <th>PROJECT</th>
               <th>ITERATION</th>
               <th>STORY</th>
+              <th>TASK</th>
               <th>DESCRIPTION</th>
               <th>USER</th>
+              <th>PLANNEDSTART</th>
+              <th>PLANNEDEND</th>
+              <th>PLANNEDLOGGED</th>
               <th>START</th>
               <th>END</th>
               <th>LOGGED</th>
@@ -197,14 +221,18 @@
       </div>
       <div class="tab-pane singlereport">
         <div id="singleExcelReport" class="reports"></div>
-        <table id="singleExcelReportTable" class="display" cellspacing="0" width="100%">
+        <table id="singleExcelReportTable" class="display" cellspacing="0" width="auto">
           <thead>
             <tr>
               <th>ID</th>	
               <th>PROJECT</th>
               <th>ITERATION</th>
               <th>STORY</th>	
+              <th>TASK</th>
               <th>DESCRIPTION</th>
+              <th>PLANNEDSTART</th>
+              <th>PLANNEDEND</th>
+              <th>PLANNEDLOGGED</th>
               <th>START</th>
               <th>END</th>
               <th>LOGGED</th>
@@ -218,44 +246,37 @@
   </div>
 </div>
 <script type="text/javascript">
-$("#chartType").change(function () {
-	if(this.value ===  'bar'){
-		$( "#userReport" ).hide();
-		$( "#userReportBarChart" ).show();
-		$( "#userReportLineChart" ).hide();
-	}else if(this.value ===  'line'){
-		$( "#userReport" ).hide();
-		$( "#userReportBarChart" ).hide();
-		$( "#userReportLineChart" ).show();
-	}else{
-		$( "#userReport" ).show();
-		$( "#userReportBarChart" ).hide();
-		$( "#userReportLineChart" ).hide();
-	}
- });
+  $('.tab-pane').hide();
+  
+  <% if (typeof selectedUser !="undefined") { %>
+    $('#singleUserReport').parent('li').addClass('active');  
+    $('#singleUserReport').parent('.tab-pane').show();
+  <%}else{%>
+    $('#userReport').parent('li').addClass('active');  
+    $('#userReport').parent('.tab-pane').show();
+  <%}%>
 
-<% if (typeof selectedUser !="undefined" && typeof user.teamName !="undefined") { %>
-  var teamid = '<%= user.teamId %>';
-  var data = {id : teamid};
-  $.ajax({
-   url : '/getTeamUsersByTeamId',
-   type:'get',
-   dataType: 'json',
-   data : data
- }).done(function(teamMembers){
-  var selectedUser=''
-  for(i=0; i< teamMembers.length; i++){
-    if('<%= selectedUser.id %>' == teamMembers[i].id){
-      selectedUser = 'selected';
-    }else{
-      selectedUser = '';
-    }
-    $("#teamMembers").append("<option "+selectedUser+" value="+teamMembers[i].id+">"+teamMembers[i].firstname+" "+teamMembers[i].lastname+"</option>");     
+  $("#chartType").change(function () {
+    $("#parent").children(".wholereport").children().hide();
+  	if(this.value ===  'bar'){		
+  		$( "#userReportBarChart" ).show();
+      $( "#projectReportBarChart" ).show();
+      $( "#iterationReportBarChart" ).show();
+      $( "#storyReportBarChart" ).show();
+  	}else if(this.value ===  'line'){
+  		$( "#userReportLineChart" ).show();
+      $( "#projectReportLineChart" ).show();
+      $( "#iterationReportLineChart" ).show();
+      $( "#storyReportLineChart" ).show();
+  	}else if(this.value ===  'pie'){
+  		$( "#userReport" ).show();
+      $( "#projectReport" ).show();
+      $( "#iterationReport" ).show();
+      $( "#storyReport" ).show();
+  	}
+   });
 
-  }   
-});
-
- $( "select" ).change(function () {
+   $( "#teamMembers" ).change(function () {
   var url = './report?id='+$( this ).val();
   //return false;
   var str = "";
@@ -263,8 +284,7 @@ $("#chartType").change(function () {
     $(location).attr('href',url);
   });    
 });
- <% } %>
- </script>
+</script>
  <% include footer.html %>
 </body>
 </html>

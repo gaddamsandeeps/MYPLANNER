@@ -1,0 +1,42 @@
+.addstorylabel{
+	height: 30px;
+}
+
+.addonstory{
+	margin-left: 20px;
+}
+
+
+textarea{
+	resize : none;
+}
+
+/*Data table styles*/
+
+#storyReportTable td{
+	padding-left: 18px;
+} 
+
+
+/*sub task table*/
+
+.sub-task-wrapper{
+	width: 100%;
+	border: 1px solid #ddd;
+}
+.sub-task-wrapper tr td,.sub-task-wrapper tr th{
+	text-align: left;
+}
+.sub-task-wrapper td,.sub-task-wrapper th{
+	border-left: 1px solid #ddd;
+}
+.add-story-subtask{
+	margin-left: 20px;
+	color: #84B8F7;
+	cursor: pointer;
+}
+.view-task{
+	margin-left: 10px;
+	color:#84B8F7;
+	cursor: pointer;
+}

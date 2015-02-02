@@ -10,3 +10,7 @@
 .form-group.has-error .error-message {
 	display: block;
 }
+
+textarea{
+	resize : none;
+}

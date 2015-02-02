@@ -1,4 +1,4 @@
-<% if (pageName !== "report") { %>
+<% if (pageName !== "report" && pageName !== "ereports") { %>
 <script src='lib/jquery-1.11.1.min.js'></script>
 <% } %>
 
@@ -26,35 +26,65 @@ var userid = '<%= user.id %>';
         <% if (typeof user != "undefined" ) { %>
         <ul class="headerNav pull-right">
             <% if (user.roleName === "MANAGER" ) { %>
-            <li>
-                <a data-toggle="modal" id="addproject" href="#AddProjectModal"></a>
-            </li>
-            <% if (pageName === "report" || pageName === "usertimesheet" || pageName === "editprofile") { %>
-            <li>
-                <a data-toggle="modal" href="/dashboard">Dashboard</a>
-            </li>
-            <% } %>
-            <% if (pageName === "report" || pageName === "dashboard" || pageName === "editprofile") { %>
-            <li>
-                <a data-toggle="modal" href="/usertimesheet?id=">Timesheet</a>
-            </li>
-            <% } %>
-            <% if (pageName === "dashboard" || pageName === "usertimesheet"  || pageName === "editprofile") { %>
-            <li>
-                <a data-toggle="modal" href="/report">Reports</a>
-            </li>
+                <li>
+                    <a data-toggle="modal" id="addproject" href="#AddProjectModal"></a>
+                </li>
+                <% if (pageName !== "dashboard") { %>
+                <li>
+                    <a data-toggle="modal" href="/dashboard">Dashboard</a>
+                </li>
+                <% } %>
+                <% if (pageName !== "story" ) { %>
+                <li>
+                    <a data-toggle="modal" href="/story">Stories</a>
+                </li>
+                <% } %>
+                <% if (pageName !== "usertimesheet" ) { %>
+                <li>
+                    <a data-toggle="modal" href="/usertimesheet?id=">Timesheet</a>
+                </li>
+                <% } %> 
+                <% if (pageName !== "edashboard" ) { %>
+                <li>
+                    <a data-toggle="modal" href="/edashboard">E-Dashboard</a>
+                </li>
+                <% } %> 
+                <% if (pageName !== "ereports" ) { %>
+                <li>
+                    <a data-toggle="modal" href="/ereports">E-Reports</a>
+                </li>
+                <% } %>          
+                <% if (pageName !== "report" ) { %>
+                <li>
+                    <a data-toggle="modal" href="/report">Reports</a>
+                </li>
             <% }} else if (user.roleName === "USER" ) {%>
-            <% if (pageName === "report" || pageName === "editprofile") { %>
-            <li>
-                <a data-toggle="modal" href="/timesheet">Timesheet</a>
-            </li>
-            <% }%>
-            <% if (pageName === "timesheet" || pageName === "editprofile") { %>
-            <li>
-                <a data-toggle="modal" href="/report?id=<%=user.id%>">Reports</a>
-            </li>
-            <% }%>
-            <% }%>
+            <% if (pageName !== "story" ) { %>
+                <li>
+                    <a data-toggle="modal" href="/story">Stories</a>
+                </li>
+                <% } %>
+                <% if (pageName !== "timesheet") { %>
+                <li>
+                    <a data-toggle="modal" href="/timesheet">Timesheet</a>
+                </li>
+                <% }%>
+                <% if (pageName !== "report") { %>
+                <li>
+                    <a data-toggle="modal" href="/report?id=<%=user.id%>">Reports</a>
+                </li>
+            <% }}else if (user.roleName === "SENIOR MANAGER" ) {%>
+            <% if (pageName !== "edashboard" ) { %>
+                <li>
+                    <a data-toggle="modal" href="/edashboard">E-Dashboard</a>
+                </li>
+                <% } %>
+                <% if (pageName !== "ereports") { %>
+                <li>
+                    <a data-toggle="modal" href="/ereports">E-Reports</a>
+                </li>
+            <% }}%>
+            
             <li style="border-right: none;padding-right: 0px;">
                 <a href="javascript:void(0)">
                     <%=user.firstname +" "+ user.lastname %> 

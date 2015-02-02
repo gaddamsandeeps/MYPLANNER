@@ -185,7 +185,7 @@ input.ng-valid.has-visited {
 }
 .res-padding
 {
-    padding:0;
+    padding:0 0 0 5px;
 }
 .align-center
 {
@@ -240,10 +240,6 @@ input.ng-valid.has-visited {
 	background:none;
 }
 
-.sowdisplay{
-	display : none;	
-}
-
 
 
 /*project edit icons area*/
@@ -264,9 +260,85 @@ textarea{
     resize : none;
 }
 
-.check-billable{
-	margin: 11px 0px 0px 0px !important;
+
+/*edashboard overrides*/
+
+
+.fixed-title-e {
+    position: fixed;
+    top: 41px;
+    width: 100%;
+    z-index: 10;
 }
+
+.np{
+    padding:0 !important;
+}
+.npl{
+    padding-left: 0;
+}
+.npr{
+    padding-right: 0;
+}
+
+.nm{
+    margin: 0 !important;
+}
+
+.ed-title{
+    padding-left: 250px !important;
+    box-shadow: none !important;
+}
+.ed-fixed-header{
+    padding-top: 20px;
+}
+
+
+.group-tab-container{
+    text-align: center;
+    width: 560px;
+    margin: 0 auto;
+}
+.group-tab-container ul{
+    list-style-type: none;
+    width: auto;
+    height: 32px;
+    margin-top: 45px;
+    border-bottom: 1px solid #ddd;
+    width: 100%;
+    display: table;
+    table-layout: fixed;
+    padding:0;
+}
+
+.group-tab-container ul li{
+    list-style-type: none;        
+    height: 40px;
+    display: table-cell;
+    width: auto;
+    text-align: center;
+    background-color:#eee;
+    border-right: 1px solid #ddd;
+    padding-top: 10px; 
+    font-weight: bold;
+}
+.group-tab-container ul li:hover,.group-tab-container ul li.active{
+    background-color:#ccc;
+    color: #333; 
+}
+.group-tab-container ul li:last-child{
+    border-right: 0;    
+}
+.res-headers{
+    height: 30px;
+    padding-top: 5px;
+}
+.res-headers div{
+    font-weight: bold;
+
+}
+
+
 
 /*Billing control styles*/
 
@@ -289,14 +361,19 @@ background: url('/images/near-end-billing.png');
 .non-billable{
 
 }
+.hidechart{
+	display : none;	
+}
 
+.showchart {
+	float:right;
+	margin-top: 5px;
+}
 
-
-
-
-
-
-
-
-
+.rightSection {
+	color	  : #666;
+	margin-top: 21px;
+	width     : 400px;
+	height    : 300px;
+}
 

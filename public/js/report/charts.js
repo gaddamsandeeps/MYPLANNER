@@ -58,7 +58,7 @@ function generateCharts(target, title, data, events, functionName, userData) {
     });
 }
 
-function generateBarCharts(target, title, data) {
+function generateBarCharts(target, title, data, plannedData) {
     var chart = new Highcharts.Chart({
         chart: {
             renderTo: target,
@@ -72,6 +72,7 @@ function generateBarCharts(target, title, data) {
           },
         xAxis: {
             type: 'category',
+            max: 6,
             labels: {
                 rotation: -45,
                 style: {
@@ -87,14 +88,35 @@ function generateBarCharts(target, title, data) {
             }
         },
         legend: {
-            enabled: false
+            enabled: true
+        },
+         scrollbar: {
+            enabled: true
         },
         tooltip: {
-            pointFormat: 'Logged : <b>{point.y:.2f} Hrs</b>'
+            pointFormat: '{point.series.name} Logged : <b>{point.y:.2f} Hrs</b>'
         },
         series: [{
-            name: 'series',
+            name: 'Actual Hours',
             data: data,
+            dataLabels: {
+                enabled: true,
+                rotation: -90,
+                color: '#FFFFFF',
+                align: 'right',
+                x: 4,
+                y: 10,
+                style: {
+                    fontSize: '13px',
+                    fontFamily: 'Verdana, sans-serif',
+                    textShadow: '0 0 3px black'
+                }
+            }
+        },
+        {
+            name: 'Planned Hours',
+            data: plannedData,
+            color: 'orange',
             dataLabels: {
                 enabled: true,
                 rotation: -90,

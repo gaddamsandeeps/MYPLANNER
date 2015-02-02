@@ -1034,7 +1034,6 @@
                         data[timezoneParam] = options.timezone;
                     }
                     pushLoading();
-                    console.log(data);
                     $.ajax($.extend({}, ajaxDefaults, source, {
                         data: data,
                         success: function(events) {
@@ -3312,13 +3311,8 @@ Common interface:
             var timeHtml = '';
             var titleHtml;
             classes.unshift('fc-day-grid-event');
-			var logStatus = '';
-			if(event.lockrequest === 1){
-				logStatus = 'unlockreq';
-			}
-			if(event.locked === 0){
-				logStatus = 'unlocked';
-			}
+			var logStatus = 'log-'+(event.statusname);
+			
             // Only display a timed events time if it is the starting segment
             if (!event.allDay && seg.isStart) {
                 timeHtml = '<span class="fc-time">' + htmlEscape(view.getEventTimeText(event)) + '</span>';

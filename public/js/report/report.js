@@ -167,11 +167,15 @@ function generateReports() {
         { "mData": "id" },
         { "mData": "title" },
         { "mData": "iteration" },
-        { "mData": function ( source, type, val ) {return source.story.trunc(10);}},
+        { "mData": "story"},
+        { "mData": "task" },
         { "mData": function ( source, type, val ) {return source.description.trunc(15);}},
+        { "mData": "plannedstart" },
+        { "mData": "plannedend" },
+        { "mData": "plannedlogged" },
         { "mData": "start" },
         { "mData": "end" },
-        { "mData": "diff" },
+        { "mData": "logged" },
         { "mData": "created" },
         { "mData": "edit" }
         ];
@@ -182,9 +186,9 @@ function generateReports() {
 
         for (var i in tempDataObj) {
             if (projectsData.hasOwnProperty(tempDataObj[i].title)) {
-                projectsData[tempDataObj[i].title] = (tempDataObj[i].diff + projectsData[tempDataObj[i].title]);
+                projectsData[tempDataObj[i].title] = (tempDataObj[i].logged + projectsData[tempDataObj[i].title]);
             } else {
-                projectsData[tempDataObj[i].title] = tempDataObj[i].diff;
+                projectsData[tempDataObj[i].title] = tempDataObj[i].logged;
             }
         }
 
@@ -201,7 +205,7 @@ function generateReports() {
         var totalDataObj = new Array();
 
         for (var i in tempDataObj) {
-            total += tempDataObj[i].diff;
+            total += tempDataObj[i].logged;
         }
 
         var remainingMins = totalWorkingMins - total;
@@ -217,113 +221,164 @@ function generateReports() {
         $('#excelReportTable').dataTable().fnClearTable();
         var mdata = [
         { "mData": "id" },
-        { "mData": "name" },
-        { "mData": "iteration" },
-        { "mData": function ( source, type, val ) {return source.story.trunc(10);}},
-        { "mData": function ( source, type, val ) {return source.description.trunc(15);}},
         { "mData": "title" },
+        { "mData": "iteration" },
+        { "mData": "story"},
+        { "mData": "task" },
+        { "mData": function ( source, type, val ) {return source.description.trunc(15);}},
+        { "mData": "name" },
+        { "mData": "plannedstart" },
+        { "mData": "plannedend" },
+        { "mData": "plannedlogged" },
         { "mData": "start" },
         { "mData": "end" },
-        { "mData": "diff" },
+        { "mData": "logged" },
         { "mData": "created" },
         { "mData": "edit" }
         ];
         getDataTable('#excelReportTable', userData, mdata);        
 
         //Users report
-        var usersData = new Array();
+        var usersData = new Array(),
+            usersPlannedData = new Array();
 
         for (var i in tempDataObj) {
-            if (usersData.hasOwnProperty(tempDataObj[i].title)) {
-                usersData[tempDataObj[i].title] = (tempDataObj[i].diff + usersData[tempDataObj[i].title]);
+            if (usersData.hasOwnProperty(tempDataObj[i].name)) {
+                usersData[tempDataObj[i].name] = (tempDataObj[i].logged + usersData[tempDataObj[i].name]);
             } else {
-                usersData[tempDataObj[i].title] = tempDataObj[i].diff;
+                usersData[tempDataObj[i].name] = tempDataObj[i].logged;
             }
         }
 
-	        //generates Users Report - Pie Chart
-			generateCharts('userReport', 'Users Report', usersData);
-
-			//generates Users Report - Bar Chart
-			var barChartDataForUserReports = new Array();
-			var size = Object.keys(usersData).length;
-
-			//two dimensional array
-			for (i=0; i <size; i++)
-				barChartDataForUserReports[i]=new Array(size)
-
-			var j = 0;
-				for (var i in usersData)
-					{
-						barChartDataForUserReports[j][0] = i;
-						barChartDataForUserReports[j][1] = parseFloat(toHrs(usersData[i]));
-						j++;
-					} 
-			generateBarCharts('userReportBarChart', 'Users Report', barChartDataForUserReports);
-
-			//generates Users Report - Line Chart
-			//generates Users Report - Line Chart
-			var lineChartKeysForUserReports = new Array();
-			var lineChartValuesForUserReports = new Array();
-			for (var i in usersData)
-				{
-					lineChartKeysForUserReports.push(i);            
-					lineChartValuesForUserReports.push(parseFloat(toHrs(usersData[i])));        
-				} 
-			generateLineCharts('userReportLineChart', 'Users Report', lineChartKeysForUserReports, lineChartValuesForUserReports);
-
-        var projectReportsData = new Array();
-
         for (var i in tempDataObj) {
-            if (projectReportsData.hasOwnProperty(tempDataObj[i].name)) {
-                projectReportsData[tempDataObj[i].name] = (tempDataObj[i].diff + projectReportsData[tempDataObj[i].name]);
+            if (usersPlannedData.hasOwnProperty(tempDataObj[i].name)) {
+                usersPlannedData[tempDataObj[i].name] = (tempDataObj[i].plannedlogged + usersPlannedData[tempDataObj[i].name]);
             } else {
-                projectReportsData[tempDataObj[i].name] = tempDataObj[i].diff;
+                usersPlannedData[tempDataObj[i].name] = tempDataObj[i].plannedlogged;
             }
         }
 
-        $("#projectReport").show();
+        //generates Users Report - Pie Chart
+        generateCharts('userReport', 'Users Report', usersData);
+
+        //generates Users Report - Bar Chart
+        var barDataUserReport = getBarChartData(usersData, usersPlannedData);
+        generateBarCharts('userReportBarChart', 'Users Report', barDataUserReport[0], barDataUserReport[1]);
+        
+        //generates Users Report - Line Chart
+        var lineDataUserReport = getLineChartData(usersData);       
+        generateLineCharts('userReportLineChart', 'Users Report', lineDataUserReport[0], lineDataUserReport[1]);
+
+        //generate projects reports
+        var projectReportsData = new Array(),
+            projectReportsPlannedData = new Array();
+
+        for (var i in tempDataObj) {
+            if (projectReportsData.hasOwnProperty(tempDataObj[i].title)) {
+                projectReportsData[tempDataObj[i].title] = (tempDataObj[i].logged + projectReportsData[tempDataObj[i].title]);
+            } else {
+                projectReportsData[tempDataObj[i].title] = tempDataObj[i].logged;
+            }
+        }
+
+        for (var i in tempDataObj) {
+            if (projectReportsPlannedData.hasOwnProperty(tempDataObj[i].title)) {
+                projectReportsPlannedData[tempDataObj[i].title] = (tempDataObj[i].plannedlogged + projectReportsPlannedData[tempDataObj[i].title]);
+            } else {
+                projectReportsPlannedData[tempDataObj[i].title] = tempDataObj[i].plannedlogged;
+            }
+        }
+
+        //$("#projectReport").show();
         $('.singlereport').remove();
 
-        //generates Projects Report
+        //generates Projects Report - Pie Chart
         generateCharts('projectReport', 'Projects Report', projectReportsData, true, 'project', tempDataObj);
 
-        //Story reports
-        var storyReportsData = new Array();        
-        var storyData = tempDataObj;
+        //generates Projects Report - Bar Chart
+        var barDataProjectReport = getBarChartData(projectReportsData, projectReportsPlannedData);
+        generateBarCharts('projectReportBarChart', 'Projects Report', barDataProjectReport[0], barDataProjectReport[1]);
 
-        for (var i in storyData) {
-            if(storyData[i].story === ''){
-                storyData[i].story = noStory;
-            }
-            if (storyReportsData.hasOwnProperty(storyData[i].story)) {
-                storyReportsData[storyData[i].story] = (storyData[i].diff + storyReportsData[storyData[i].story]);
-            } else {
-                storyReportsData[storyData[i].story] = storyData[i].diff;
-            }
-        }
-
-        //generates Story Reports
-        generateCharts('storyReport', 'Storys Reports', storyReportsData, true, 'story', tempDataObj);
+        //generates Projects Report - Line Chart
+        var lineDataProjectReport = getLineChartData(projectReportsData);         
+        generateLineCharts('projectReportLineChart', 'Projects Report', lineDataProjectReport[0], lineDataProjectReport[1]);       
 
 
         //Iteration reports
-        var iterationReportsData = new Array();
-        var iterationData = tempDataObj;
+        var iterationReportsData = new Array(),
+            iterationReportsPlannedData = new Array(),
+            iterationData = tempDataObj;
 
         for (var i in iterationData) {
-            if(iterationData[i].iteration === ''){
+            if(iterationData[i].iteration === '' || iterationData[i].iteration === null){
                 iterationData[i].iteration = noIteration;
             }
             if (iterationReportsData.hasOwnProperty(iterationData[i].iteration)) {
-                iterationReportsData[iterationData[i].iteration] = (iterationData[i].diff + iterationReportsData[iterationData[i].iteration]);
+                iterationReportsData[iterationData[i].iteration] = (iterationData[i].logged + iterationReportsData[iterationData[i].iteration]);
             } else {
-                iterationReportsData[iterationData[i].iteration] = iterationData[i].diff;
+                iterationReportsData[iterationData[i].iteration] = iterationData[i].logged;
+            }
+        }
+
+        for (var i in iterationData) {
+            if(iterationData[i].iteration === '' || iterationData[i].iteration === null){
+                iterationData[i].iteration = noIteration;
+            }
+            if (iterationReportsPlannedData.hasOwnProperty(iterationData[i].iteration)) {
+                iterationReportsPlannedData[iterationData[i].iteration] = (iterationData[i].plannedlogged + iterationReportsPlannedData[iterationData[i].iteration]);
+            } else {
+                iterationReportsPlannedData[iterationData[i].iteration] = iterationData[i].plannedlogged;
+            }
+        }
+
+        //generates Iteration Reports
+        generateCharts('iterationReport', 'Iterations Reports', iterationReportsData, true, 'iteration', tempDataObj);
+
+        //generates Iteration Report - Bar Chart
+        var barDataIterationReport = getBarChartData(iterationReportsData, iterationReportsPlannedData);
+        generateBarCharts('iterationReportBarChart', 'Iterations Report', barDataIterationReport[0], barDataIterationReport[1]);
+
+        //generates Iteration Report - Line Chart
+        var lineDataIterationReport = getLineChartData(iterationReportsData);
+        generateLineCharts('iterationReportLineChart', 'Iterations Report', lineDataIterationReport[0], lineDataIterationReport[1]);
+
+        //Story reports
+        var storyReportsData = new Array(),
+            storyReportsPlannedData = new Array(),
+            storyData = tempDataObj;
+
+        for (var i in storyData) {
+            if(storyData[i].story === '' || storyData[i].story === null){
+                storyData[i].story = noStory;
+            }
+            if (storyReportsData.hasOwnProperty(storyData[i].story)) {
+                storyReportsData[storyData[i].story] = (storyData[i].logged + storyReportsData[storyData[i].story]);
+            } else {
+                storyReportsData[storyData[i].story] = storyData[i].logged;
+            }
+        }
+
+        for (var i in storyData) {
+            if(storyData[i].story === '' || storyData[i].story === null){
+                storyData[i].story = noStory;
+            }
+            if (storyReportsPlannedData.hasOwnProperty(storyData[i].story)) {
+                storyReportsPlannedData[storyData[i].story] = (storyData[i].plannedlogged + storyReportsPlannedData[storyData[i].story]);
+            } else {
+                storyReportsPlannedData[storyData[i].story] = storyData[i].plannedlogged;
             }
         }
 
         //generates Story Reports
-        generateCharts('iterationReport', 'Iterations Reports', iterationReportsData, true, 'iteration', tempDataObj);
+        generateCharts('storyReport', 'Stories Reports', storyReportsData, true, 'story', tempDataObj);
+
+        //generates Iteration Report - Bar Chart
+        var barDataStoryReport = getBarChartData(storyReportsData, storyReportsPlannedData);
+        generateBarCharts('storyReportBarChart', 'Stories Report', barDataStoryReport[0], barDataStoryReport[1]);
+
+        //generates Iteration Report - Line Chart
+        var lineDataStoryReport = getLineChartData(storyReportsData);
+        generateLineCharts('storyReportLineChart', 'Stories Report', lineDataStoryReport[0], lineDataStoryReport[1]);
     }
 }
 
@@ -331,11 +386,11 @@ function userProjectShow(project, tempDataObj) {
     var projectReportData = new Array();
 
     for (var i in tempDataObj) {
-        if (tempDataObj[i].name === project) {
-            if (projectReportData.hasOwnProperty(tempDataObj[i].title)) {
-                projectReportData[tempDataObj[i].title] = (tempDataObj[i].diff + projectReportData[tempDataObj[i].title]);
+        if (tempDataObj[i].title === project) {
+            if (projectReportData.hasOwnProperty(tempDataObj[i].name)) {
+                projectReportData[tempDataObj[i].name] = (tempDataObj[i].logged + projectReportData[tempDataObj[i].name]);
             } else {
-                projectReportData[tempDataObj[i].title] = tempDataObj[i].diff;
+                projectReportData[tempDataObj[i].name] = tempDataObj[i].logged;
             }
         }
     }
@@ -352,9 +407,9 @@ function iterationStoryReportShow(iteration, tempDataObj) {
     for (var i in tempDataObj) {
         if (tempDataObj[i].iteration === Number(iteration) || tempDataObj[i].iteration === iteration) {
             if (iterationStoryData.hasOwnProperty(tempDataObj[i].story)) {
-                iterationStoryData[tempDataObj[i].story] = (tempDataObj[i].diff + iterationStoryData[tempDataObj[i].story]);
+                iterationStoryData[tempDataObj[i].story] = (tempDataObj[i].logged + iterationStoryData[tempDataObj[i].story]);
             } else {
-                iterationStoryData[tempDataObj[i].story] = tempDataObj[i].diff;
+                iterationStoryData[tempDataObj[i].story] = tempDataObj[i].logged;
             }
         }
     }
@@ -370,10 +425,10 @@ function iterationStoryUserReportShow(story, tempDataObj) {
 
     for (var i in tempDataObj) {
         if (tempDataObj[i].story === Number(story) || tempDataObj[i].story === story) {
-            if (iterationStoryUserData.hasOwnProperty(tempDataObj[i].title)) {
-                iterationStoryUserData[tempDataObj[i].title] = (tempDataObj[i].diff + iterationStoryUserData[tempDataObj[i].title]);
+            if (iterationStoryUserData.hasOwnProperty(tempDataObj[i].name)) {
+                iterationStoryUserData[tempDataObj[i].name] = (tempDataObj[i].logged + iterationStoryUserData[tempDataObj[i].name]);
             } else {
-                iterationStoryUserData[tempDataObj[i].title] = tempDataObj[i].diff;
+                iterationStoryUserData[tempDataObj[i].name] = tempDataObj[i].logged;
             }
         }
     }
@@ -384,16 +439,15 @@ function iterationStoryUserReportShow(story, tempDataObj) {
     generateCharts('iterationStoryUserReport', 'Story '+story + " " + ' Report', iterationStoryUserData);
 }
 
-
 function userStoryShow(story, tempDataObj) {
     var storyData = new Array();
 
     for (var i in tempDataObj) {
         if (tempDataObj[i].story === story) {
-            if (storyData.hasOwnProperty(tempDataObj[i].title)) {
-                storyData[tempDataObj[i].title] = (tempDataObj[i].diff + storyData[tempDataObj[i].title]);
+            if (storyData.hasOwnProperty(tempDataObj[i].name)) {
+                storyData[tempDataObj[i].name] = (tempDataObj[i].logged + storyData[tempDataObj[i].name]);
             } else {
-                storyData[tempDataObj[i].title] = tempDataObj[i].diff;
+                storyData[tempDataObj[i].name] = tempDataObj[i].logged;
             }
         }
     }
@@ -422,6 +476,46 @@ function getDataTable(id, userData, mdata){
         "aaData": JSON.parse(JSON.stringify(userData)),  
         "aoColumns": mdata
     });
+}
+
+function getLineChartData(data){
+    var keys = new Array();
+    var values = new Array();
+    for (var i in data)
+        {
+            keys.push(i);            
+            values.push(parseFloat(toHrs(data[i])));        
+        }
+    return [keys, values];
+}
+
+function getBarChartData(actualData, plannedData){
+            //generates Users Report - Bar Chart
+        var reportData = new Array();
+        var plannedReportData = new Array();
+        var size = Object.keys(actualData).length;
+
+        //two dimensional array
+        for (i=0; i <size; i++){
+            reportData[i]=new Array(size);
+            plannedReportData[i]=new Array(size);
+        }
+
+        var j = 0;
+            for (var i in actualData)
+                {
+                    reportData[j][0] = i;
+                    reportData[j][1] = parseFloat(toHrs(actualData[i]));
+                    j++;
+                }
+            j = 0;
+            for (var i in plannedData)
+                {
+                    plannedReportData[j][0] = i;
+                    plannedReportData[j][1] = parseFloat(toHrs(plannedData[i]));
+                    j++;
+                }
+    return [reportData, plannedReportData];
 }
 
 String.prototype.trunc = String.prototype.trunc ||

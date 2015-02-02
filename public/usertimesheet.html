@@ -14,14 +14,26 @@
 <body>
 	<% var pageName = 'usertimesheet' %>
  <% include header.html %>
-
+<% if(teamMembers.length !== 0) {%>  
  <!--if no user selected redirt to first one -->
- <% if(selectedUser !== undefined) {%>     
+ <% if(selectedUser !== undefined) {%>
 
  <div class="fixed-header"> 
     <h3><%= selectedUser.firstname %> <%= selectedUser.lastname %>'s Timesheet</h3>
     <div id="teamusers-container">
-     <label>Select User : &nbsp;</label> <select id="teamMembers"> </select>
+     <label>Select User : &nbsp;</label>
+     <select id="teamMembers">
+        <option>All</option>
+        <% for(var i=0; i<teamMembers.length; i++) {
+          if( selectedUser.id  === teamMembers[i].id){%>
+          <option selected value="<%= teamMembers[i].id %>">
+        <% } else{%>
+          <option  value="<%= teamMembers[i].id %>">
+        <% }%>
+          <%= teamMembers[i].firstname+" "+teamMembers[i].lastname %>                
+        </option>
+        <% } %>   
+    </select>
  </div>
 </div>
 
@@ -37,7 +49,7 @@
             <form name="AddTimeForm" id="AddTimeForm" novalidate class="form-horizontal">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4>Details</h4>
+                    <h4 id="modalHeader"></h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -57,16 +69,23 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="col-md-4 control-label" for="addTimeStoryDescription">Story Description</label>
+                        <label class="col-md-4 control-label" for="addTimeStory">Story</label>
                         <div class="col-md-8">
-                            <input type="text" readonly id="addTimeStoryDescription" name="addTimeStoryDescription" class="form-control" placeholder="Story Description" required>
+                            <input type="text" readonly id="addTimeStory" name="addTimeStory" class="form-control" placeholder="Story" required>
                         </div>
                     </div>
 
+					<div class="form-group">
+						<label class="col-md-4 control-label" for="addTimeTask">Task</label>
+						<div class="col-md-8">
+							<input type="text" readonly id="addTimeTask" name="addTimeTask" class="form-control" placeholder="Task" required>
+						</div>
+					</div>
+
                     <div class="form-group">
-                        <label class="col-md-4 control-label" for="addTimeStoryDescription">Status</label>
+                        <label class="col-md-4 control-label" for="addTimeStoryStatus">Status</label>
                         <div class="col-md-8">
-                            <input type="text" readonly id="logStatuses" class="form-control">
+                            <input type="text" readonly id="storyStatus" class="form-control" placeholder="Status" required>
                         </div>
                     </div>
                     <!-- end of fields to add iteration and story for logs-->
@@ -77,19 +96,39 @@
                             <textarea class="form-control" readonly id="addTimeDescription" rows="3"></textarea>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label" for="addTimeStartTime">Start Time</label>
-                        <div class="col-md-8">
-                            <input type="datetime-local" readonly id="addTimeStartTime" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label" for="addTimeEndTime">End Time</label>
-                        <div class="col-md-8">
-                            <input type="datetime-local" readonly id="addTimeEndTime" class="form-control">
-                        </div>
-                    </div>
-                </div>
+                    <div id="plannedActivityContainer">
+                                    <h4 class="activity-heading"> Planned activity</h4>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="addTimeStartTime">Start Time</label>
+                                        <div class="col-md-8">
+                                            <input type="datetime-local" id="addTimePlannedStartTime" name="addTimePlannedStartTime" class="form-control" placeholder="Start Time" required disabled>
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="addTimeEndTime">End Time</label>
+                                        <div class="col-md-8">
+                                            <input type="datetime-local" id="addTimePlannedEndTime" name="addTimePlannedEndTime" class="form-control" placeholder="End Time" required disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="actualActivityContainer">
+                                    <h4 class="activity-heading"> Actual activity</h4>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="addTimeStartTime">Start Time</label>
+                                        <div class="col-md-8">
+                                            <input type="datetime-local" id="addTimeStartTime" name="addTimeStartTime" class="form-control" placeholder="Start Time" required disabled>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="addTimeEndTime">End Time</label>
+                                        <div class="col-md-8">
+                                            <input type="datetime-local" id="addTimeEndTime" name="addTimeEndTime" class="form-control" placeholder="End Time" required disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary" id="btnUnlock">Unlock</button>
                 </div>
@@ -107,42 +146,25 @@
 <script src='lib/fullcalendar.js'></script>
 <script src='js/common/util.js'></script>
 <script src='js/usertimesheet.js'></script>
-<script type="text/javascript">  
-var teamid = '<%= user.teamId %>';
-var data = {id : teamid};
-$.ajax({
- url : '/getTeamUsersByTeamId',
- type:'get',
- dataType: 'json',
- data : data
-}).done(function(teamMembers){
-    <% if(selectedUser !== undefined) {%>
-        var selectedUser='';
-        for(i=0; i< teamMembers.length; i++){
-            if('<%= selectedUser.id %>' == teamMembers[i].id){
-                selectedUser = 'selected';
-            }else{
-                selectedUser = '';
-            }
-            $("#teamMembers").append("<option "+selectedUser+" value="+teamMembers[i].id+">"+teamMembers[i].firstname+" "+teamMembers[i].lastname+"</option>");     
-            
-        }   
-        <%}else{%>
-            //if no user selected get first user data
-            $(location).attr('href','./usertimesheet?id='+teamMembers[0].id);
-            <%}%>    
-        });
+<script type="text/javascript">
 
-$( "select" ).change(function () {
-  var url = './usertimesheet?id='+$( this ).val();
-  //return false;
-  var str = "";
-  $( "select option:selected" ).each(function() {
-      $(location).attr('href',url);
-  });    
-});
+<% if(!selectedUser) {%>   
+    $(location).attr('href','./usertimesheet?id='+<%= teamMembers[0].id %>);
+<%}%>
+    $( "#teamMembers" ).change(function () {
+      var url = './usertimesheet?id='+$( this ).val();
+      //return false;
+      var str = "";
+      $( "select option:selected" ).each(function() {
+          $(location).attr('href',url);
+      });    
+    });
 </script>
 
+<%}else{%>
+    <br><br><br>
+    No User to view
+<%}%>
 <% include footer.html %>
 </body>
 

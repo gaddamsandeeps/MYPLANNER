@@ -26,6 +26,46 @@ exports.getLogStatuses = function(callback) {
     }
 };
 
+exports.getStoryStatuses = function(callback) {
+    try {
+        var getStoryStatusesSQL = queries.storystatus.getStoryStatuses;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getStoryStatusesSQL, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.getUserDetailsByLogid = function(logId, callback) {
+    try {
+        var getUserDetailsByLogidSQL = queries.log.getUserDetailsByLogid;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getUserDetailsByLogidSQL, logId, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows[0]);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
 exports.getLogsByUserId = function(obj, callback) {
     try {
         var getLogsByUserIdSQL = queries.log.getLogsByUserId;
@@ -146,6 +186,26 @@ exports.getReportLogs = function(obj, callback) {
     }
 };
 
+exports.getTeamsReportLogs = function(obj, callback) {
+    try {
+        var getTeamsReportLogsSQL = queries.log.getTeamsReportLogs;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getTeamsReportLogsSQL, obj, function(err, rows) {            
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
 exports.getDetailedUserReportLogs = function(obj, callback) {
     try {
         var getDetailedUserReportLogsSQL = queries.log.getDetailedUserReportLogs;
@@ -227,12 +287,12 @@ exports.unlockLogRequest = function(obj, callback) {
 };
 
 
-exports.saveLog = function(obj, callback) {
+exports.savePlannedLog = function(obj, callback) {
     try {
-        var saveLogSQL = queries.log.saveLog;
+        var savePlannedLogSQL = queries.log.savePlannedLog;
 
         pool.getConnection(function(err, connection) {
-            connection.query(saveLogSQL, obj, function(err, rows) {
+            connection.query(savePlannedLogSQL, obj, function(err, rows) {
                 connection.release();
                 if (err) {
                     log.error(err);
@@ -248,12 +308,35 @@ exports.saveLog = function(obj, callback) {
     }
 };
 
-exports.editLog = function(obj, callback) {
+
+exports.saveActualLog = function(obj, callback) {
+    try {
+        var saveActualLogSQL = queries.log.saveActualLog;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(saveActualLogSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        });
+
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+
+
+exports.editLog = function(obj, logid, callback) {
     try {
         var editLogSQL = queries.log.editLog;
 
-        var logId = obj[8];
-        saveLogHistory(logId);
+        saveLogHistory(logid);
 
         pool.getConnection(function(err, connection) {
             connection.query(editLogSQL, obj, function(err, rows) {
@@ -277,8 +360,9 @@ var saveLogHistory = function(logId) {
         var saveLogHistorySQL = queries.log.saveLogHistory;
 
         module.exports.getLogById(logId, function(val) {
-            var obj = [val.id, val.projectid, val.iteration, val.story, val.status, val.startdate, val.enddate, val.userid, val.loggeduser, val.description,
-                val.createddate, val.editdate, val.locked, val.lockrequest
+
+            var obj = [val.id, val.projectid, val.teamid, val.iteration, val.story, val.storystatus, val.plannedstartdate, val.plannedenddate, val.startdate, val.enddate, val.userid, val.loggeduser, val.description,
+                val.createddate, val.editdate, val.status
             ];
 
             pool.getConnection(function(err, connection) {

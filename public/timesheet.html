@@ -1,125 +1,165 @@
 ﻿<!DOCTYPE html>
 <html>
-
-<head>
-    <title>Timesheet</title>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="lib/bootstrap.css" rel="stylesheet">
-    <link href='lib/fullcalendar.css' rel='stylesheet'>
-    <link href='css/timesheet.css' rel='stylesheet'>
-</head>
-
-<body>
-	<% var pageName = 'timesheet' %>
-   <% include header.html %>
-   <div class="fixed-header">   
-    <h3>Timesheet</h3>    
-</div>
-
-<div class="container-fluid">
-    <div id="calContainer" class="col-md-10">
-        <div id='calendar'></div>
-    </div>
-</div>
-
-<div class="modal fade" id="AddTimeModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form name="AddTimeForm" id="AddTimeForm" novalidate class="form-horizontal">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 id="modalHeader"></h4>
+    <head>
+        <title>Timesheet</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="lib/bootstrap.css" rel="stylesheet">
+        <link href='lib/fullcalendar.css' rel='stylesheet'>
+            <link href='css/timesheet.css' rel='stylesheet'>
+            </head>
+            <body>
+                <% var pageName = 'timesheet' %>
+                <% include header.html %>
+                <div class="fixed-header">
+                    <h3>Timesheet</h3>
                 </div>
-                <div class="modal-body">
-                  <UL id="errorContainer"></UL>
-                  <div class="form-group">
-                    <label class="col-md-4 control-label" for="addTimeProjectId">Project</label>
-                    <div class="col-md-8">
-                        <select id="addTimeProjectId" name="addTimeProjectId" class="form-control">
-                            <option value="">Select Project</option>
-                        </select>
+                <div class="container-fluid">
+                    <div id="calContainer" class="col-md-10">
+                        <div id='calendar'></div>
                     </div>
                 </div>
-                <div class="form-group" id="teamMembersWrapper" style="display:none">
-                  <label class="col-md-4 control-label" for="addTimeProjectId">Type</label>
-                  <div class="col-md-4">
-                    <select class="form-control" id="resourceType">
-                        <option value="self">Self</option>
-                        <option value="team">Team</option>
-                    </select>
-                </div>				
-                <div class="col-md-4"  >
-                    <select class="form-control" id="teamMembers" style="display:none"><option value="">Select Employee</option>	
-                    </select>
-                </div>				
-            </div>
-            
-            <!-- fields to add iteration and story for logs-->
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="addTimeIterationNo">Iteration</label>
-                <div class="col-md-8">
-                    <input type="text" id="addTimeIterationNo" name="addTimeIterationNo" class="form-control" placeholder="Iteration No" required>
+                <div class="modal fade" id="AddTimeModal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form name="AddTimeForm" id="AddTimeForm" novalidate class="form-horizontal">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h4 id="modalHeader"></h4>
+                                </div>
+                                <div class="modal-body">
+                                <UL id="errorContainer"></UL>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label" for="addTimeProjectId">Project</label>
+                                    <div class="col-md-8">
+                                        <select id="addTimeProjectId" name="addTimeProjectId" class="form-control">
+                                            <option value="">Select Project</option>
+                                            <% for(var i=0; i<projects.length; i++) {%>
+                                            <option value="<%= projects[i].id %>"><%= projects[i].name %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+                                <% if (logAccess.accesslevel === 2) { %>
+                                <div class="form-group" id="teamMembersWrapper">
+                                    <label class="col-md-4 control-label" for="addTimeProjectId">Type</label>
+                                    <div class="col-md-4">
+                                        <select class="form-control" id="resourceType">
+                                            <option value="self">Self</option>
+                                            <option value="team">Team</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4"  >
+                                        <select class="form-control" id="teamMembers" style="display:none">
+                                            <option value="">Select Employee</option>
+                                            <% for(var i=0; i<teamMembers.length; i++) {%>
+                                            <option value="<%= teamMembers[i].id %>">
+                                                <%= teamMembers[i].firstname+" "+teamMembers[i].lastname %>
+                                            </option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+                                <% } %>
+                                <!-- fields to add iteration and story for logs-->
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label" for="addTimeIterationNo">Iteration</label>
+                                    <div class="col-md-8">
+                                        <select id="addTimeIterationNo" name="addTimeIterationNo" class="form-control">
+                                            <option value="">Select Iteration</option>
+                                            <% for(var i=0; i<iterations.length; i++) {%>
+                                            <option value="<%= iterations[i].id %>"><%= iterations[i].name %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label" for="addTimeStory">Story</label>
+                                    <div class="col-md-8">
+                                        <select id="addTimeStory" name="addTimeStory" class="form-control" required>
+                                            <option value="">Select Story</option>
+										</select>
+                                    </div>
+                                </div>
+								<div class="form-group">
+                                    <label class="col-md-4 control-label" for="addTimeTask">SubTask</label>
+                                    <div class="col-md-8">
+                                        <select id="addTimeTask" name="addTimeTask" class="form-control" placeholder="Task" required>
+                                            <option value="">Select Task</option>
+										</select>
+                                    </div>
+                                </div>
+                                <div class="form-group">	
+                                    <label class="col-md-4 control-label" for="addTimeStory">Status</label>
+                                    <div class="col-md-8">
+                                        <select class="form-control" id="storyStatus">
+                                            <option value="">Select Status</option>
+                                            <% for(var i=0; i<storystatus.length; i++) {%>
+                                            <option value="<%= storystatus[i].id %>"><%= storystatus[i].name %></option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- end of fields to add iteration and story for logs-->
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label" for="addTimeDescription">Description</label>
+                                    <div class="col-md-8">
+                                        <textarea class="form-control" name="addTimeDescription" id="addTimeDescription" rows="3" placeholder="Log Description"></textarea>
+                                    </div>
+                                </div>
+                                <div id="plannedActivityContainer">
+                                    <h4 class="activity-heading"> Planned activity</h4>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="addTimeStartTime">Start Time</label>
+                                        <div class="col-md-8">
+                                            <input type="datetime-local" id="addTimePlannedStartTime" name="addTimePlannedStartTime" class="form-control" placeholder="Start Time" required>
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="addTimeEndTime">End Time</label>
+                                        <div class="col-md-8">
+                                            <input type="datetime-local" id="addTimePlannedEndTime" name="addTimePlannedEndTime" class="form-control" placeholder="End Time" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="actualActivityContainer">
+                                    <h4 class="activity-heading"> Actual activity</h4>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="addTimeStartTime">Start Time</label>
+                                        <div class="col-md-8">
+                                            <input type="datetime-local" id="addTimeStartTime" name="addTimeStartTime" class="form-control" placeholder="Start Time" required disabled>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label" for="addTimeEndTime">End Time</label>
+                                        <div class="col-md-8">
+                                            <input type="datetime-local" id="addTimeEndTime" name="addTimeEndTime" class="form-control" placeholder="End Time" required disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="submitlog" type="submit" class="btn btn-primary"></button>
+                                <button type="reset" class="btn btn-default">Reset</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal" id="lockFormCloseBtn">Close</button>
+                            </div>
+                            <div class="requestunlock" style="display:none;">
+                                <button type="button" class="btn btn-primary" id="unlockRequest">Unlock Request</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="addTimeStoryDescription">Story</label>
-                <div class="col-md-8">
-                    <input type="text" id="addTimeStoryDescription" name="addTimeStoryDescription" class="form-control" placeholder="Story Description" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="addTimeStoryDescription">Status</label>
-                <div class="col-md-8">
-                    <select class="form-control" id="logStatuses">
-                        <option value="">Select Status</option>
-                    </select>
-                </div>
-            </div>
-            <!-- end of fields to add iteration and story for logs-->
-
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="addTimeDescription">Description</label>
-                <div class="col-md-8">
-                    <textarea class="form-control" name="addTimeDescription" id="addTimeDescription" rows="3" placeholder="Description"></textarea>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="addTimeStartTime">Start Time</label>
-                <div class="col-md-8">
-                    <input type="datetime-local" id="addTimeStartTime" name="addTimeStartTime" class="form-control" placeholder="Start Time" required>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label" for="addTimeEndTime">End Time</label>
-                <div class="col-md-8">
-                    <input type="datetime-local" id="addTimeEndTime" name="addTimeEndTime" class="form-control" placeholder="End Time" required>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Save</button>
-            <button type="reset" class="btn btn-default">Reset</button>
-            <button type="button" class="btn btn-default" data-dismiss="modal" id="lockFormCloseBtn">Close</button>
-        </div>
-        <div class="requestunlock" style="display:none;">
-          <button type="button" class="btn btn-primary" id="unlockRequest">Unlock Request</button>
-      </div>
-  </form>
-</div>
-</div>
-</div>
-
-<% include footer.html %>
-<script src='lib/moment.min.js'></script>
-<script src='lib/jquery.js'></script>
-<script src="lib/bootstrap.js"></script>
-<script src='lib/fullcalendar.js'></script>
-<script src='js/common/util.js'></script>
-<script src='js/timesheet.js'></script>
-</body>
-
-</html>
+            <% include footer.html %>
+            <script src='lib/moment.min.js'></script>
+            <script src='lib/jquery.js'></script>
+            <script src="lib/bootstrap.js"></script>
+            <script src='lib/fullcalendar.js'></script>
+            <script src='js/common/util.js'></script>
+            <script src='js/timesheet.js'></script>
+            <script src='js/common/dateformat.js'></script>
+        </body>
+    </html>

@@ -25,12 +25,58 @@ exports.getTeams = function(callback) {
     }
 };
 
-exports.getTeam = function(userId, callback) {
+exports.getExecutivesByTeamId = function(team, callback) {
     try {
-        var getTeamSQL = queries.team.getTeam;
+        var getExecutivesByTeamIdSQL = queries.team.getExecutivesByTeamId;
 
         pool.getConnection(function(err, connection) {
-            connection.query(getTeamSQL, userId, function(err, rows) {
+            var q = connection.query(getExecutivesByTeamIdSQL, team.id, function(err, rows) {                
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    if(rows.length > 0){
+                        team.executives = rows;
+                        callback(team);
+                    }else{
+                        callback(team);
+                    }
+                    
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.getExecutiveTeams = function(userId, callback) {
+    try {
+        var getExecutiveTeamsSQL = queries.team.getExecutiveTeams;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getExecutiveTeamsSQL, userId, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.getTeamByLeadId = function(userId, callback) {
+    try {
+        var getTeamByLeadIdSQL = queries.team.getTeamByLeadId;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getTeamByLeadIdSQL, userId, function(err, rows) {
                 connection.release();
                 if (err) {
                     log.error(err);
@@ -45,12 +91,86 @@ exports.getTeam = function(userId, callback) {
     }
 };
 
-exports.saveTeam = function(obj, callback) {
+exports.getTeamByUserId = function(userId, callback) {
     try {
-        var saveTeamSQL = queries.team.saveTeam;
+        var getTeamByUserIdSQL = queries.team.getTeamByUserId;
 
         pool.getConnection(function(err, connection) {
-            connection.query(saveTeamSQL, obj, function(err, rows) {
+            connection.query(getTeamByUserIdSQL, userId, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows[0]);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.getTeamLeadDetailsByUserId = function(userId, callback) {
+    try {
+        var getTeamLeadDetailsByUserIdSQL = queries.team.getTeamLeadDetailsByUserId;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getTeamLeadDetailsByUserIdSQL, userId, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows[0]);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.saveTeam = function(obj, executives, callback) {
+    try {
+        var saveTeamSQL = queries.team.saveTeam;
+        var userId = obj[3];
+
+        pool.getConnection(function(err, connection) {
+            connection.query(saveTeamSQL, obj, function(err, rows) {                
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    var teamId = rows.insertId;
+                    
+                    var lngt = new Array();
+                    if(executives.length === 0){
+                            callback(rows.insertId);
+                        }
+                    for(var i =0; i<executives.length;i++){                        
+                        saveExecutives(executives[i], teamId, userId, function(eval){
+                            lngt.push(eval);
+                            if (lngt.length === executives.length) {
+                                callback(rows.insertId);
+                            }
+                        });
+                    }                    
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+var saveExecutives = function(executive, teamid, createdBy, callback) {
+    try {
+        var saveExecutivesSQL = queries.team.saveExecutives;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(saveExecutivesSQL, [executive, teamid, createdBy], function(err, rows) {
                 connection.release();
                 if (err) {
                     log.error(err);
@@ -65,9 +185,31 @@ exports.saveTeam = function(obj, callback) {
     }
 };
 
-exports.editTeam = function(obj, callback) {
+var removeExecutives = function(teamid, callback) {
+    try {
+        var removeExecutivesByTeamidSQL = queries.team.removeExecutivesByTeamid;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(removeExecutivesByTeamidSQL, teamid, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback([]);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.editTeam = function(obj, executives, callback) {
     try {
         var editTeamSQL = queries.team.editTeam;
+        var teamId = obj[4];
+        var userId = obj[3];
 
         pool.getConnection(function(err, connection) {
             connection.query(editTeamSQL, obj, function(err, rows) {
@@ -76,7 +218,20 @@ exports.editTeam = function(obj, callback) {
                     log.error(err);
                     callback(err);
                 } else {
-                    callback(rows.insertId);
+                    removeExecutives(teamId,function(){
+                        var lngt = new Array();
+                        if(executives.length === 0){
+                                callback(rows.insertId);
+                            }
+                        for(var i =0; i<executives.length;i++){                        
+                            saveExecutives(executives[i], teamId, userId, function(eval){
+                                lngt.push(eval);
+                                if (lngt.length === executives.length) {
+                                    callback(rows.insertId);
+                                }
+                            });
+                        }
+                    });                    
                 }
             });
         });

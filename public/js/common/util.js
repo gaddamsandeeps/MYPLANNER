@@ -4,8 +4,8 @@ function monthStartEnd(d) {
     var f = new Date(y, m - 1, 1);
     var l = new Date(y, m, 0);
     return {
-        startdate: y + '-' + m + '-' + f.getDate(),
-        enddate: y + '-' + m + '-' + l.getDate()
+        startdate: (1900 + f.getYear()) + '-' + (f.getMonth() + 1) + '-' + f.getDate(),
+        enddate: (1900 + l.getYear()) + '-' + (l.getMonth() + 1) + '-' + l.getDate()
     };
 }
 

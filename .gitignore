@@ -3,3 +3,4 @@
 /logs
 /nbproject/private/
 *.log
+/server/daemon

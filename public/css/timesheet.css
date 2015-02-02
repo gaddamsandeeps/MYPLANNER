@@ -6,14 +6,22 @@
 	border: 0;
 }
 
-.unlockreq{
+.log-unlockrequest{
 	background-color: red;
 	border-color: red;
 }
 
-.unlocked{
+.log-unlocked{
 	background-color: green;
 	border-color: green;
+}
+
+.log-actual{
+}
+
+.log-planned{
+	background-color: orange;
+	border-color: orange;
 }
 
 .requestunlock {
@@ -41,4 +49,17 @@ h3
 	text-align: right;
 	margin:3px 10px 0 0;
 	float:right;
+}
+
+.activity-heading{
+	margin-bottom: 20px;
+	display: block;
+	font-weight: bold;
+}
+#modalHeader{
+	font-weight: bold;
+}
+
+textarea{
+	resize : none;
 }

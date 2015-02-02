@@ -1,0 +1,24 @@
+.executiveTable {
+    width: 100%;
+    border: 1px solid #ddd;
+}
+
+.executiveTable tr td, .executiveTable tr th {
+    text-align: left;
+    padding-left: 20px;
+    padding-top: 5px;
+}
+
+.executiveTable td, .executiveTable th {
+    border-left: 1px solid #ddd;
+    padding-bottom: 1em;
+}
+
+.executiveTable tr {
+    border: 1px solid #ddd;
+}
+
+.reset-executive{
+    text-align: right;
+    padding-right: 18px;
+}
