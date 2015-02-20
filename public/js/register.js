@@ -21,21 +21,14 @@ app.controller('NewUserController', function($scope, $http) {
         teamid: null,
         firstname: '',
         lastname: '',
-        sex: 'M',
-        dob: '',
         contact: ''
     };
     $scope.newUser = empty;
     $scope.save = function() {
         $scope.$broadcast('show-errors-check-validity');
-        
-         $("#dobCtrl").css("color","#a94442").text("");
 
-        if ($scope.Form.$valid) {                
-            
-            if(!dobChecker($scope.newUser.dob,20)){
-                return;
-            };
+
+        if ($scope.Form.$valid) {
 
             var model = JSON.parse(angular.toJson($scope.newUser));
             delete model.confirmPassword;
@@ -43,10 +36,10 @@ app.controller('NewUserController', function($scope, $http) {
             model.teamid = (model.teamid) ? model.teamid.id : null;
             $http.post('/saveUser', model).then(function(obj) {
                 if (obj.data.message === "success") {
-                    $("#dobCtrl").css("color","#3DB34A").text('New User Created Successfully. Please login with your credentials');    
-                    setTimeout(function(){
-                        location.href = '/';    
-                    },2000);                   
+                    $("#registerCtrl").css("color", "#3DB34A").text('New User Created Successfully. Please login with your credentials');
+                    setTimeout(function() {
+                        location.href = '/';
+                    }, 2000);
                 }
             }, function(e) {
                 console.log(e);
@@ -65,24 +58,4 @@ app.controller('NewUserController', function($scope, $http) {
             $scope.newUser.teamid = null;
         }
     };
-
-
-    function dobChecker(date, age){
-        if(date){
-        var currentDate = new Date();
-        var userDate = new Date(date);
-        var validationYear = new Date().getFullYear()-age;
-        var userDateYear = new Date(date).getFullYear();
-        var validYearDate = new Date(validationYear, currentDate.getMonth(), currentDate.getDate());
-        var userYearDate = new Date(userDateYear, userDate.getMonth(), userDate.getDate());      
-        var userDateTime = userYearDate.getTime();
-        var dobDateTime = validYearDate.getTime();        
-        if(userDateTime> dobDateTime){
-        $("#dobCtrl").css("color","#a94442").text("Date cannot be later than"+ validYearDate);            
-        }
-        return (userDateTime<=dobDateTime);      
-        }else{
-            return true;
-        }        
-    }
 });

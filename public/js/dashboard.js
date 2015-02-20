@@ -149,7 +149,7 @@ app.factory('Services', function($http, $q) {
     }
 });
 
-app.controller('genericCtrl', function($rootScope, Services) {
+app.controller('genericCtrl', function($http, $rootScope, Services) {
 
     $rootScope.getResources = function(e) {
         if (e) {
@@ -211,32 +211,60 @@ app.controller('genericCtrl', function($rootScope, Services) {
         var url = '/report?id=' + id;
         location.href = url;
     };
+    $rootScope.removeUser = function(uid, name, currentIndex, teamUsers) {
+
+        $rootScope.teamUsers = teamUsers;
+
+        var dashBdResourceHandler = $rootScope.TeamUsers;
+        var removeResourceHandler, searchIndex = -1;
+        bootbox.confirm("Do you want to continue ?", function(result) {
+            if (!result) {
+                return;
+            }
+            var obj = {
+                id: uid
+            };
+            removeResourceHandler = Services.postURL('/removeUser', obj);
+            removeResourceHandler.then(function(arg) {
+                teamUsers.splice(currentIndex, 1);
+                for (var i = 0; i < dashBdResourceHandler.length; i++) {
+                    if (dashBdResourceHandler[i].id == uid) {
+                        searchIndex = i;
+                        break;
+                    }
+                    if (searchIndex != -1) {
+                        dashBdResourceHandler.splice(searchIndex, 1);
+                    }
+                }
+                showStatus(arg, "Resource " + name + " deactivated");
+            }, function(e) {
+                console.log(e);
+            });
+        });
+    };
 });
 
 app.controller('projectViewController', function($scope, $rootScope, Services, $filter) {
     //droppedProjects
+    $rootScope.$on('editProjectName', function() {
 
-
-$rootScope.$on('editProjectName', function() {
-
-    var currentProj = $filter('filter')($scope.droppedProjects, {
-            id:$rootScope.curProjectHandler.id
+        var currentProj = $filter('filter')($scope.droppedProjects, {
+            id: $rootScope.curProjectHandler.id
         });
 
-    if(currentProj.length){
-                currentProj[0].name=$rootScope.curProjectHandler.name;
-                currentProj[0].startdate = $rootScope.curProjectHandler.startdate ||$("#ProjectModal #startdate").val();
-                currentProj[0].enddate = $rootScope.curProjectHandler.enddate || $("#ProjectModal #enddate").val();
-                currentProj[0].description = $rootScope.curProjectHandler.description||$("#ProjectModal #projectdescription").val();
-                 currentProj[0].diff = currentDateStatus( currentProj[0].enddate, currentProj[0].startdate);
-                currentProj[0].currentdate = todaysDate();
-    }
-});
+        if (currentProj.length) {
+            currentProj[0].name = $rootScope.curProjectHandler.name;
+            currentProj[0].startdate = $rootScope.curProjectHandler.startdate || $("#ProjectModal #startdate").val();
+            currentProj[0].enddate = $rootScope.curProjectHandler.enddate || $("#ProjectModal #enddate").val();
+            currentProj[0].description = $rootScope.curProjectHandler.description || $("#ProjectModal #projectdescription").val();
+            currentProj[0].diff = currentDateStatus(currentProj[0].enddate, currentProj[0].startdate);
+            currentProj[0].currentdate = todaysDate();
+        }
+    });
 
 
     $scope.droppedProjects = {};
     Services.getURL('/getMyProjects').then(function(d) {
-
 
         var total = 0,
             spent = 0,
@@ -247,38 +275,31 @@ $rootScope.$on('editProjectName', function() {
                 spent = toHrs(d[i].users[j].logged);
                 d[i].users[j].logged = spent;
 
-              
-
                 /*Billing Validity control*/
 
 
-                var billingNearEndDate = new Date(d[i].users[j].enddate);
-                var nearFactor = new Date(d[i].users[j].enddate).getDate() - 5;                                    
-                    billingNearEndDate.setDate(nearFactor);
-                var billingNearEndDateTime = billingNearEndDate.getTime();
-
-
-                var billingEndTime =new Date(d[i].users[j].enddate).getTime();
-                var currentDateTime = new Date().getTime();
-                
                 var validityCtrlClass, validityStatus;
 
-                if( currentDateTime >= billingNearEndDateTime && currentDateTime <= billingEndTime){
-                    validityCtrlClass = "near-end-billing";
-                    validityStatus = "Billing will be completed within next 5 days.";                    
-                }else if (currentDateTime < billingEndTime) {
-                    validityCtrlClass = "active-billing";
-                    validityStatus = "Active billing."
-                }else if (currentDateTime > billingEndTime){
-                    validityCtrlClass = "inactive-billing";
-                    validityStatus = "Billing completed for current project."
+                if (d[i].users[j].billable === 1) {
+                    if (d[i].users[j].days < 0) {
+                        validityCtrlClass = 'inactive-billing';
+                        validityStatus = "Billing completed for current project."
+                    } else if (d[i].users[j].days >= 0 && d[i].users[j].days <= 5) {
+                        validityCtrlClass = 'near-end-billing';
+                        validityStatus = "Billing will be completed within next 5 days.";
+                    } else {
+                        validityCtrlClass = 'active-billing';
+                        validityStatus = "Active billing."
+                    }
                 }
-                if(!d[i].users[j].billable){
+                if (d[i].users[j].billable !== 1) {
                     validityCtrlClass = "non-billable";
-                    validityStatus = "Not billable for current project."
+                    validityStatus = "Not billable for current project.";
                     d[i].users[j].sowno = "NA";
+                } else {
+                    sowno = d[i].users[j].sowno;
                 }
-                    
+
                 d[i].users[j].validityCtrlClass = validityCtrlClass;
                 d[i].users[j].validityStatus = validityStatus;
 
@@ -302,7 +323,8 @@ $rootScope.$on('editProjectName', function() {
 
     $scope.addToProjectsView = function(projectid, projectname) {
         var check = $filter('filter')($scope.droppedProjects, {
-            id: projectid
+            id: projectid,
+            name: projectname
         });
         if (check.length === 0) {
             Services.getURL('/addMyProject?id=' + projectid).then(function(d) {
@@ -323,9 +345,26 @@ $rootScope.$on('editProjectName', function() {
                     d.users[j].bal = bal;
 
                     d.users[j].percent = (spent / total) * 100;
+                    if (d.users[j].billable === 1) {
+                        if (d.users[j].days < 0) {
+                            d.users[j].validityCtrlClass = 'inactive-billing';
+                            d.users[j].validityStatus = "Billing completed for current project."
+                        } else if (d.users[j].days >= 0 && d.users[j].days <= 5) {
+                            d.users[j].validityCtrlClass = 'near-end-billing';
+                            d.users[j].validityStatus = "Billing will be completed within next 5 days.";
+                        } else {
+                            d.users[j].validityCtrlClass = 'active-billing';
+                            d.users[j].validityStatus = "Active billing."
+                        }
+                    }
+                    if (d.users[j].billable !== 1) {
+                        d.users[j].validityCtrlClass = "non-billable";
+                        d.users[j].validityStatus = "Not billable for current project."
+                        d.users[j].sowno = "NA";
+                    } else {
+                        d.sowno = d.users[j].sowno;
+                    }
                 }
-
-
                 if (d.id) {
                     showStatus({
                         "message": "success"
@@ -369,17 +408,11 @@ $rootScope.$on('editProjectName', function() {
     };
 
     $scope.copyResource = function(projectid, projectname, resourcename, resourcefullname) {
-	  
-      document.getElementById('SowForm').reset();
-	  
-	  //$scope.reset();
-	  
-	  if($('#billing').is(':checked')){
-			$('#sownodisplay').removeClass('sowdisplay');
-	  } else { 
-			$('#sownodisplay').addClass('sowdisplay');
-	  }
-	  
+
+        document.getElementById('SowForm').reset();
+
+        //$scope.reset();
+
         var pindex = -1;
         for (var i = 0, l = $scope.droppedProjects.length; i < l; i++) {
             var p = $scope.droppedProjects[i];
@@ -403,20 +436,20 @@ $rootScope.$on('editProjectName', function() {
                 });
 
 
-            var obj = {
-                id: projectid,
-                userid: tempArr[0].id
-            }
-            $rootScope.userid = obj.userid;
-            $rootScope.projectresourceid = obj.projectresourceid;
-            $rootScope.projectid = projectid;
-            $rootScope.resourcename = resourcename;
-            $rootScope.resourcefullname = resourcefullname;
-            $rootScope.projectname = projectname;
-   
-	            $('#resourceName').val(resourcefullname);
-				$("#saveSow").show();
-				$("#editSow").hide();
+                var obj = {
+                    id: projectid,
+                    userid: tempArr[0].id
+                }
+                $rootScope.userid = obj.userid;
+                $rootScope.projectresourceid = obj.projectresourceid;
+                $rootScope.projectid = projectid;
+                $rootScope.resourcename = resourcename;
+                $rootScope.resourcefullname = resourcefullname;
+                $rootScope.projectname = projectname;
+
+                $('#resourceName').val(resourcefullname);
+                $("#saveSow").show();
+                $("#editSow").hide();
                 $('#AddDateModal').modal('show');
                 $scope.$apply();
             }
@@ -434,6 +467,7 @@ $rootScope.$on('editProjectName', function() {
                 t = i;
             }
         }
+        console.log($scope.droppedProjects);
         var tArr = $scope.droppedProjects[t].users;
         var tcheck = $filter('filter')(tArr, {
             username: resourcename
@@ -464,28 +498,26 @@ $rootScope.$on('editProjectName', function() {
 
         $rootScope.curResourceHandler = d;
         $rootScope.curProjectHandler = p;
-
-
         $rootScope.userid = d.id;
         $rootScope.projectresourceid = d.projectresourceid;
         $rootScope.projectid = p.id;
         $rootScope.projectname = p.name;
-		$rootScope.sowno = d.sowno;
-        $rootScope.resourcefullname = d.firstname+" "+d.lastname;
+        $rootScope.sowno = d.sowno;
+        $rootScope.resourcefullname = d.firstname + " " + d.lastname;
 
-        $("#sowprojectdescription").val(d.description);
-        $("#sowstartdate").val(d.startdate);
-        $("#sowenddate").val(d.enddate);
-        $("#billable").prop("checked", Boolean(d.billable));
-		$('#sowno').val(d.sowno);
-		if($('#billable').prop('checked')){
-			$('#sownodisplay').removeClass('sowdisplay');
-		}else {
-			$('#sownodisplay').addClass('sowdisplay');
-		}
+        var sowproject = {
+            name: d.firstname + " " + d.lastname,
+            sowprojectdescription: d.description,
+            sowstartdate: d.startdate,
+            sowenddate: d.enddate,
+            billable: d.billable,
+            sowno: d.sowno
+        };
+
         $("#saveSow").hide();
         $("#editSow").show();
         $('#AddDateModal').modal('show');
+        $rootScope.$broadcast("updatesowmodelevent", sowproject);
     };
 
     $scope.removeResource = function(project, userObj) {
@@ -539,7 +571,7 @@ $rootScope.$on('editProjectName', function() {
         //location.reload();
     };
 
-    $scope.editProject = function(p,id) {
+    $scope.editProject = function(p, id) {
 
         $rootScope.curProjectHandler = p;
         $rootScope.projectType = 'Edit Project';
@@ -549,33 +581,33 @@ $rootScope.$on('editProjectName', function() {
 
 
 
-    $scope.removeProject = function(p, id, projects, currentIndex){
+    $scope.removeProject = function(p, id, projects, currentIndex) {
 
         var dashBdProjectsHandler = $scope.droppedProjects;
-        var removeProjectHandler,searchIndex = -1;
+        var removeProjectHandler, searchIndex = -1;
         bootbox.confirm("Do you want to remove the project ?", function(result) {
-            
+
             if (!result) {
                 return;
             }
-                var obj = {
-                    id: id
+            var obj = {
+                id: id
+            };
+            var msg = 'Project ' + p.name + ' removed';
+            removeProjectHandler = Services.postURL('/removeProject', obj, msg);
+            removeProjectHandler.then(function(arg) {
+                projects.splice(currentIndex, 1);
+                for (var i = 0; i < dashBdProjectsHandler.length; i++) {
+
+                    if (dashBdProjectsHandler[i].id == id) {
+                        searchIndex = i;
+                        break;
+                    }
                 };
-                var msg = 'Project ' + p.name + ' removed';
-                removeProjectHandler = Services.postURL('/removeProject', obj, msg);
-                removeProjectHandler.then(function(arg){
-                        projects.splice(currentIndex,1);
-                        for(var i =0; i<dashBdProjectsHandler.length; i++){
-        
-						if(dashBdProjectsHandler[i].id == id){
-							searchIndex = i;
-                                break;
-                            }
-                        };
-                        if(searchIndex != -1){							
-                            dashBdProjectsHandler.splice(searchIndex,1);
-                        }
-                });;
+                if (searchIndex != -1) {
+                    dashBdProjectsHandler.splice(searchIndex, 1);
+                }
+            });;
         });
     };
 
@@ -588,10 +620,10 @@ $rootScope.$on('editProjectName', function() {
     //Settings section
     $scope.setPermissions = function(userData) {
         var accesslevel = 1;
-		if(userData.check){
-			accesslevel = 2;
-		}
-		console.log(userData);
+        if (userData.check) {
+            accesslevel = 2;
+        }
+        console.log(userData);
         Services.postURL("/setPermissions", {
             "accesslevel": accesslevel,
             "id": userData.id
@@ -610,22 +642,20 @@ $rootScope.$on('editProjectName', function() {
             console.log(e);
         });
     };
-	
-	$scope.reset = function(){
-		$rootScope.$broadcast('show-errors-reset');
-		$scope.project = {};
-		$scope.sowproject = {};
-		$('#sownodisplay').removeAttr('show-errors');
-		$('#errorContainer').empty();
-	}	
+
+    $scope.reset = function() {
+        $rootScope.$broadcast('show-errors-reset');
+        $scope.project = {};
+        $scope.sowproject = {};
+        $('#sownodisplay').removeAttr('show-errors');
+        $('#errorContainer').empty();
+    }
 });
 
 app.controller('ProjectController', function($scope, $rootScope, Services) {
     var tempObj = null;
     $rootScope.$on('editProject', function() {
         Services.getURL('/getProject?id=' + $rootScope.projectId).then(function(d) {
-            
-        
             var s1 = new Date(d.startdate);
             var s2 = new Date(d.enddate);
             var e1 = document.getElementById('startdate');
@@ -647,12 +677,12 @@ app.controller('ProjectController', function($scope, $rootScope, Services) {
             console.log(e);
         });
     });
- 
-	$scope.close = function() {
-		$scope.$broadcast('show-errors-reset');
+
+    $scope.close = function() {
+        $scope.$broadcast('show-errors-reset');
         $scope.project = {};
-		$scope.sowproject = {};
-		$('#errorContainer').empty();
+        $scope.sowproject = {};
+        $('#errorContainer').empty();
     };
 
     $scope.saveProject = function() {
@@ -681,9 +711,6 @@ app.controller('ProjectController', function($scope, $rootScope, Services) {
                         $rootScope.curProjectHandler.name = $("#ProjectForm #projectname").val();
                         $rootScope.$broadcast("editProjectName");
                     }
-
-
-
                 }, function(e) {
                     console.log(e);
                 });
@@ -713,148 +740,215 @@ app.controller('ProjectController', function($scope, $rootScope, Services) {
 //SOW scenarios..
 app.controller('SowController', function($scope, $rootScope, Services, $filter) {
     $scope.sowproject = $rootScope.sowproject = resetModel();
-	
-	$scope.getSowNumber = function(){
-		if($('#billable').is(':checked')){
-			$('#sowno').val("");
-			$('#sownodisplay').removeClass('sowdisplay');
-		} else{
-			$('#sownodisplay').addClass('sowdisplay');
-		}		
-	};
 
-    $scope.saveSow = function() {
-		$scope.$broadcast('show-errors-check-validity');
-        if ($scope.SowForm.$valid) {
-			var model = JSON.parse(angular.toJson($scope.sowproject));
-            //model.name = $('#resourceName').val();
-            model.userid = $rootScope.userid;
-            model.id = $rootScope.projectid;
-            model.projectname = $rootScope.projectname;
-			
-            var msg = $rootScope.resourcefullname + ' added to project ' + $rootScope.projectname;
-            Services.postURL('/addResourceToProject', model).then(function(d) {
-
-                if (d.message === 'success') {
-                    $('#AddDateModal').modal('hide');
-                    document.getElementById('SowForm').reset();
-                    $scope.$broadcast('show-errors-reset');
-                    $scope.sowproject = resetModel();
-                    var tempArr = $filter('filter')($rootScope.TeamUsers, {
-                        username: $rootScope.resourcename
-                    });
-
-                    var proj = $filter('filter')($rootScope.Projects, {
-                        name: $rootScope.projectname
-                    });
-
-                    if (proj.length) {
-                        proj[0].count++;
-                    }
-                    var res = tempArr[0];
-                    
-                    //code to increment project count
-                    res.projectCount++;
-                    res.startdate = d.data.startdate;
-                    res.enddate = d.data.enddate;
-                    res.billable = d.data.billable;
-					res.sowno = d.data.sowno;
-                    res.description = d.data.description;
-                    res.projectresourceid = d.data.projectresourceid;
-
-                    //start
-                    var total = calcBusinessDays(new Date(d.data.startdate), new Date(d.data.enddate)),
-                        spent = toHrs(d.data.logged),
-                        bal = (total - spent).toFixed(2),
-                        percent = (spent / total) * 100;
-
-                    res.total = total;
-                    res.logged = spent;
-                    res.bal = bal;
-                    res.percent = percent;
-                    //end
-
-                    x.push(res);
-                    //code to increment project count
-                }
-                showStatus(d, msg);
-            }, function(e) {
-                console.log(e);
-            });
-            /*}else {
-             $('#errorContainer').html('<LI>End Date should be Greater than Start Date</LI>');
-         }*/
+    $scope.getSowNumber = function() {
+        if ($scope.sowproject.billable) {
+            $scope.sowproject.sowno = "";
+        } else {
+            $scope.sowproject.sowno = "NA";
         }
     };
 
+    $scope.saveSow = function() {
+        $scope.$broadcast('show-errors-check-validity');
+        if ($scope.SowForm.$valid) {
+            if ($scope.sowproject.sowenddate >= $scope.sowproject.sowstartdate) {
+                $('#sowerrorContainer').empty();
+                var model = JSON.parse(angular.toJson($scope.sowproject));
+                //model.name = $('#resourceName').val();
+                model.userid = $rootScope.userid;
+                model.id = $rootScope.projectid;
+                model.projectname = $rootScope.projectname;
+
+                var msg = $rootScope.resourcefullname + ' added to project ' + $rootScope.projectname;
+
+                Services.postURL('/addResourceToProject', model).then(function(d) {
+
+                    if (d.message === 'success') {
+                        $('#AddDateModal').modal('hide');
+                        document.getElementById('SowForm').reset();
+                        $scope.$broadcast('show-errors-reset');
+                        $scope.sowproject = resetModel();
+                        var tempArr = $filter('filter')($rootScope.TeamUsers, {
+                            username: $rootScope.resourcename
+                        });
+
+                        var proj = $filter('filter')($rootScope.Projects, {
+                            name: $rootScope.projectname
+                        });
+
+                        if (proj.length) {
+                            proj[0].count++;
+                        }
+                        var res = tempArr[0];
+
+                        //code to increment project count
+
+                        res.projectCount++;
+                        res.startdate = d.data.startdate;
+                        res.enddate = d.data.enddate;
+                        res.billable = d.data.billable;
+
+                        if (res.billable === 1) {
+                            if (d.data.days < 0) {
+                                res.validityCtrlClass = 'inactive-billing';
+                                res.validityStatus = "Billing completed for current project."
+                            } else if (d.data.days >= 0 && d.data.days <= 5) {
+                                res.validityCtrlClass = 'near-end-billing';
+                                res.validityStatus = "Billing will be completed within next 5 days.";
+                            } else {
+                                res.validityCtrlClass = 'active-billing';
+                                res.validityStatus = "Active billing."
+                            }
+                        }
+
+                        if (res.billable !== 1) {
+                            res.validityCtrlClass = "non-billable";
+                            res.validityStatus = "Not billable for current project."
+                            res.sowno = "NA";
+                        } else {
+                            res.sowno = d.data.sowno;
+                        }
+                        res.description = d.data.description;
+                        res.projectresourceid = d.data.projectresourceid;
+
+                        //start
+                        var total = calcBusinessDays(new Date(d.data.startdate), new Date(d.data.enddate)),
+                            spent = toHrs(d.data.logged),
+                            bal = (total - spent).toFixed(2),
+                            percent = (spent / total) * 100;
+
+                        res.total = total;
+                        res.logged = spent;
+                        res.bal = bal;
+                        res.percent = percent;
+                        //end
+
+                        x.push(res);
+                        //code to increment project count
+                    }
+                    showStatus(d, msg);
+                }, function(e) {
+                    console.log(e);
+                });
+            } else {
+                $('#sowerrorContainer').html('<LI>End Date should be Greater than Start Date</LI>');
+            }
+        }
+    };
+
+
+    $scope.$on("updatesowmodelevent", function(event, data) {
+        $scope.sowproject = data;
+        if ($scope.sowproject.billable === 1) {
+            $scope.sowproject.billable = true;
+        } else {
+            $scope.sowproject.billable = false;
+        }
+
+    });
+
     $scope.updateSow = function() {
-	
-        $rootScope.sowproject = {
-            sowprojectdescription: $("#sowprojectdescription").val(),
-            sowstartdate: $("#sowstartdate").val(),
-            sowenddate: $("#sowenddate").val(),
-			sowno : $('#sowno').val(),
-            billable: Number($("#billable").prop("checked"))
-        };
-		
+
+        if ($scope.SowForm.$invalid) {
+            $scope.$broadcast('show-errors-check-validity');
+            return;
+        }
+
+        $rootScope.sowproject = $scope.sowproject;
+
+        if (!$scope.sowproject.billable) {
+            $rootScope.sowproject.billable = 0;
+        } else {
+            $rootScope.sowproject.billable = 1;
+        }
+
+
+
         var model = JSON.parse(angular.toJson($rootScope.sowproject));
         model.userid = $rootScope.userid;
         model.id = $rootScope.projectid;
         model.projectname = $rootScope.projectname;
         model.projectresourceid = $rootScope.projectresourceid;
 
-        var msg = $rootScope.resourcefullname + " 's status updated to project "  + $rootScope.projectname;
-        
-
-        Services.postURL('/editResourceOfProject', model).then(function(d) {
-
-            if (d.message === 'success') {
-                $('#AddDateModal').modal('hide');
-                document.getElementById('SowForm').reset();
+        var msg = $rootScope.resourcefullname + " 's status updated to project " + $rootScope.projectname;
 
 
-                var spentTime = toHrs(d.data.logged);
-                d.data.logged = spentTime;
+        if ($scope.sowproject.sowenddate >= $scope.sowproject.sowstartdate) {
+            $('#sowerrorContainer').empty();
 
-                var total = calcBusinessDays(new Date(d.data.startdate), new Date(d.data.enddate));
-                d.data.total = total;
+            Services.postURL('/editResourceOfProject', model).then(function(d) {
 
-                var bal = (total - spentTime).toFixed(2);
-                d.data.bal = bal;
+                if (d.message === 'success') {
+                    $('#AddDateModal').modal('hide');
 
-                d.data.percent = (spentTime / total) * 100;
+                    $scope.sowproject = {};
 
-                $rootScope.curResourceHandler.firstname = d.data.firstname;
-                $rootScope.curResourceHandler.lastname = d.data.lastname;
-                $rootScope.curResourceHandler.startdate = d.data.startdate;
-                $rootScope.curResourceHandler.enddate = d.data.enddate;
-				$rootScope.curResourceHandler.sowno = d.data.sowno;
-                $rootScope.curResourceHandler.logged = d.data.logged;
-                $rootScope.curResourceHandler.total = d.data.total;
-                $rootScope.curResourceHandler.bal = d.data.bal;
-                $rootScope.curResourceHandler.percent = d.data.percent;
-                $rootScope.curResourceHandler.description = d.data.description;
-                $rootScope.curResourceHandler.billable = d.data.billable;
+                    var spentTime = toHrs(d.data.logged);
+                    d.data.logged = spentTime;
 
-            }
-            showStatus(d, msg);
-        }, function(e) {
-            console.log(e);
-        });
+                    var total = calcBusinessDays(new Date(d.data.startdate), new Date(d.data.enddate));
+                    d.data.total = total;
+
+                    var bal = (total - spentTime).toFixed(2);
+                    d.data.bal = bal;
+
+                    d.data.percent = (spentTime / total) * 100;
+
+                    $rootScope.curResourceHandler.firstname = d.data.firstname;
+                    $rootScope.curResourceHandler.lastname = d.data.lastname;
+                    $rootScope.curResourceHandler.startdate = d.data.startdate;
+                    $rootScope.curResourceHandler.enddate = d.data.enddate;
+
+                    if (d.data.billable === 1) {
+                        if (d.data.days <= 0) {
+                            $rootScope.curResourceHandler.validityCtrlClass = 'inactive-billing';
+                            $rootScope.curResourceHandler.validityStatus = "Billing completed for current project."
+                        } else if (d.data.days > 0 && d.data.days <= 5) {
+                            $rootScope.curResourceHandler.validityCtrlClass = 'near-end-billing';
+                            $rootScope.curResourceHandler.validityStatus = "Billing will be completed within next 5 days.";
+                        } else {
+                            $rootScope.curResourceHandler.validityCtrlClass = 'active-billing';
+                            $rootScope.curResourceHandler.validityStatus = "Active billing."
+                        }
+                    }
+
+                    if (d.data.billable !== 1) {
+                        $rootScope.curResourceHandler.validityCtrlClass = "non-billable";
+                        $rootScope.curResourceHandler.validityStatus = "Not billable for current project.";
+                        $rootScope.curResourceHandler.sowno = "NA";
+                    } else {
+                        $rootScope.curResourceHandler.sowno = d.data.sowno;
+                    }
+                    $rootScope.curResourceHandler.logged = d.data.logged;
+                    $rootScope.curResourceHandler.total = d.data.total;
+                    $rootScope.curResourceHandler.bal = d.data.bal;
+                    $rootScope.curResourceHandler.percent = d.data.percent;
+                    $rootScope.curResourceHandler.description = d.data.description;
+                    $rootScope.curResourceHandler.billable = d.data.billable;
+                }
+                showStatus(d, msg);
+            }, function(e) {
+                console.log(e);
+            });
+        } else {
+            $('#sowerrorContainer').html('<LI>End Date should be Greater than Start Date</LI>');
+        }
     };
-	
-	$scope.closeSow = function(){
-		$scope.sowproject = {};
-		$scope.$broadcast('show-errors-reset');
-		$('#errorContainer').empty();
-	};
-	
+
+    $scope.closeSow = function() {
+        $scope.sowproject = {};
+        $scope.$broadcast('show-errors-reset');
+        $('#errorContainer').empty();
+        $('#sowerrorContainer').empty();
+    };
+
     function resetModel() {
         return {
             sowprojectdescription: '',
             sowstartdate: '',
             sowenddate: '',
-			sowno : '',
+            sowno: '',
             billable: false
         };
     }

@@ -25,7 +25,7 @@ var userid = '<%= user.id %>';
         </div>
         <% if (typeof user != "undefined" ) { %>
         <ul class="headerNav pull-right">
-            <% if (user.roleName === "MANAGER" ) { %>
+            <% if (user.roleId === 2 ) { %>
                 <li>
                     <a data-toggle="modal" id="addproject" href="#AddProjectModal"></a>
                 </li>
@@ -34,34 +34,29 @@ var userid = '<%= user.id %>';
                     <a data-toggle="modal" href="/dashboard">Dashboard</a>
                 </li>
                 <% } %>
+                <% if (pageName !== "project" ) { %>
+                <li>
+                    <a data-toggle="modal" href="/project">Projects</a>
+                </li>
+                <% } %>
                 <% if (pageName !== "story" ) { %>
                 <li>
-                    <a data-toggle="modal" href="/story">Stories</a>
+                    <a data-toggle="modal" href="/story">Sprints</a>
                 </li>
                 <% } %>
                 <% if (pageName !== "usertimesheet" ) { %>
                 <li>
                     <a data-toggle="modal" href="/usertimesheet?id=">Timesheet</a>
                 </li>
-                <% } %> 
-                <% if (pageName !== "edashboard" ) { %>
-                <li>
-                    <a data-toggle="modal" href="/edashboard">E-Dashboard</a>
-                </li>
-                <% } %> 
-                <% if (pageName !== "ereports" ) { %>
-                <li>
-                    <a data-toggle="modal" href="/ereports">E-Reports</a>
-                </li>
-                <% } %>          
+                <% } %>                       
                 <% if (pageName !== "report" ) { %>
                 <li>
                     <a data-toggle="modal" href="/report">Reports</a>
                 </li>
-            <% }} else if (user.roleName === "USER" ) {%>
+            <% }} else if (user.roleId === 3 ) {%>
             <% if (pageName !== "story" ) { %>
                 <li>
-                    <a data-toggle="modal" href="/story">Stories</a>
+                    <a data-toggle="modal" href="/story">Sprints</a>
                 </li>
                 <% } %>
                 <% if (pageName !== "timesheet") { %>
@@ -73,7 +68,7 @@ var userid = '<%= user.id %>';
                 <li>
                     <a data-toggle="modal" href="/report?id=<%=user.id%>">Reports</a>
                 </li>
-            <% }}else if (user.roleName === "SENIOR MANAGER" ) {%>
+            <% }}else if (user.roleId === 4 ) {%>
             <% if (pageName !== "edashboard" ) { %>
                 <li>
                     <a data-toggle="modal" href="/edashboard">E-Dashboard</a>

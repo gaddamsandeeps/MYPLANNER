@@ -7,8 +7,8 @@ function generateCharts(target, title, data, events, functionName, userData) {
             plotShadow: false
         },
         credits: {
-              enabled: false
-          },
+            enabled: false
+        },
         title: {
             text: title
         },
@@ -38,18 +38,17 @@ function generateCharts(target, title, data, events, functionName, userData) {
             events: {
                 click: function(event) {
                     if (events) {
-                        if(functionName == 'iteration'){
+                        if (functionName == 'iteration') {
                             iterationStoryReportShow(event.point.title, userData);
-                        }else if(functionName == 'story'){
+                        } else if (functionName == 'story') {
                             userStoryShow(event.point.title, userData);
-                        }else if(functionName == 'project'){
+                        } else if (functionName == 'project') {
                             userProjectShow(event.point.title, userData);
-                        }
-                        else if(functionName == 'iterationStory'){                            
+                        } else if (functionName == 'iterationStory') {
                             iterationStoryUserReportShow(event.point.title, userData);
                         }
-						//focus on generated chart
-						document.getElementById(target).scrollIntoView();                        
+                        //focus on generated chart
+                        document.getElementById(target).scrollIntoView();
                     }
                 }
 
@@ -66,10 +65,10 @@ function generateBarCharts(target, title, data, plannedData) {
         },
         title: {
             text: title
-        },        
+        },
         credits: {
-              enabled: false
-          },
+            enabled: false
+        },
         xAxis: {
             type: 'category',
             max: 6,
@@ -90,7 +89,7 @@ function generateBarCharts(target, title, data, plannedData) {
         legend: {
             enabled: true
         },
-         scrollbar: {
+        scrollbar: {
             enabled: true
         },
         tooltip: {
@@ -112,8 +111,7 @@ function generateBarCharts(target, title, data, plannedData) {
                     textShadow: '0 0 3px black'
                 }
             }
-        },
-        {
+        }, {
             name: 'Planned Hours',
             data: plannedData,
             color: 'orange',
@@ -137,32 +135,32 @@ function generateBarCharts(target, title, data, plannedData) {
 function generateLineCharts(target, title, keys, values) {
     var chart = new Highcharts.Chart({
         chart: {
-            renderTo: target,            
+            renderTo: target,
             plotBorderWidth: 1,
             zoomType: 'xy'
         },
-		title: {
+        title: {
             text: title
         },
 
         credits: {
-              enabled: false
-          },
+            enabled: false
+        },
         xAxis: {
             categories: keys
         },
         tooltip: {
             formatter: function() {
-                return this.x + ' logged for '+this.y+' Hrs';
+                return this.x + ' logged for ' + this.y + ' Hrs';
             }
         },
         yAxis: {
             type: 'logarithmic',
-			title: {
+            title: {
                 text: 'Hours'
             }
         },
-		legend: {
+        legend: {
             enabled: false
         },
         series: [{

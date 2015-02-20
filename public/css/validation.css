@@ -1,16 +1,15 @@
 .error-message {
-	color: #a94442;
+    color: #a94442;
 }
 [ng-cloak] {
-	display: none;
+    display: none;
 }
 .form-group .error-message {
-	display: none;
+    display: none;
 }
 .form-group.has-error .error-message {
-	display: block;
+    display: block;
 }
-
-textarea{
-	resize : none;
+textarea {
+    resize: none;
 }

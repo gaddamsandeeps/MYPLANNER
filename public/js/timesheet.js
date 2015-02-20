@@ -23,7 +23,7 @@ $(document).on("change", "#resourceType", function() {
 
 //Clear error msg on reset
 
-$("#resetBtn").on("click", function(){
+$("#resetBtn").on("click", function() {
     $("#errorContainer").empty();
 });
 
@@ -57,60 +57,72 @@ $('#unlockRequest').click(function() {
     });
 });
 
-$('#addTimeProjectId').on('change',function(e){
-			var projectId = $(e.currentTarget).val();
-			$.ajax({
-					url: '/getStoriesNTasks?projectid='+projectId,
-					type: 'get',
-					contentType: 'application/json',
-			}).done(function(resp){
-				var tasklist = $('#addTimeStory');
-				tasklist.empty();
-				tasklist.append("<option value=''>Select Story</option>");
-				for(var i=0;i<resp.length;i++){
-					tasklist.append($("<option></option>").attr("value",resp[i].id).text(resp[i].name));
-				}
-			});
+$('#addTimeProjectId').on('change', function(e) {
+    $('#addTimeIterationNo').prop("disabled", false);
+    $('#addTimeIterationNo').val('');
+    $('#addTimeStory').val('');
+    $('#addTimeTask').val('');
 });
 
-$('#addTimeStory').on('change',function(e){
-            var storyId = $(e.currentTarget).val();
-            
-            if(storyId =="" ){
-                    $("#addTimeTask").parent().parent(".form-group").show();                       
-                    return;
+$('#addTimeIterationNo').on('change', function(e) {
+    $('#addTimeStory').prop("disabled", false);
+
+    var iterationId = $(e.currentTarget).val();
+    var projectId = $('#addTimeProjectId').val();
+
+    $.ajax({
+        url: '/getInCompleteStoriesNTasksByPidnIterId?projectid=' + projectId + '&iterationid=' + iterationId,
+        type: 'get',
+        contentType: 'application/json',
+    }).done(function(resp) {
+        var tasklist = $('#addTimeStory');
+        tasklist.empty();
+        tasklist.append("<option value=''>Select Story</option>");
+        for (var i = 0; i < resp.length; i++) {
+            tasklist.append($("<option></option>").attr("value", resp[i].id).text(resp[i].name));
+        }
+    });
+});
+
+$('#addTimeStory').on('change', function(e) {
+    $('#addTimeTask').prop("disabled", false);
+    var storyId = $(e.currentTarget).val();
+
+    if (storyId == "") {
+        $("#addTimeTask").parent().parent(".form-group").show();
+        return;
+    }
+    $.ajax({
+        url: '/getTasks?storyid=' + storyId,
+        type: 'get',
+        contentType: 'application/json',
+    }).done(function(resp) {
+
+        if (resp.length) {
+            $("#addTimeTask").parent().parent(".form-group").show();
+            var tasklist = $('#addTimeTask');
+            tasklist.empty();
+            tasklist.append("<option value=''>Select Task</option>");
+            for (var i = 0; i < resp.length; i++) {
+                tasklist.append($("<option></option>").attr("value", resp[i].id).text(resp[i].name));
             }
-            $.ajax({
-                    url: '/getTasks?storyid='+storyId,
-                    type: 'get',
-                    contentType: 'application/json',
-            }).done(function(resp){
+        } else {
+            $("#addTimeTask").parent().parent(".form-group").hide();
+        }
 
-                if(resp.length){
-                        $("#addTimeTask").parent().parent(".form-group").show();                       
-                        var tasklist = $('#addTimeTask');
-                        tasklist.empty();
-                        tasklist.append("<option value=''>Select Task</option>");
-                        for(var i=0;i<resp.length;i++){
-                            tasklist.append($("<option></option>").attr("value",resp[i].id).text(resp[i].name));
-                        }
-                }else{
-                    $("#addTimeTask").parent().parent(".form-group").hide();
-                }
-
-            });
+    });
 });
 
 var el = $('#calendar');
 var modalEl = $('#AddTimeModal');
 var calObj = {
-    
 
-    eventClick: function(event, element) {       
+
+    eventClick: function(event, element) {
 
         var status = event.logstatusid,
-        storyId = event.storyid,
-        projectId = event.projectid;
+            storyId = event.storyid,
+            projectId = event.projectid;
         taskId = event.taskid || "";
 
 
@@ -133,17 +145,17 @@ var calObj = {
         $("#teamMembersWrapper").hide();
         $('#errorContainer').html('');
         $("#resetBtn").hide();
-        
+
         // Render story & independent task data of event project.
         getStories(projectId, renderStories, storyId, true);
 
-        if(taskId){
-        $("#addTimeTask").parent().parent(".form-group").show();
-        // Render task data of the event story
-        getTasks(storyId, renderTasks, taskId);
-        
-        }else{
-            $("#addTimeTask").parent().parent(".form-group").hide();   
+        if (taskId) {
+            $("#addTimeTask").parent().parent(".form-group").show();
+            // Render task data of the event story
+            getTasks(storyId, renderTasks, taskId);
+
+        } else {
+            $("#addTimeTask").parent().parent(".form-group").hide();
         }
 
 
@@ -236,7 +248,7 @@ var calObj = {
                 });
                 modalHeaderText = "Unlock received. Please submit again";
                 saveLogBtnText = "Update"; // to be removed.
-        }       
+        }
 
         $("#addTimeProjectId").val(event.projectid);
         $("#addTimeIterationNo").val(event.iterationid);
@@ -271,8 +283,8 @@ var calObj = {
                     requestUrl = "/editLog";
                 }
 
-                if (validate(actualStartDateNode, actualEndDateNode,status)) {
-					$('.modal-footer').hide();
+                if (validate(actualStartDateNode, actualEndDateNode, status)) {
+                    $('.modal-footer').hide();
                     var requestHandler = $.ajax({
                         url: requestUrl,
                         type: 'POST',
@@ -281,7 +293,7 @@ var calObj = {
                     });
 
                     requestHandler.done(function(d) {
-						$('.modal-footer').hide();
+                        $('.modal-footer').hide();
                         showStatus(d, 'Log edited successfully');
                         el.fullCalendar('removeEvents', [event._id]);
                         modalEl.modal('hide');
@@ -337,9 +349,9 @@ var calObj = {
             'disabled': false
         });
 
-         $("#addTimeTask").parent().parent(".form-group").show(); 
+        $("#addTimeTask").parent().parent(".form-group").show();
 
-        $("#addTimeStartTime, #addTimeEndTime").prop("disabled", true);
+        $("#addTimeStartTime, #addTimeEndTime, #addTimeIterationNo, #addTimeStory, #addTimeTask").prop("disabled", true);
 
         $(".modal-footer").show();
         $('.requestunlock').hide();
@@ -469,18 +481,18 @@ var calObj = {
 el.fullCalendar(calObj);
 
 //convert date ex: 2011-10-05T14:48 2011-10-05 02:48 PM 
-function convertISO(dte){
-    var dteObj = new Date(dte);    
+function convertISO(dte) {
+    var dteObj = new Date(dte);
 
-    var dteObjIso = new Date(dteObj.toISOString() );
-        dteObjIso =   new Date( dteObjIso.getTime() + ( dteObjIso.getTimezoneOffset() * 60000 ) );
+    var dteObjIso = new Date(dteObj.toISOString());
+    dteObjIso = new Date(dteObjIso.getTime() + (dteObjIso.getTimezoneOffset() * 60000));
 
-    return dateFormat(dteObjIso,'yyyy-mm-dd hh:MM TT');
+    return dateFormat(dteObjIso, 'yyyy-mm-dd hh:MM TT');
 }
 
 //validate log form
 function validate(StartTime, EndTime, status) {
-  
+
     if (!$('#addTimeProjectId').val()) {
         $('#errorContainer').html(projErrMsg);
         return false;
@@ -500,19 +512,19 @@ function validate(StartTime, EndTime, status) {
             return false;
         }
         if ($('#addTimeStory').val() == "") {
-            
+
             $('#errorContainer').html(storyErrMsg);
             return false;
-        }else{
+        } else {
             var subTaskDisplay = $("#addTimeTask").parent().parent(".form-group").css("display");
-            if(subTaskDisplay != "none" && $("#addTimeTask").val()==""){
-              $('#errorContainer').html(taskErrMsg);
-               return false;
+            if (subTaskDisplay != "none" && $("#addTimeTask").val() == "") {
+                $('#errorContainer').html(taskErrMsg);
+                return false;
             }
-        
+
 
         }
-        
+
         if ($('#storyStatus').val() === '') {
             $('#errorContainer').html(statusErrMsg);
             return false;
@@ -522,11 +534,11 @@ function validate(StartTime, EndTime, status) {
             $('#errorContainer').html(iterationNoErrMsg);
             return false;
         }
-    }    
-    
-    if(!StartTime.value || !EndTime.value){        
+    }
 
-        if(status=1){
+    if (!StartTime.value || !EndTime.value) {
+
+        if (status = 1) {
             $('#errorContainer').html(emptyPlannedDateErrMsg);
             return false;
         }
@@ -535,32 +547,32 @@ function validate(StartTime, EndTime, status) {
 
 
 
-    if (!(sameDates(StartTime.value, EndTime.value) && (EndTime.valueAsNumber > StartTime.valueAsNumber))) {        
-        if(status ==1){
-        $('#errorContainer').html(plannedDatesErrMsg);    
-        }else{
-         $('#errorContainer').html(actualDatesErrMsg);               
-        } 
+    if (!(sameDates(StartTime.value, EndTime.value) && (EndTime.valueAsNumber > StartTime.valueAsNumber))) {
+        if (status == 1) {
+            $('#errorContainer').html(plannedDatesErrMsg);
+        } else {
+            $('#errorContainer').html(actualDatesErrMsg);
+        }
         return false;
     }
 
-    if(status !== 1){
+    if (status !== 1) {
         var plannedDay = new Date($("#addTimePlannedStartTime").val()).getUTCDate();
         var actualsDay = new Date($("#addTimeStartTime").val()).getUTCDate();
-        if(plannedDay !== actualsDay){
-            $('#errorContainer').html(plannedActualDayErrMsg);                 
+        if (plannedDay !== actualsDay) {
+            $('#errorContainer').html(plannedActualDayErrMsg);
             return false;
         }
     }
 
-    if(status == 1 && $("#addTimeStartTime").val()){
-               var currentDay = new Date().getUTCDate();
+    if (status == 1 && $("#addTimeStartTime").val()) {
+        var currentDay = new Date().getUTCDate();
         var actualsDay = new Date($("#addTimeStartTime").val()).getUTCDate();
-        if(actualsDay > currentDay){
-            $('#errorContainer').html(currentDayValidationErrMsg);                 
+        if (actualsDay > currentDay) {
+            $('#errorContainer').html(currentDayValidationErrMsg);
             return false;
         }
-    }    
+    }
 
 
 
@@ -569,54 +581,54 @@ function validate(StartTime, EndTime, status) {
 
 
 
-function getLocalEventObj(title, plannedstart, plannedend, start, end , id, logstatusid, statusName) {
+function getLocalEventObj(title, plannedstart, plannedend, start, end, id, logstatusid, statusName) {
     return {
-          description: $("#addTimeDescription").val(),
-          end: end,
-          id: id || null,
-          iterationid: $("#addTimeIterationNo").val(),
-          plannedstart: plannedstart || null,
-          plannedend: plannedend || null,
-          projectid: $("#addTimeProjectId").val(),
-          start: start,
-          logstatusid: logstatusid,
-          logstatusname: statusName || null,
-          storyid: $("#addTimeStory").val(),
-          taskid: $("#addTimeTask").val(),
-          storystatusid: $("#storyStatus").val(),
-          storyname: null,
-          title: title
-      }
+        description: $("#addTimeDescription").val(),
+        end: end,
+        id: id || null,
+        iterationid: $("#addTimeIterationNo").val(),
+        plannedstart: plannedstart || null,
+        plannedend: plannedend || null,
+        projectid: $("#addTimeProjectId").val(),
+        start: start,
+        logstatusid: logstatusid,
+        logstatusname: statusName || null,
+        storyid: $("#addTimeStory").val(),
+        taskid: $("#addTimeTask").val(),
+        storystatusid: $("#storyStatus").val(),
+        storyname: null,
+        title: title
+    }
 }
 
-function getClassName(logstatusid){  
-  switch(logstatusid){
-    case 1:
-    return "log-planned";
-    break;
-    case 2: 
-    return "";
-    break;
-    case 3:
-    return "log-unlockrequest";  
-    break;
-    case 4:
-    return "log-unlocked";
-    break;
-  }
+function getClassName(logstatusid) {
+    switch (logstatusid) {
+        case 1:
+            return "log-planned";
+            break;
+        case 2:
+            return "";
+            break;
+        case 3:
+            return "log-unlockrequest";
+            break;
+        case 4:
+            return "log-unlocked";
+            break;
+    }
 }
 
 
 function getStories(projectId, callback, storyId, taskFlag) {
 
-    if(taskFlag){
-            getStoriesUrl = "/getStoriesNTasks";
-    }else{
-            getStoriesUrl = "/getStories";
+    if (taskFlag) {
+        getStoriesUrl = "/getStoriesNTasks";
+    } else {
+        getStoriesUrl = "/getStories";
     }
 
     $.ajax({
-        url: getStoriesUrl+'?projectid=' + projectId,
+        url: getStoriesUrl + '?projectid=' + projectId,
         type: 'get',
         contentType: 'application/json',
 
@@ -627,19 +639,19 @@ function getStories(projectId, callback, storyId, taskFlag) {
 
 }
 
-function renderStories(storiesArray){
- $("#addTimeStory").empty();
-    if(storiesArray.length){            
+function renderStories(storiesArray) {
+    $("#addTimeStory").empty();
+    if (storiesArray.length) {
         $("#addTimeStory").append("<option value=''>Select Story</option>");
-        for(i=0; i<storiesArray.length; i++){            
-            $("#addTimeStory").append("<option value="+storiesArray[i].id+">"+storiesArray[i].name+"</option>");
+        for (i = 0; i < storiesArray.length; i++) {
+            $("#addTimeStory").append("<option value=" + storiesArray[i].id + ">" + storiesArray[i].name + "</option>");
         }
     }
 }
 
 
-function getTasks ( storyId, callback,taskId) {
-      $.ajax({
+function getTasks(storyId, callback, taskId) {
+    $.ajax({
         url: '/getTasks?storyid=' + storyId,
         type: 'get',
         contentType: 'application/json',
@@ -648,15 +660,15 @@ function getTasks ( storyId, callback,taskId) {
         callback(resp);
         $("#addTimeTask").val(taskId);
     });
-  
+
 }
 
-function renderTasks(taskArray){
+function renderTasks(taskArray) {
     $("#addTimeTask").empty();
-    if(taskArray.length){            
+    if (taskArray.length) {
         $("#addTimeTask").append("<option value=''>Select Task</option>");
-        for(i=0; i<taskArray.length; i++){
-            $("#addTimeTask").append("<option value="+taskArray[i].id+">"+taskArray[i].name+"</option>");
+        for (i = 0; i < taskArray.length; i++) {
+            $("#addTimeTask").append("<option value=" + taskArray[i].id + ">" + taskArray[i].name + "</option>");
         }
     }
 }

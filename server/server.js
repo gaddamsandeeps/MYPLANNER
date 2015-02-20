@@ -41,7 +41,7 @@ passport.use(new LocalStrategy({
                 });
             } else {
                 async.series({
-                        roleName: function(callback) {
+                        role: function(callback) {
                             requestProcesser.getRoleByUserNameObj(username, function(val) {
                                 callback(null, val);
                             });
@@ -58,20 +58,21 @@ passport.use(new LocalStrategy({
                         }
                     },
                     function(err, results) {
-                        user.roleName = results.roleName.name;
+                        user.roleId = results.role.id;
+                        user.roleName = results.role.name;
                         if (results.team) {
                             user.teamId = results.team.id;
                             user.teamName = results.team.name;
-                            user.hasTeam = true;                         
-                        }else{
+                            user.hasTeam = true;
+                        } else {
                             user.hasTeam = false;
                         }
-                        if(results.roleName.name === properties.roles.manager) {
+                        if (results.role.id === properties.roles.manager) {
                             user.isLead = true;
-                        }else{
+                        } else {
                             user.isLead = false;
-                            if(results.teamId){
-                               user.teamId = results.teamId.id;
+                            if (results.teamId) {
+                                user.teamId = results.teamId.id;
                             }
                         }
                         return done(null, user);
@@ -112,7 +113,8 @@ app.use(passport.session());
 // all environments
 app.set('port', process.env.PORT || config.server_config.port);
 // app.set('view engine', 'jade');
-app.use(express.favicon());
+//app.use(express.favicon());
+app.use(express.favicon('public/images/favicon.ico'));
 //app.use(express.logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded());
@@ -133,9 +135,9 @@ app.get('/dashboard', ensureAuthenticated, function(request, response) {
 
 app.get('/edashboard', ensureAuthenticated, function(request, response) {
     var eteam = {};
-    if(request.user.roleName === properties.roles.manager){
+    if (request.user.roleId === properties.roles.manager) {
         eteam.id = request.user.teamId;
-        eteam.name = request.user.teamName;        
+        eteam.name = request.user.teamName;
         eteam.username = request.user.username;
         eteam.leadid = request.user.id;
     }
@@ -144,9 +146,9 @@ app.get('/edashboard', ensureAuthenticated, function(request, response) {
     async.series({
             teams: function(callback) {
                 requestProcesser.getExecutiveTeamsAsObj(userId, function(val) {
-                    if(request.user.roleName === properties.roles.manager){
-                       val.push(eteam);
-                    }                    
+                    if (request.user.roleId === properties.roles.manager) {
+                        val.push(eteam);
+                    }
                     callback(null, val);
                 });
             }
@@ -159,15 +161,15 @@ app.get('/edashboard', ensureAuthenticated, function(request, response) {
             });
         });
 
-    
-    
+
+
 });
 
 app.get('/ereports', ensureAuthenticated, function(request, response) {
     var eteam = {};
-    if(request.user.roleName === properties.roles.manager){
+    if (request.user.roleId === properties.roles.manager) {
         eteam.id = request.user.teamId;
-        eteam.name = request.user.teamName;        
+        eteam.name = request.user.teamName;
         eteam.username = request.user.username;
         eteam.leadid = request.user.id;
     }
@@ -176,9 +178,9 @@ app.get('/ereports', ensureAuthenticated, function(request, response) {
     async.series({
             teams: function(callback) {
                 requestProcesser.getExecutiveTeamsAsObj(userId, function(val) {
-                    if(request.user.roleName === properties.roles.manager){
-                       val.push(eteam);
-                    }                    
+                    if (request.user.roleId === properties.roles.manager) {
+                        val.push(eteam);
+                    }
                     callback(null, val);
                 });
             }
@@ -191,8 +193,8 @@ app.get('/ereports', ensureAuthenticated, function(request, response) {
             });
         });
 
-    
-    
+
+
 });
 
 app.get('/story', ensureAuthenticated, function(request, response) {
@@ -204,17 +206,29 @@ app.get('/story', ensureAuthenticated, function(request, response) {
             user: request.user,
             projects: [],
             storytypes: [],
+            iterations: [],
+            taskstatus: [],
             message: request.flash('error')
         });
-    } else {        
-        async.series({                
+    } else {
+        async.series({
                 projects: function(callback) {
                     requestProcesser.getTeamProjectsObj(userId, teamId, function(val) {
                         callback(null, val);
                     });
                 },
+                iterations: function(callback) {
+                    requestProcesser.getIterationsAsObj(userId, function(val) {
+                        callback(null, val);
+                    });
+                },
                 storytypes: function(callback) {
                     requestProcesser.getStoryTypesObj(userId, function(val) {
+                        callback(null, val);
+                    });
+                },
+                taskstatus: function(callback) {
+                    requestProcesser.getTaskStatusesAsObj(userId, function(val) {
                         callback(null, val);
                     });
                 }
@@ -224,15 +238,44 @@ app.get('/story', ensureAuthenticated, function(request, response) {
                     user: request.user,
                     projects: results.projects,
                     storytypes: results.storytypes,
+                    iterations: results.iterations,
+                    taskstatus: results.taskstatus,
                     message: request.flash('error')
                 });
             });
     }
 });
 
+app.get('/project', ensureAuthenticated, function(request, response) {
+    var userId = request.user.id;
+    var teamId = request.user.teamId;
+
+    async.series({
+            projects: function(callback) {
+                requestProcesser.getNonTProjectsAsObj(userId, teamId, function(val) {
+                    callback(null, val);
+                });
+            },
+            teams: function(callback) {
+                requestProcesser.getTeamsAsObj(userId, function(val) {
+                    callback(null, val);
+                });
+            },
+        },
+        function(err, results) {
+            response.render('project.html', {
+                user: request.user,
+                projects: results.projects,
+                teams: results.teams,
+                message: request.flash('error')
+            });
+        });
+
+});
+
 app.get('/timesheet', ensureAuthenticated, function(request, response) {
     var userId = request.user.id;
-    var teamId = request.user.teamId;    
+    var teamId = request.user.teamId;
     async.series({
             logstatus: function(callback) {
                 requestProcesser.getLogStatusesObj(userId, function(val) {
@@ -245,10 +288,14 @@ app.get('/timesheet', ensureAuthenticated, function(request, response) {
                 });
             },
             logAccess: function(callback) {
-                if(request.user.isLead){
-                    val = { accesslevel: 2, userid: userId, teamid: teamId };
+                if (request.user.isLead) {
+                    val = {
+                        accesslevel: 2,
+                        userid: userId,
+                        teamid: teamId
+                    };
                     callback(null, val);
-                }else{
+                } else {
                     requestProcesser.hasLogAccessObj(userId, function(val) {
                         callback(null, val);
                     });
@@ -365,6 +412,13 @@ app.get('/', ensureAuthenticated, function(request, response) {
     response.render('login.html');
 });
 
+app.get('/verify', ensureAuthenticated, function(request, response) {
+    response.render('verify.html', {
+        user: request.user,
+        message: request.flash('error')
+    });
+});
+
 app.get('/admin', ensureAuthenticated, function(request, response) {
     var teams = null,
         roles = null;
@@ -387,7 +441,7 @@ app.get('/admin', ensureAuthenticated, function(request, response) {
                     callback(null, val);
                 });
             },
-            projects: function(callback) {
+            adminprojects: function(callback) {
                 requestProcesser.getAdminProjectsObj(userId, function(val) {
                     callback(null, val);
                 });
@@ -404,7 +458,7 @@ app.get('/admin', ensureAuthenticated, function(request, response) {
                 executives: results.executives,
                 teams: results.teams,
                 roles: results.roles,
-                projects: results.projects,
+                adminprojects: results.adminprojects,
                 iterations: results.iterations,
                 message: request.flash('error')
             });
@@ -432,7 +486,7 @@ app.get('/loggedIn', ensureAuthenticated);
 // USER SERVICS
 app.get('/getExecutives', ensureAuthenticated, requestProcesser.getExecutives);
 
-app.get('/getUser', ensureAuthenticated, requestProcesser.getUser);
+app.get('/getUser', requestProcesser.getUser);
 app.get('/getTeamUsersAndAvailability', ensureAuthenticated, requestProcesser.getTeamUsersAndAvailability);
 app.get('/getNonTeamUsers', ensureAuthenticated, requestProcesser.getNonTeamUsers);
 app.get('/getLeads', ensureAuthenticated, requestProcesser.getLeads);
@@ -440,6 +494,9 @@ app.get('/getLeads', ensureAuthenticated, requestProcesser.getLeads);
 app.post('/saveUser', requestProcesser.saveUser);
 app.post('/editUser', ensureAuthenticated, requestProcesser.editUser);
 app.post('/mapUser', ensureAuthenticated, requestProcesser.mapUser);
+app.post('/removeUser', requestProcesser.removeUser);
+app.post('/verifyUser', requestProcesser.verifyUser);
+app.get('/getUnverifiedUsers', requestProcesser.getUnverifiedUsers);
 
 app.post('/changePassword', ensureAuthenticated, requestProcesser.changePassword);
 app.post('/resetPassword', requestProcesser.resetPassword);
@@ -453,6 +510,11 @@ app.get('/getAdminProjects', ensureAuthenticated, requestProcesser.getAdminProje
 app.post('/saveAdminProject', ensureAuthenticated, requestProcesser.saveAdminProject);
 app.post('/editAdminProject', ensureAuthenticated, requestProcesser.editAdminProject);
 
+app.get('/getTProjects', ensureAuthenticated, requestProcesser.getTProjects);
+app.get('/getNonTProjects', ensureAuthenticated, requestProcesser.getNonTProjects);
+app.post('/giveAccessToProjectsByTeamId', ensureAuthenticated, requestProcesser.giveAccessToProjectsByTeamId);
+app.post('/removeAccessToProjectsByTeamId', ensureAuthenticated, requestProcesser.removeAccessToProjectsByTeamId);
+
 app.post('/saveProject', ensureAuthenticated, requestProcesser.saveProject);
 app.post('/editProject', ensureAuthenticated, requestProcesser.editProject);
 app.post('/removeProject', ensureAuthenticated, requestProcesser.removeProject);
@@ -463,14 +525,24 @@ app.get('/getIterations', ensureAuthenticated, requestProcesser.getIterations);
 app.post('/saveStory', ensureAuthenticated, requestProcesser.saveStory);
 app.post('/editStory', ensureAuthenticated, requestProcesser.editStory);
 app.post('/removeStory', ensureAuthenticated, requestProcesser.removeStory);
+app.post('/moveToNextIteration', ensureAuthenticated, requestProcesser.moveToNextIteration);
+
+app.post('/addStoryComment', ensureAuthenticated, requestProcesser.addStoryComment);
+
 app.get('/getStories', ensureAuthenticated, requestProcesser.getStories);
 app.get('/getStoriesNTasks', ensureAuthenticated, requestProcesser.getStoriesNTasks);
+app.get('/getStoriesNTasksByPidnIterId', ensureAuthenticated, requestProcesser.getStoriesNTasksByPidnIterId);
+app.get('/getInCompleteStoriesNTasksByPidnIterId', ensureAuthenticated, requestProcesser.getInCompleteStoriesNTasksByPidnIterId);
 app.get('/getStory', ensureAuthenticated, requestProcesser.getStory);
 
 app.post('/saveTask', ensureAuthenticated, requestProcesser.saveTask);
 app.post('/editTask', ensureAuthenticated, requestProcesser.editTask);
+app.post('/changeTaskStatus', ensureAuthenticated, requestProcesser.changeTaskStatus);
 app.post('/removeTask', ensureAuthenticated, requestProcesser.removeTask);
+app.post('/addTaskComment', ensureAuthenticated, requestProcesser.addTaskComment);
+
 app.get('/getTasks', ensureAuthenticated, requestProcesser.getTasks);
+app.get('/getInCompleteTasks', ensureAuthenticated, requestProcesser.getInCompleteTasks);
 app.get('/getTask', ensureAuthenticated, requestProcesser.getTask);
 
 app.post('/addResourceToProject', ensureAuthenticated, requestProcesser.addResourceToProject);
@@ -551,23 +623,26 @@ d.run(function() {
 
 function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
+        if (req.url !== '/verify' && req.url !== '/profile' && req.url !== '/editUser' && !req.user.verified && (req.user.roleId !== properties.roles.user)) {
+            res.redirect('/verify');
+        }
         if (req.url === '/loggedIn' || req.url === '/') {
-            if (req.user.roleName === properties.roles.manager) {
+            if (req.user.roleId === properties.roles.manager) {
                 res.redirect('/dashboard');
-            } else if (req.user.roleName === properties.roles.admin) {
+            } else if (req.user.roleId === properties.roles.admin) {
                 res.redirect('/admin');
-            } else if (req.user.roleName === properties.roles.seniormanager) {
+            } else if (req.user.roleId === properties.roles.seniormanager) {
                 res.redirect('/edashboard');
             } else {
                 res.redirect('/timesheet');
             }
-        } else if (restrictedPages(properties.roles.user, req.url) && req.user.roleName === properties.roles.user) {
+        } else if (restrictedPages(properties.roles.user, req.url) && req.user.roleId === properties.roles.user) {
             res.redirect('/timesheet');
-        } else if (restrictedPages(properties.roles.manager, req.url) && req.user.roleName === properties.roles.manager) {
+        } else if (restrictedPages(properties.roles.manager, req.url) && req.user.roleId === properties.roles.manager) {
             res.redirect('/dashboard');
-        } else if (restrictedPages(properties.roles.admin, req.url) && req.user.roleName === properties.roles.admin) {
+        } else if (restrictedPages(properties.roles.admin, req.url) && req.user.roleId === properties.roles.admin) {
             res.redirect('/admin');
-        } else if (restrictedPages(properties.roles.seniormanager, req.url) && req.user.roleName === properties.roles.seniormanager) {
+        } else if (restrictedPages(properties.roles.seniormanager, req.url) && req.user.roleId === properties.roles.seniormanager) {
             res.redirect('/edashboard');
         } else {
             return next();
@@ -579,13 +654,13 @@ function ensureAuthenticated(req, res, next) {
     }
 }
 
-//url restrictions restrictedPages(request.user.roleName, request.url,callback);
+//url restrictions restrictedPages(request.user.roleId, request.url,callback);
 function restrictedPages(key, reqUrl) {
     var urls = {};
-    urls[properties.roles.user] = ['admin', 'dashboard', 'edashboard','ereports'];
-    urls[properties.roles.manager] = ['admin'];
-    urls[properties.roles.admin] = ['dashboard', 'timesheet', 'report', 'story', 'edashboard','ereports'];
-    urls[properties.roles.seniormanager] = ['dashboard', 'timesheet', 'admin', 'story'];
+    urls[properties.roles.user] = ['admin', 'dashboard', 'edashboard', 'ereports', 'project'];
+    urls[properties.roles.manager] = ['admin', 'edashboard'];
+    urls[properties.roles.admin] = ['dashboard', 'timesheet', 'report', 'story', 'edashboard', 'ereports', 'project'];
+    urls[properties.roles.seniormanager] = ['dashboard', 'timesheet', 'admin', 'story', 'project'];
     if (urls.hasOwnProperty(key)) {
         var arr = urls[key];
         for (var i = 0; i < arr.length; i++) {

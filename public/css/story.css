@@ -1,42 +1,160 @@
-.addstorylabel{
-	height: 30px;
+.addstorylabel {
+    height: 30px;
+}
+.addonstory {
+    margin-left: 20px;
 }
 
-.addonstory{
-	margin-left: 20px;
+.nodisplay {
+	display:none;
 }
 
 
-textarea{
-	resize : none;
+.storycompleted{
+    color: red;
+    font-style: oblique;
+    font-weight: bold
 }
-
+textarea {
+    resize: none;
+}
 /*Data table styles*/
 
-#storyReportTable td{
-	padding-left: 18px;
-} 
-
-
+#storyReportTable td {
+    padding-left: 18px;
+}
 /*sub task table*/
 
-.sub-task-wrapper{
-	width: 100%;
-	border: 1px solid #ddd;
+.sub-task-wrapper {
+    width: 100%;
+    border: 1px solid #ddd;
 }
-.sub-task-wrapper tr td,.sub-task-wrapper tr th{
-	text-align: left;
+.sub-task-wrapper tr td, .sub-task-wrapper tr th {
+    text-align: left;
 }
-.sub-task-wrapper td,.sub-task-wrapper th{
-	border-left: 1px solid #ddd;
+.sub-task-wrapper td, .sub-task-wrapper th {
+    border-left: 1px solid #ddd;
 }
-.add-story-subtask{
-	margin-left: 20px;
-	color: #84B8F7;
-	cursor: pointer;
+.add-story-subtask {
+    margin-left: 20px;
+    color: #84B8F7;
+    cursor: pointer;
 }
-.view-task{
-	margin-left: 10px;
-	color:#84B8F7;
-	cursor: pointer;
+.view-task {
+    margin-left: 10px;
+    color: #84B8F7;
+    cursor: pointer;
 }
+.fixed-header
+{
+	margin-top:63px;
+}
+h3
+{
+	padding:0 0 15px 10px;
+	border-bottom:1px solid #d0d0d0;
+	margin-bottom:15px;
+}
+.sprints
+{
+	width: auto;
+	margin: 0 auto;
+	display: block;
+}
+.tab-pane
+{
+	border:0;
+}
+/*Grid*/
+table.dataTable thead th
+{
+	font-family: "OpenSans-Semibold","Arial","Sans-serif";
+	font-size:15px;
+}
+
+/* LAYOUT START */
+.bordered
+{
+	border:1px solid #d0d0d0;
+}
+.col-layout-card
+{
+	width: 14.28571428%;
+	border-left: 1px solid #d0d0d0;
+}
+.col-layout-card:first-child
+{
+	border-left: 0;
+}
+h4
+{
+	border-bottom:0;
+}
+.layout-card
+{
+	border:1px solid #d0d0d0;
+	border-top:0;
+}
+.layout-card.type-story .card-type,
+.layout-card.type-issue .card-type
+{
+	height:4px;
+	font-size:4px;
+}
+.layout-card.type-story
+{
+	background-color:#f6f6f6;
+}
+.layout-card.type-issue
+{
+	background-color:#fff;
+}
+.layout-card.type-story .card-type
+{
+	background-color:#004C7E;
+}
+.layout-card.type-issue .card-type
+{
+	background-color:#ab3232;
+}
+.card-title
+{
+	font-family: "OpenSans-Semibold","Arial","Sans-serif";
+	border-bottom:1px solid #d0d0d0;
+	background-color:#eee;
+}
+.card-title,
+.card-data
+{
+	padding:3px 5px;
+}
+.card-data
+{
+	font-size:13px;
+}
+/* LAYOUT END */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

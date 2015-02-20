@@ -28,7 +28,7 @@
             <div class="col-md-9 leftPannelSection fixed-header">
                 <div class="clearfix"></div>
                 <div id="ProjectView" projectdroppable class="">
-                    <div ng-repeat="p in droppedProjects" class="projectSection">
+                    <div ng-repeat="p in droppedProjects  | orderBy:'name'" class="projectSection">
                         <div class="pv" resourcedroppable projectid="{{p.id}}" projectname="{{p.name}}">
                             
                             <div onclick="minimaxConetent(this)">
@@ -134,7 +134,7 @@
                 <h4>
                     <i class="fa fa-user"></i>
                     Developers ({{TeamUsers.length}})
-                    <i class="fa fa-chevron-down pull-right" id="togleSection"></i>
+                    <i class="fa fa-chevron-up pull-right" id="togleSection"></i>
                     <i class="fa fa-refresh pull-right" ng-click="getResources($event)"></i>
                 </h4>
 
@@ -147,13 +147,17 @@
                         <div ng-repeat="r in TeamUsers | filter:searchUser" bs-popover>
                             <div resourcedraggable class="item" fullname="{{r.firstname +' '+ r.lastname}}" username="{{r.username}}">
                                 <div class="res-padding">
-                                    <div class="pull-left res-padding resource-name" data-toggle="tooltip" data-original-title="{{r.resourcelogged?r.resourcelogged: 0}}% - {{r.logged ? r.logged : 0}} Mins">
-                                        {{r.firstname +" "+ r.lastname + " ("+ r.projectCount +")" }}
-                                    </div>
-                                    <div class="pull-right">
-                                        <div class="pull-left res-padding user-settings align-center">
+                                    <div class="pull-left res-padding user-settings align-center">
                                             <input type="checkbox" ng-model="r.check" ng-change="setPermissions(r)" class="check-permissions"/>
                                         </div>
+                                    <div class="pull-left res-padding resource-name" data-toggle="tooltip" data-original-title="{{r.resourcelogged?r.resourcelogged: 0}}% - {{r.logged ? r.logged : 0}} Mins">
+                                        {{r.firstname +" "+ r.lastname}}
+                                    </div>
+									<div class="pull-left res-padding">
+										{{" ("+ r.projectCount +")&nbsp;" }}
+									</div>
+                                    <div class="pull-right">
+                                        
                                         <div class="pull-left res-padding align-center" title="Check Report" ng-click="showUserReport(r.id)">
                                             <i class="fa fa-bar-chart right-inside-icn"></i>
                                         </div>
@@ -162,6 +166,8 @@
                                         </div>
                                         <div class="pull-left res-padding align-center">
                                             <span class="status{{r.status}} status"></span>
+                                            <span title="Remove User" ng-click="removeUser(r.id, r.firstname+' '+r.lastname,$index,TeamUsers)"><i class="fa fa-times"></i></span>
+                                </span>
                                         </div>
                                     </div>
                                 </div>
@@ -178,7 +184,7 @@
                 <h4>
                     <i class="fa fa-list-alt"></i>
                     Projects ({{Projects.length}})
-                    <i class="fa fa-chevron-down  pull-right" id="togleSection"></i>
+                    <i class="fa fa-chevron-up  pull-right" id="togleSection"></i>
                     <i class="fa fa-refresh pull-right" ng-click="getProjects($event)"></i>
                     <i class="fa fa-plus pull-right" ng-click="addProject($event)"></i>
                 </h4>
@@ -191,18 +197,23 @@
                     <div class="right-overflow">
                         <div ng-repeat="p in Projects | filter:searchProject" bs-popover>
                             <div class="item" projectdraggable projectid="{{p.id}}" projectname="{{p.name}}">
-                                <text data-toggle="tooltip" data-original-title="{{p.projectlogged?p.projectlogged:0}}% - {{p.logged ? p.logged : 0}} Mins">
-                                    {{p.name +" ("+ p.count +")"}}
-                                </text>
-
-                                <span class="project-edit-icon-wrapper">
-                                        <span ng-click="editProject(p, p.id)"><i class="fa fa-pencil-square-o"></i></span>
-
-                                        <span ng-click="removeProject(p, p.id, Projects, $index)"><i class="fa fa-times"></i></span>
-
-                                </span>
-
-
+                                <div class="res-padding">
+									<div class="pull-left res-padding proj-name" data-toggle="tooltip" data-original-title="{{p.projectlogged?p.projectlogged:0}}% - {{p.logged ? p.logged : 0}} Mins">
+										{{p.name}}
+									</div>
+									<div class="pull-left">
+										{{" ("+ p.count +")&nbsp;"}}
+									</div>
+									<div class="pull-right project-edit-icon-wrapper">
+										<div class="pull-left res-padding align-center" ng-click="editProject(p, p.id)">
+                                            <i class="fa fa-pencil-square-o right-inside-icn"></i>
+                                        </div>
+										<div class="pull-left res-padding align-center" ng-click="removeProject(p, p.id, Projects, $index)">
+                                            <i class="fa fa-times right-inside-icn"></i>
+                                        </div>
+									</div>
+								</div>
+								<div class="clearfix"></div>
                             </div>
                             <div class="itemLine">
                                 <div style="overflow: hidden; width: {{p.projectlogged}}%;"></div>
@@ -276,7 +287,7 @@
                  <h4>Add {{resourcefullname}} to {{projectname}}</h4>
              </div>
              <div class="modal-body">
-                <UL id="errorContainer"></UL>
+                <UL id="sowerrorContainer"></UL>
 					 <!--
                     <div class="form-group">
                         <label for="resourcename" class="col-md-4 control-label">Resource Name</label>
@@ -296,7 +307,7 @@
                         <label for="sowstartdate" class="col-md-4 control-label">Start Date</label>
 
                         <div class="col-md-8">
-                            <input type="date" id="sowstartdate" name="sowstartdate" ng-model="sowproject.sowstartdate" class="form-control" placeholder="Start Date" required>
+                            <input type="date" id="sowstartdate" name="sowstartdate" ng-model="sowproject.sowstartdate" class="form-control" placeholder="Start Date" ng-required="true">
                             <span class="error-message" ng-show="SowForm.sowstartdate.$error.required">Please enter a valid date</span>
                         </div>
                     </div>
@@ -304,7 +315,7 @@
                         <label for="sowenddate" class="col-md-4 control-label">End Date</label>
 
                         <div class="col-md-8">
-                            <input type="date" id="sowenddate" name="sowenddate" ng-model="sowproject.sowenddate" class="form-control" placeholder="End Date" required>
+                            <input type="date" id="sowenddate" name="sowenddate" ng-model="sowproject.sowenddate" class="form-control" placeholder="End Date" ng-required="true">
                             <span class="error-message" ng-show="SowForm.sowenddate.$error.required">Please enter a valid date</span>
                         </div>
                     </div>
@@ -312,13 +323,13 @@
                         <label for="billable" class="col-md-4 control-label">Billable</label>
 
                         <div class="col-md-8">
-                            <input type="checkbox" ng-model="sowproject.billable" name="billable" id="billable" ng-click="getSowNumber()" class="check-billable"/>
+                            <input type="checkbox" ng-model="sowproject.billable" name="billable" id="billable" ng-change="getSowNumber()" class="check-billable"/>
                         </div>
                     </div>
-					<div class="form-group sowdisplay" id="sownodisplay">
+					<div class="form-group" id="sownodisplay" ng-if="sowproject.billable" show-errors>
 							<label for="sownumber" class="col-md-4 control-label">Sow Number</label>
 							<div class="col-md-8">
-								<input type="text" ng-model="sowproject.sowno" id="sowno"  name="sowno" class="form-control" placeholder="Sow Number"/>
+								<input type="text" ng-model="sowproject.sowno" id="sowno"  name="sowno" class="form-control" placeholder="Sow Number" ng-required="sowproject.billable"/>
 								<span class="error-message" ng-show="SowForm.sowno.$error.required">Please enter Sow Number</span>
 							</div>
 					</div>

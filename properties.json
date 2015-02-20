@@ -13,8 +13,8 @@
         "sowstartdate": "sowstartdate",
         "sowenddate": "sowenddate",
         "sowprojectdescription": "sowprojectdescription",
-        "billable":"billable",
-        "projectname":"projectname"
+        "billable": "billable",
+        "projectname": "projectname"
     },
 
     "team": {
@@ -24,7 +24,7 @@
         "teamId": "teamid",
         "userId": "userid",
         "id": "id",
-        "executives":"executives"
+        "executives": "executives"
     },
 
     "iteration": {
@@ -32,7 +32,8 @@
         "name": "name",
         "desc": "description",
         "startDate": "startdate",
-        "endDate": "enddate"
+        "endDate": "enddate",
+        "iterationid":"iterationid"
     },
 
     "story": {
@@ -41,7 +42,8 @@
         "projectId": "projectid",
         "desc": "description",
         "hrs": "hours",
-        "type": "type"
+        "type": "type",
+        "status":"status"
     },
 
     "task": {
@@ -50,7 +52,8 @@
         "storyId": "storyid",
         "desc": "description",
         "hrs": "hours",
-        "prevHrs":"prevTaskHours"
+        "prevHrs": "prevTaskHours",
+        "stateId":"stateid"
     },
 
     "role": {
@@ -60,10 +63,10 @@
     },
 
     "roles": {
-	   "seniormanager": "SENIOR MANAGER",
-        "manager": "MANAGER",
-        "admin": "ADMIN",
-        "user": "USER",
+        "seniormanager": 4,
+        "manager": 2,
+        "admin": 1,
+        "user": 3,
         "id": "id",
         "roleId": "roleid"
     },
@@ -77,8 +80,6 @@
         "roleId": "roleid",
         "firstName": "firstname",
         "lastName": "lastname",
-        "sex": "sex",
-        "dob": "dob",
         "contact": "contact",
         "oldPassword": "oldpassword",
         "newPassword": "newpassword"
@@ -90,9 +91,9 @@
         "iterationno": "iterationno",
         "story": "story",
         "task": "task",
-        "storyStatus":"storyStatus",
-        "plannedStartDate" : "plannedStartDate",
-        "plannedEndDate" : "plannedEndDate",
+        "storyStatus": "storyStatus",
+        "plannedStartDate": "plannedStartDate",
+        "plannedEndDate": "plannedEndDate",
         "startDate": "startdate",
         "endDate": "enddate",
         "desc": "description",

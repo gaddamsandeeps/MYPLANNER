@@ -2,13 +2,12 @@
 #ProjectView {
     min-height: 500px;
 }
-#ProjectView h5{
-    padding:5px 0 0 5px;
+#ProjectView h5 {
+    padding: 5px 0 0 5px;
 }
 .check-permissions {
- margin: 4px 10px 0px 0px !important;
+    margin: 4px 10px 0px 0px !important;
 }
-
 .item i {
     font-style: normal;
     font-size: 12px;
@@ -17,7 +16,6 @@
     border-radius: 5px;
     padding: 0 4px;
 }
-
 .pv {
     border: 1px solid #cdd6dd;
     margin: 0;
@@ -25,10 +23,9 @@
     position: relative;
     background: #f3f7f9;
 }
-.pv:hover
-{
+.pv:hover {
     background: #ece0d1;
-    border:1px solid #d5c3af;
+    border: 1px solid #d5c3af;
 }
 .right-overflow {
     max-height: 350px;
@@ -41,38 +38,34 @@
     overflow-x: hidden;
     overflow-y: auto;
 }
-
-.open{
-	box-shadow: 0px 1px 3px 2px #ccc;
-	background: #fff;
-}
-.open:hover
-{
+.open {
+    box-shadow: 0px 1px 3px 2px #ccc;
     background: #fff;
-    border-color:#5b717f;
+}
+.open:hover {
+    background: #fff;
+    border-color: #5b717f;
 }
 .pv .close {
     position: absolute;
     top: 0;
     right: 5px;
-    color:#56574F;
+    color: #56574F;
     cursor: pointer;
 }
 .pv .expand {
     position: absolute;
     top: 15px;
     left: -5px;
-    color:#bec7ca;
+    color: #bec7ca;
     cursor: pointer;
 }
 .pv .expand:hover {
-
-    color:#a19b90;
+    color: #a19b90;
 }
 .pv > div {
     padding: 5px 0;
 }
-
 .developers {
     min-height: 38px;
 }
@@ -86,6 +79,7 @@
     position: relative;
 }
 */
+
 .developer i {
     /*font-style: normal;
     position: absolute;
@@ -96,15 +90,12 @@
     cursor: pointer;
     margin-left:10px;*/
 }
-
 .over {
     background-color: #eee;
 }
-
 .navbar-nav > li {
     margin: 10px;
 }
-
 #Mashup {
     margin-right: 10px;
 }
@@ -119,184 +110,167 @@ input.ng-valid.has-visited {
     border: 1px solid #a3bf57;
 }
 */
+
 .error-message {
     color: #a94442;
 }
-
 [ng-cloak] {
     display: none;
 }
-
 .form-group .error-message {
     display: none;
 }
-
 .form-group.has-error .error-message {
     display: block;
 }
-.right-inside-icn
-{
-	font-size:14px !important;
-	background:none !important;
-	padding:0 !important;
-	margin-right:10px;
+.right-inside-icn {
+    font-size: 14px !important;
+    background: none !important;
+    padding: 0 !important;
+    margin-right: 10px;
 }
-.size-large
-{
-    font-size:17px !important;
+.size-large {
+    font-size: 17px !important;
 }
-.resource-name
-{
+.resource-name,
+.proj-name {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding-right:5px;
 }
-
-@media (min-width: 990px) {
-    .resource-name
-    {
-       width:100px;
-   }
+@media (min-width: 992px) {
+    .resource-name {
+        width: 56px;
+    }
+	.item .proj-name {
+		width:110px;
+	}
 }
 @media (min-width: 1024px) {
-    .resource-name
-    {
-       width:114px;
-   }
+    .resource-name {
+        width: 64px;
+    }
+	.item .proj-name {
+		width:118px;
+	}
 }
 @media (min-width: 1100px) {
-    .resource-name
-    {
-       width:130px;
-   }
+    .resource-name {
+        width: 82px;
+    }
+	.item .proj-name {
+		width:153px;
+	}
 }
 @media (min-width: 1200px) {
-    .resource-name
-    {
-       width:150px;
-   }
+    .resource-name {
+        width: 108px;
+    }
+	.item .proj-name {
+		width:178px;
+	}
 }
 @media (min-width: 1280px) {
-    .resource-name
-    {
-       width:175px;
-   }
+    .resource-name {
+        width: 128px;
+    }
+	.item .proj-name {
+		width:198px;
+	}
 }
-.res-padding
-{
-    padding:0;
+@media (min-width: 1365px) {
+    .resource-name {
+        width: 148px;
+    }
+	.item .proj-name {
+		width:219px;
+	}
 }
-.align-center
-{
+@media (min-width: 1599px) {
+    .resource-name {
+        width: 206px;
+    }
+	.item .proj-name {
+		width:278px;
+	}
+}
+.res-padding {
+    padding: 0;
+}
+.align-center {
     text-align: center;
 }
-.align-right
-{
-	text-align:right;
+.align-right {
+    text-align: right;
 }
-.res-close,.res-edit
-{
-	color:#d3d6d7;
-	cursor:pointer;
-	margin-left:10px;
+.res-close, .res-edit {
+    color: #d3d6d7;
+    cursor: pointer;
+    margin-left: 10px;
 }
-.res-close:hover,.res-edit:hover
-{
-	color:#56574F;
+.res-close:hover, .res-edit:hover {
+    color: #56574F;
 }
-.res-close i,.res-edit i
-{
-	font-size:14px;
-	background:none;
+.res-close i, .res-edit i {
+    font-size: 14px;
+    background: none;
 }
-.left-section
-{
-	cursor:default;
-	font-family: 'OpenSans-Semibold';
+.left-section {
+    cursor: default;
+    font-family: 'OpenSans-Semibold';
 }
-.rightPannelSection, 
-.leftPannelSection h4,
-.leftPannelSection h5
-{
-	font-family: 'OpenSans-Semibold';
+.rightPannelSection, .leftPannelSection h4, .leftPannelSection h5 {
+    font-family: 'OpenSans-Semibold';
 }
-.text-light
-{
-	color:#666;
+.text-light {
+    color: #666;
 }
-
-.billable,
-.non-billable
-{
-	display:inline-block;
-	height:16px;
-	width:16px;
-	background:url('/images/billable16.png');
-	margin-right:5px;
+.billable, .non-billable {
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    background: url('/images/billable16.png');
+    margin-right: 5px;
 }
-.non-billable
-{
-	background:none;
+.non-billable {
+    background: none;
 }
-
-.sowdisplay{
-	display : none;	
+.sowdisplay {
+    display: none;
 }
-
-
-
 /*project edit icons area*/
 
-.project-edit-icon-wrapper{
+.project-edit-icon-wrapper {
     display: inline-block;
     float: right;
 }
-.project-edit-icon-wrapper span{
+.project-edit-icon-wrapper span {
     display: inline-block;
-
 }
-.project-edit-icon-wrapper span i{
+.project-edit-icon-wrapper span i {
     font: normal normal normal 14px/1 FontAwesome;
 }
-
-textarea{
-    resize : none;
+textarea {
+    resize: none;
 }
-
-.check-billable{
-	margin: 11px 0px 0px 0px !important;
+.check-billable {
+    margin: 11px 0px 0px 0px !important;
 }
-
 /*Billing control styles*/
 
-.billing-control{
-display: inline-block;
-height: 16px;
-width: 16px;
-margin-right: 5px;        
+.billing-control {
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    margin-right: 5px;
 }
-.near-end-billing{
-background: url('/images/near-end-billing.png');
+.near-end-billing {
+    background: url('/images/near-end-billing.png');
 }
-
-.active-billing{
+.active-billing {
     background: url('/images/active-billing.png');
 }
-.inactive-billing{
+.inactive-billing {
     background: url('/images/inactive-billing.png');
 }
-.non-billable{
-
-}
-
-
-
-
-
-
-
-
-
-
-
+.non-billable {}

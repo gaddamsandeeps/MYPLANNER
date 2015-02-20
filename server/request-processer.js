@@ -65,13 +65,13 @@ exports.getUserByIdObj = function(userId, callback) {
 };
 
 exports.getExecutivesAsObj = function(userId, callback) {
-    log.debug("getExecutivesAsObj : logged in user is " + (userId));    
+    log.debug("getExecutivesAsObj : logged in user is " + (userId));
     userService.getExecutives(callback);
 };
 
 exports.getExecutives = function(request, response) {
-    log.debug("getExecutives : logged in user is " + (request.user.id)); 
-    
+    log.debug("getExecutives : logged in user is " + (request.user.id));
+
     userService.getExecutives(function(returnValue) {
         response.json(returnValue);
     });
@@ -159,9 +159,64 @@ exports.getAdminProjectsObj = function(userId, callback) {
     projectService.getAdminProjects([userId], callback);
 };
 
-exports.saveAdminProject = function(request, response, callback) {
-    log.debug("saveAdminProject : logged in user is " + (request.user.id));
+exports.getTProjects = function(request, response) {
+    log.debug("getTProjects : logged in user is " + (request.user.id));
     var userId = request.user.id;
+    projectService.getTProjects([userId], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.getTProjectsAsObj = function(userId, callback) {
+    log.debug("getTProjects : logged in user is " + (userId));
+
+    projectService.getTProjects([userId], callback);
+};
+
+exports.getNonTProjects = function(request, response) {
+    log.debug("getNonTProjects : logged in user is " + (request.user.id));
+    var userId = request.user.id;
+    var teamId = request.user.teamId;
+
+    projectService.getNonTProjects([teamId], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.getNonTProjectsAsObj = function(userId, teamId, callback) {
+    log.debug("getNonTProjectsAsObj : logged in user is " + (userId));
+
+    projectService.getNonTProjects([teamId], callback);
+};
+
+
+
+exports.giveAccessToProjectsByTeamId = function(request, response) {
+    log.debug("giveAccessToProjectsByTeamId : logged in user is " + (request.user.id));
+    var userId = request.user.id;
+    var pid = request.param(properties.project.id);
+    var teamId = request.user.teamId;
+
+    projectService.giveAccessToProjectsByTeamId([pid, teamId], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.removeAccessToProjectsByTeamId = function(request, response) {
+    log.debug("removeAccessToProjectsByTeamId : logged in user is " + (request.user.id));
+    var userId = request.user.id;
+    var pid = request.param(properties.project.id);
+    var teamId = request.param(properties.team.teamId);
+
+    projectService.removeAccessToProjectsByTeamId([pid, teamId], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.saveAdminProject = function(request, response, callback) {
+    var userId = request.user.id;
+    log.debug("saveAdminProject : logged in user is " + userId);
+
     var name = request.param(properties.project.name);
     var desc = request.param(properties.project.desc);
     var strtDte = request.param(properties.project.startDate);
@@ -172,13 +227,16 @@ exports.saveAdminProject = function(request, response, callback) {
 };
 
 exports.editAdminProject = function(request, response, callback) {
-    log.debug("editAdminProject : logged in user is " + (request.user.id));
+    var userId = request.user.id;
+    log.debug("editAdminProject : logged in user is " + userId);
+
+
     var id = request.param(properties.project.id);
     var name = request.param(properties.project.name);
     var desc = request.param(properties.project.desc);
     var strtDte = request.param(properties.project.startDate);
     var endDte = request.param(properties.project.endDate);
-    projectService.editAdminProject([name, desc, strtDte, endDte, id], function(returnValue) {
+    projectService.editAdminProject([userId, name, desc, strtDte, endDte, id], function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -244,10 +302,34 @@ exports.saveUser = function(request, response, callback) {
     var roleId = request.param(properties.user.roleId);
     var firstName = request.param(properties.user.firstName);
     var lastName = request.param(properties.user.lastName);
-    var sex = request.param(properties.user.sex);
-    var dob = request.param(properties.user.dob);
     var contact = request.param(properties.user.contact);
-    userService.saveUser([uName, encrypt.encrypt(pwd), roleId, firstName, lastName, sex, dob, contact, (teamId === '' ? '0' : teamId)], function(returnValue) {
+    userService.saveUser([uName, encrypt.encrypt(pwd), roleId, firstName, lastName, contact, (teamId === '' ? '0' : teamId)], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.removeUser = function(request, response, callback) {
+    log.debug("removeUser" + (request.user.id));
+    var uid = request.param(properties.user.id);
+
+    userService.removeUser(uid, function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.verifyUser = function(request, response, callback) {
+    log.debug("verifyUser" + (request.user.id));
+    var uid = request.param(properties.user.id);
+
+    userService.verifyUser(uid, function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.getUnverifiedUsers = function(request, response, callback) {
+    log.debug("getUnverifiedUsers" + (request.user.id));
+
+    userService.getUnverifiedUsers(function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -255,6 +337,7 @@ exports.saveUser = function(request, response, callback) {
 exports.userExist = function(request, response, callback) {
     log.debug("userExist");
     var uName = request.param(properties.user.userName);
+
     userService.userExist(uName, function(returnValue) {
         response.json(returnValue);
     });
@@ -267,13 +350,12 @@ exports.editUser = function(request, response, callback) {
     var roleId = request.param(properties.user.roleId);
     var firstName = request.param(properties.user.firstName);
     var lastName = request.param(properties.user.lastName);
-    var sex = request.param(properties.user.sex);
-    var dob = request.param(properties.user.dob);
     var contact = request.param(properties.user.contact);
-    userService.editUser([userId, roleId, firstName, lastName, sex, dob, contact, (teamId === '' ? '0' : teamId)], function(returnValue) {
+    userService.editUser([userId, roleId, firstName, lastName, contact, (teamId === '' ? '0' : teamId)], function(returnValue) {
         if (returnValue.message === 'success') {
             request.user.firstname = firstName;
             request.user.lastname = lastName;
+            request.logout();
             response.json(returnValue);
         }
     });
@@ -330,7 +412,7 @@ exports.saveTeam = function(request, response, callback) {
     var name = request.param(properties.team.name);
     var desc = request.param(properties.team.desc);
     var leadId = request.param(properties.team.leadId);
-    
+
     var executives = request.param(properties.team.executives);
 
     teamService.saveTeam([name, desc, leadId, userId], executives, function(returnValue) {
@@ -339,7 +421,7 @@ exports.saveTeam = function(request, response, callback) {
 };
 
 exports.editTeam = function(request, response, callback) {
-    var userId = request.user.id;    
+    var userId = request.user.id;
 
     log.debug("editTeam : logged in user is " + (userId));
     var id = request.param(properties.team.id);
@@ -370,19 +452,21 @@ exports.saveProject = function(request, response, callback) {
     var desc = request.param(properties.project.desc);
     var strtDte = request.param(properties.project.startDate);
     var endDte = request.param(properties.project.endDate);
-    projectService.saveProject([name, desc, strtDte, endDte, userId, teamId], function(returnValue) {
+    projectService.saveProject([name, desc, strtDte, endDte, userId, teamId], teamId, function(returnValue) {
         response.json(returnValue);
     });
 };
 
 exports.editProject = function(request, response, callback) {
-    log.debug("editProject : logged in user is " + (request.user.id));
+    var userId = request.user.id;
+
+    log.debug("editProject : logged in user is " + userId);
     var id = request.param(properties.project.id);
     var name = request.param(properties.project.name);
     var desc = request.param(properties.project.desc);
     var strtDte = request.param(properties.project.startDate);
     var endDte = request.param(properties.project.endDate);
-    projectService.editProject([name, desc, strtDte, endDte, id], function(returnValue) {
+    projectService.editProject([userId, name, desc, strtDte, endDte, id], function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -391,7 +475,8 @@ exports.removeProject = function(request, response, callback) {
     log.debug("removeProject : logged in user is " + (request.user.id));
     var userId = request.user.id;
     var id = request.param(properties.project.id);
-    projectService.removeProject(id, function(returnValue) {
+    var teamId = request.user.teamId;
+    projectService.removeProject([id, teamId], function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -426,12 +511,14 @@ exports.saveStory = function(request, response, callback) {
     log.debug("saveStory : logged in user is " + (request.user.id));
     var userId = request.user.id;
     var name = request.param(properties.story.name);
+    var iterationid = request.param(properties.iteration.iterationid);
     var projectId = request.param(properties.story.projectId);
     var desc = request.param(properties.story.desc);
     var hrs = request.param(properties.story.hrs);
     var type = request.param(properties.story.type);
+    var status = request.param(properties.story.status);
 
-    storyService.saveStory([name, projectId, desc, hrs, type, userId], function(returnValue) {
+    storyService.saveStory([name, iterationid, projectId, desc, hrs, type, type, userId], function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -441,10 +528,13 @@ exports.editStory = function(request, response, callback) {
     var userId = request.user.id;
     var id = request.param(properties.story.id);
     var name = request.param(properties.story.name);
+    //var iterationid = request.param(properties.iteration.iterationid);
     //var projectId = request.param(properties.story.projectId);
     var desc = request.param(properties.story.desc);
     var hrs = request.param(properties.story.hrs);
-    storyService.editStory([name, desc, hrs, userId, id], function(returnValue) {
+    var status = request.param(properties.story.status);
+
+    storyService.editStory([name, desc, hrs, status, userId, id], id, function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -453,16 +543,30 @@ exports.removeStory = function(request, response, callback) {
     log.debug("removeStory : logged in user is " + (request.user.id));
     var userId = request.user.id;
     var sid = request.param(properties.story.id);
-    storyService.removeStory(sid, function(returnValue) {
+    storyService.removeStory([sid, userId], sid, function(returnValue) {
         response.json(returnValue);
     });
 };
 
-exports.storyCompleted = function(request, response, callback) {
-    log.debug("storyCompleted : logged in user is " + (request.user.id));
+exports.moveToNextIteration = function(request, response, callback) {
+    log.debug("moveToNextIteration : logged in user is " + (request.user.id));
     var userId = request.user.id;
     var sid = request.param(properties.story.id);
-    storyService.storyCompleted(sid, function(returnValue) {
+    var iterid = request.param(properties.iteration.iterationid);
+
+    storyService.moveToNextIteration([userId, iterid, sid], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.addStoryComment = function(request, response, callback) {
+    var userId = request.user.id;
+
+    log.debug("addStoryComment : logged in user is " + userId);
+
+    var sid = request.param(properties.story.id);
+    var description = request.param(properties.story.desc);
+    storyService.addStoryComment([sid, userId, description], function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -481,6 +585,29 @@ exports.getStoriesNTasks = function(request, response, callback) {
     var userId = request.user.id;
     var projectId = request.param(properties.story.projectId);
     storyService.getStoriesNTasks(projectId, function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.getStoriesNTasksByPidnIterId = function(request, response, callback) {
+    log.debug("getStoriesNTasksByPidnIterId : logged in user is " + (request.user.id));
+    var userId = request.user.id;
+    var projectId = request.param(properties.story.projectId);
+    var iterationId = request.param(properties.iteration.iterationid);
+
+    storyService.getStoriesNTasksByPidnIterId([projectId, iterationId], function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.getInCompleteStoriesNTasksByPidnIterId = function(request, response, callback) {
+    log.debug("getInCompleteStoriesNTasksByPidnIterId : logged in user is " + (request.user.id));
+    var userId = request.user.id;
+
+    var projectId = request.param(properties.story.projectId);
+    var iterationId = request.param(properties.iteration.iterationid);
+
+    storyService.getInCompleteStoriesNTasksByPidnIterId([projectId, iterationId], function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -506,7 +633,7 @@ exports.saveTask = function(request, response, callback) {
     var storyId = request.param(properties.task.storyId);
     var desc = request.param(properties.task.desc);
     var hrs = request.param(properties.task.hrs);
-    
+
     taskService.saveTask([name, storyId, desc, hrs, userId], function(returnValue) {
         response.json(returnValue);
     });
@@ -516,13 +643,13 @@ exports.editTask = function(request, response, callback) {
     log.debug("editTask : logged in user is " + (request.user.id));
     var userId = request.user.id;
     var id = request.param(properties.task.id);
-    var name = request.param(properties.task.name);    
+    var name = request.param(properties.task.name);
     var desc = request.param(properties.task.desc);
     var hrs = request.param(properties.task.hrs);
     var prevHrs = request.param(properties.task.prevHrs);
     var storyId = request.param(properties.task.storyId);
-    
-    taskService.editTask([name, desc, hrs, userId, id, prevHrs, storyId], function(returnValue) {
+
+    taskService.editTask([name, desc, hrs, userId, id, prevHrs, storyId], id, function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -531,16 +658,32 @@ exports.removeTask = function(request, response, callback) {
     log.debug("removeTask : logged in user is " + (request.user.id));
     var userId = request.user.id;
     var tid = request.param(properties.task.id);
-    taskService.removeTask(tid, function(returnValue) {
+    taskService.removeTask([tid, userId], tid, function(returnValue) {
         response.json(returnValue);
     });
 };
 
-exports.taskCompleted = function(request, response, callback) {
-    log.debug("taskCompleted : logged in user is " + (request.user.id));
+exports.changeTaskStatus = function(request, response, callback) {
+    log.debug("changeTaskStatus : logged in user is " + (request.user.id));
     var userId = request.user.id;
+
     var tid = request.param(properties.task.id);
-    taskService.taskCompleted(tid, function(returnValue) {
+    var stateId = request.param(properties.task.stateId);
+    var type = request.param(properties.story.type);
+
+    taskService.changeTaskStatus([userId, stateId, tid], type, function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.addTaskComment = function(request, response, callback) {
+    var userId = request.user.id;
+
+    log.debug("addTaskComment : logged in user is " + userId);
+
+    var tid = request.param(properties.task.id);
+    var description = request.param(properties.task.desc);
+    storyService.addTaskComment([tid, userId, description], sid, function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -550,6 +693,21 @@ exports.getTasks = function(request, response, callback) {
     var userId = request.user.id;
     var storyId = request.param(properties.task.storyId);
     taskService.getTasks(storyId, function(returnValue) {
+        response.json(returnValue);
+    });
+};
+
+exports.getTaskStatusesAsObj = function(userId, callback) {
+    log.debug("getTaskStatuses : logged in user is " + (userId));
+
+    taskService.getTaskStatuses(callback);
+};
+
+exports.getInCompleteTasks = function(request, response, callback) {
+    log.debug("getInCompleteTasks : logged in user is " + (request.user.id));
+    var userId = request.user.id;
+    var storyId = request.param(properties.task.storyId);
+    taskService.getInCompleteTasks(storyId, function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -609,7 +767,10 @@ exports.getProject = function(request, response, callback) {
 };
 
 exports.addResourceToProject = function(request, response, callback) {
-    log.debug("addResourceToProject : logged in user is " + (request.user.id));
+    var userId = request.user.id;
+
+    log.debug("addResourceToProject : logged in user is " + userId);
+
     var teamId = request.user.teamId;
     var pid = request.param(properties.project.id);
     var uid = request.param(properties.project.userId);
@@ -619,9 +780,11 @@ exports.addResourceToProject = function(request, response, callback) {
     var billable = request.param(properties.project.billable);
     var sowNo = request.param(properties.project.sowNo);
 
+    sowNo = (billable == 0) ? "NA" : sowNo;
+
     var projectname = request.param(properties.project.projectname);
-    
-    projectService.addResourceToProject([pid, uid, startDate, endDate, description, billable, sowNo], function(returnValue) {
+
+    projectService.addResourceToProject([pid, uid, startDate, endDate, description, billable, sowNo, userId], function(returnValue) {
         userService.getUserById(uid, function(val) {
             var body = (defaultUtil.format(mailerMessages.add_resource.text, val.firstname + ' ' + val.lastname, projectname));
             mailer.sendMail(val.username, request.user.username, mailerMessages.add_resource.subject, body);
@@ -631,7 +794,10 @@ exports.addResourceToProject = function(request, response, callback) {
 };
 
 exports.editResourceOfProject = function(request, response, callback) {
-    log.debug("editResourceOfProject : logged in user is " + (request.user.id));
+    var userId = request.user.id;
+
+    log.debug("editResourceOfProject : logged in user is " + userId);
+
     var teamId = request.user.teamId;
     var pid = request.param(properties.project.id);
     var projectResourceId = request.param(properties.project.projectResourceId);
@@ -642,9 +808,11 @@ exports.editResourceOfProject = function(request, response, callback) {
     var billable = request.param(properties.project.billable);
     var sowNo = request.param(properties.project.sowNo);
 
+    sowNo = (billable == 0) ? "NA" : sowNo;
+
     var projectname = request.param(properties.project.projectname);
 
-    projectService.editResourceOfProject([pid, uid, startDate, endDate, description, billable, sowNo], projectResourceId, function(returnValue) {
+    projectService.editResourceOfProject([pid, uid, startDate, endDate, description, billable, sowNo, userId], projectResourceId, function(returnValue) {
 
         userService.getUserById(uid, function(val) {
             var body = (defaultUtil.format(mailerMessages.add_resource.text, val.firstname + ' ' + val.lastname, projectname));
@@ -724,7 +892,7 @@ exports.editLog = function(request, response, callback) {
     var endDate = request.param(properties.logs.endDate);
     var desc = request.param(properties.logs.desc);
     var status = request.param(properties.logs.status);
-    logService.editLog([startDate, endDate, loggedUserId, desc, status, id], id, function(returnValue) {
+    logService.editLog([startDate, endDate, desc, status, id], id, function(returnValue) {
         response.json(returnValue);
     });
 };
@@ -786,7 +954,7 @@ exports.getReportLogs = function(request, response, callback) {
 
 exports.getTeamsReportLogs = function(request, response, callback) {
     log.debug("getTeamsReportLogs : logged in user is " + (request.user.id));
-    
+
     var startDate = request.param(properties.logs.startDate);
     var endDate = request.param(properties.logs.endDate);
 
@@ -823,8 +991,10 @@ exports.getDetailedProjectReportLogs = function(request, response, callback) {
     log.debug("getDetailedProjectReportLogs : logged in user is " + (request.user.id));
     var userId = request.user.id;
     var projectId = request.param(properties.project.id);
-    
-    projectService.getDetailedProjectReportLogs(projectId, function(returnValue) {
+
+    var teamId = request.param(properties.team.teamId);
+
+    projectService.getDetailedProjectReportLogs([projectId, teamId], function(returnValue) {
         response.json(returnValue);
     });
 };

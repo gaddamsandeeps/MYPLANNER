@@ -1,65 +1,53 @@
 #calContainer {
-	margin: 0 auto;
-	float: none;
+    margin: 0 auto;
+    float: none;
 }
 .nav-tabs {
-	border: 0;
+    border: 0;
 }
-
-.log-unlockrequest{
-	background-color: red;
-	border-color: red;
+.log-unlockrequest {
+    background-color: red;
+    border-color: red;
 }
-
-.log-unlocked{
-	background-color: green;
-	border-color: green;
+.log-unlocked {
+    background-color: green;
+    border-color: green;
 }
-
-.log-actual{
+.log-actual {} .log-planned {
+    background-color: orange;
+    border-color: orange;
 }
-
-.log-planned{
-	background-color: orange;
-	border-color: orange;
-}
-
 .requestunlock {
-	display:none;
-	padding: 19px 20px 20px;
-	margin-top: 15px;
-	text-align: right;
-	border-top: 1px solid #e5e5e5;
+    display: none;
+    padding: 19px 20px 20px;
+    margin-top: 15px;
+    text-align: right;
+    border-top: 1px solid #e5e5e5;
 }
-h3
-{
-	padding:0 0 10px 10px;
-	border:0; 
-	display:inline;
+h3 {
+    padding: 0 0 10px 10px;
+    border: 0;
+    display: inline;
 }
-.fixed-header
-{
-	margin-top:63px;
-	border-bottom:1px solid #d0d0d0; 
-	margin-bottom:15px; 
-	padding-bottom:14px;
+.fixed-header {
+    margin-top: 63px;
+    border-bottom: 1px solid #d0d0d0;
+    margin-bottom: 15px;
+    padding-bottom: 14px;
 }
-
-#teamusers-container{
-	text-align: right;
-	margin:3px 10px 0 0;
-	float:right;
+#teamusers-container {
+    text-align: right;
+    margin: 3px 10px 0 0;
+    float: right;
 }
-
-.activity-heading{
-	margin-bottom: 20px;
-	display: block;
-	font-weight: bold;
+.activity-heading {
+    margin-bottom: 20px;
+    display: block;
+    font-weight: bold;
 }
-#modalHeader{
-	font-weight: bold;
+#modalHeader {
+    font-weight: bold;
 }
-
-textarea{
-	resize : none;
+textarea {
+    resize: none;
 }

@@ -8,7 +8,7 @@
   <link href="lib/bootstrap.css" rel="stylesheet">        
   <link href='lib/fullcalendar.css' rel='stylesheet'>
   <link href='css/report/report.css' rel='stylesheet'>
-  <link href="css/edashboard.css" rel="stylesheet">
+  <link href="css/report/ereports.css" rel="stylesheet">
   
   <!-- jquery datatables-->
   <link href='css/datatables/jquery.dataTables.css' rel='stylesheet'>
@@ -27,8 +27,6 @@
 <script>
         var teams = <%- JSON.stringify(teams) %>
   </script>
-  
-
    
 </head>
 <body>
@@ -39,12 +37,15 @@
    <h3>Reports</h3>
  </div>    
     <div class="row">
-        <div class="col-md-12">
-            
+        <div class="col-md-12">            
             <div class="group-tab-container">
                     <ul>
+                      <label class="teamlabel">Teams : </label>
                         <% for(var i=0; i<teams.length; i++) {%>
-                             <li data-teamid="<%= teams[i].id %>" ed-tab class="group-name"> <%= teams[i].name %> </li>
+                             <li data-teamid="<%= teams[i].id %>" ed-tab class="group-name"> 
+                             <input type="checkbox" name="teamCheckbox" id="<%= teams[i].id %>" CHECKED>
+                              <%= teams[i].name %> 
+                            </li>
                         <% } %>
                     </ul>    
             </div>
@@ -113,6 +114,11 @@
       $( "#iterationReport" ).show();
     }
    });
+  $( "input:checkbox" ).click(function () {
+      generateReports();   
+    });
+
+
 
 </script>
  <% include footer.html %>

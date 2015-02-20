@@ -1,7 +1,7 @@
 var app = angular.module('resourceTracking', ['resourceTracking.directives']);
 app.controller('changePasswordController', function($scope, $http) {
     var empty = {
-        oldpassword:'',
+        oldpassword: '',
         newpassword: '',
         confirmnewpassword: ''
     };

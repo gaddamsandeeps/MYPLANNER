@@ -18,7 +18,7 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">                
-                <div style="color:#a94442; margin-left:210px" id="dobCtrl"></div>
+                <div style="color:#a94442; margin-left:210px" id="registerCtrl"></div>
                 </div>
                 <div class="form-group" show-errors>
                     <label class="col-md-4 control-label" for="name">User Name</label>
@@ -72,21 +72,7 @@
                         <input type="text" id="lastname" name="lastname" ng-model="newUser.lastname" class="form-control" placeholder="Last Name" required>
                         <span class="error-message" ng-show="Form.lastname.$error.required">LastName is required</span>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label" for="sex">Sex</label>
-                    <div class="col-md-8">
-                        <input type="radio" value="M" ng-model="newUser.sex">male
-                        <input type="radio" value="F" ng-model="newUser.sex">female
-                    </div>
-                </div>
-                <div class="form-group" show-errors>
-                    <label class="col-md-4 control-label" for="dob">Date Of Birth</label>
-                    <div class="col-md-8">
-                        <input type="date" id="dob" name="dob" ng-model="newUser.dob" class="form-control" placeholder="Date Of Birth" required>
-                        <span class="error-message" ng-show="Form.dob.$error.required">Date Of Birth is required</span>
-                    </div>
-                </div>
+                </div>                              
                 <div class="form-group" show-errors>
                     <label class="col-md-4 control-label" for="phone">Contact</label>
                     <div class="col-md-8">

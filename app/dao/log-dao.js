@@ -191,7 +191,7 @@ exports.getTeamsReportLogs = function(obj, callback) {
         var getTeamsReportLogsSQL = queries.log.getTeamsReportLogs;
 
         pool.getConnection(function(err, connection) {
-            connection.query(getTeamsReportLogsSQL, obj, function(err, rows) {            
+            connection.query(getTeamsReportLogsSQL, obj, function(err, rows) {
                 connection.release();
                 if (err) {
                     log.error(err);
@@ -336,8 +336,6 @@ exports.editLog = function(obj, logid, callback) {
     try {
         var editLogSQL = queries.log.editLog;
 
-        saveLogHistory(logid);
-
         pool.getConnection(function(err, connection) {
             connection.query(editLogSQL, obj, function(err, rows) {
                 connection.release();
@@ -347,31 +345,6 @@ exports.editLog = function(obj, logid, callback) {
                 } else {
                     callback(rows);
                 }
-            });
-        });
-
-    } catch (e) {
-        log.error(e);
-    }
-};
-
-var saveLogHistory = function(logId) {
-    try {
-        var saveLogHistorySQL = queries.log.saveLogHistory;
-
-        module.exports.getLogById(logId, function(val) {
-
-            var obj = [val.id, val.projectid, val.teamid, val.iteration, val.story, val.storystatus, val.plannedstartdate, val.plannedenddate, val.startdate, val.enddate, val.userid, val.loggeduser, val.description,
-                val.createddate, val.editdate, val.status
-            ];
-
-            pool.getConnection(function(err, connection) {
-                connection.query(saveLogHistorySQL, obj, function(err, rows) {
-                    connection.release();
-                    if (err) {
-                        console.log(err);
-                    }
-                });
             });
         });
 

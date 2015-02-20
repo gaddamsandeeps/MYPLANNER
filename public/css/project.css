@@ -1,0 +1,30 @@
+.teamsTable {
+    width: 100%;
+    border: 1px solid #ddd;
+}
+.teamsTable tr td, .teamsTable tr th {
+    text-align: left;
+    padding-left: 20px;
+    padding-top: 5px;
+}
+.teamsTable td, .teamsTable th {
+    border-left: 1px solid #ddd;
+    padding-bottom: 1em;
+}
+.teamsTable tr {
+    border: 1px solid #ddd;
+}
+.reset-executive {
+    text-align: right;
+    padding-right: 18px;
+}
+
+.projectSearchBox input[type='text'] {
+    padding: 5px 8px;
+    height: 30px;
+    border: 1px solid #7E7E7E;
+    width: 25%;
+    margin: 5px 5px 4px 5px;
+    outline: none;
+	float:right;
+}

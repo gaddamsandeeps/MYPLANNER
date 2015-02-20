@@ -12,23 +12,30 @@ exports.saveStory = function(obj, callback) {
     });
 };
 
-exports.editStory = function(obj, callback) {
+exports.editStory = function(obj, sid, callback) {
     log.debug("editStory");
-    storyDao.editStory(obj, function(returnValue) {
+    storyDao.editStory(obj, sid, function(returnValue) {
         util.handleErrors(returnValue, callback);
     });
 };
 
-exports.removeStory = function(id, callback) {
+exports.removeStory = function(obj, id, callback) {
     log.debug("removeStory");
-    storyDao.removeStory(id, function(returnValue) {
+    storyDao.removeStory(obj, id, function(returnValue) {
         util.handleErrors(returnValue, callback);
     });
 };
 
-exports.storyCompleted = function(id, callback) {
-    log.debug("storyCompleted");
-    storyDao.storyCompleted(id, function(returnValue) {
+exports.moveToNextIteration = function(obj, callback) {
+    log.debug("moveToNextIteration");
+    storyDao.moveToNextIteration(obj, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};
+
+exports.addStoryComment = function(obj, callback) {
+    log.debug("addStoryComment");
+    storyDao.addStoryComment(obj, function(returnValue) {
         util.handleErrors(returnValue, callback);
     });
 };
@@ -46,6 +53,16 @@ exports.getStories = function(pid, callback) {
 exports.getStoriesNTasks = function(pid, callback) {
     log.debug("getStoriesNTasks");
     storyDao.getStoriesNTasks(pid, callback);
+};
+
+exports.getStoriesNTasksByPidnIterId = function(obj, callback) {
+    log.debug("getStoriesNTasksByPidnIterId");
+    storyDao.getStoriesNTasksByPidnIterId(obj, callback);
+};
+
+exports.getInCompleteStoriesNTasksByPidnIterId = function(obj, callback) {
+    log.debug("getInCompleteStoriesNTasksByPidnIterId");
+    storyDao.getInCompleteStoriesNTasksByPidnIterId(obj, callback);
 };
 
 exports.getStory = function(id, callback) {

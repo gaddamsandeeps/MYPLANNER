@@ -137,6 +137,27 @@ exports.saveUser = function(obj, callback) {
     });
 };
 
+exports.removeUser = function(uid, callback) {
+    log.debug("removeUser");
+    userDao.removeUser(uid, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};
+
+exports.verifyUser = function(uid, callback) {
+    log.debug("verifyUser");
+    userDao.verifyUser(uid, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};
+
+exports.getUnverifiedUsers = function(callback) {
+    log.debug("getUnverifiedUsers");
+    userDao.getUnverifiedUsers(function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};
+
 exports.userExist = function(uName, callback) {
     log.debug("userExist");
     userDao.userExist(uName, callback);

@@ -1,0 +1,35 @@
+.group-tab-container {
+    text-align: center;
+    width: 350px;
+    margin: 0 auto;
+    margin-left: 16px;
+    float: left;
+}
+.group-tab-container ul {
+    list-style-type: none;
+    width: auto;
+    height: 32px;
+    margin-top: 45px;
+    width: 100%;
+    display: table;
+    table-layout: fixed;
+    padding: 0;
+}
+.group-tab-container ul li {
+    list-style-type: none;
+    height: 40px;
+    display: table-cell;
+    width: auto;
+    text-align: center;
+    background-color: #eee;
+    border-right: 1px solid #ddd;
+    padding-top: 10px;
+    font-weight: bold;
+}
+.group-tab-container ul li:hover, .group-tab-container ul li.active {
+    background-color: #ccc;
+    color: #333;
+}
+.group-tab-container ul li:last-child {
+    border-right: 0;
+}

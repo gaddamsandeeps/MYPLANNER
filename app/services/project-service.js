@@ -12,6 +12,32 @@ exports.getAdminProjects = function(userId, callback) {
     projectDao.getAdminProjects(userId, callback);
 };
 
+exports.getTProjects = function(userId, callback) {
+    log.debug("getTProjects");
+    projectDao.getTProjects(userId, callback);
+};
+
+exports.getNonTProjects = function(teamId, callback) {
+    log.debug("getNonTProjects");
+    projectDao.getNonTProjects(teamId, callback);
+};
+
+exports.giveAccessToProjectsByTeamId = function(obj, callback) {
+    log.debug("giveAccessToProjectsByTeamId");
+
+    projectDao.giveAccessToProjectsByTeamId(obj, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};
+
+exports.removeAccessToProjectsByTeamId = function(obj, callback) {
+    log.debug("removeAccessToProjectsByTeamId");
+
+    projectDao.removeAccessToProjectsByTeamId(obj, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};
+
 exports.saveAdminProject = function(obj, callback) {
     log.debug("saveAdminProject");
     projectDao.saveAdminProject(obj, function(returnValue) {
@@ -26,9 +52,9 @@ exports.editAdminProject = function(obj, callback) {
     });
 };
 
-exports.getDetailedProjectReportLogs = function(pid, callback) {
+exports.getDetailedProjectReportLogs = function(obj, callback) {
     log.debug("getDetailedProjectReportLogs");
-    projectDao.getDetailedProjectReportLogs(pid, callback);
+    projectDao.getDetailedProjectReportLogs(obj, callback);
 };
 
 exports.getProjectsByTeamId = function(obj, finalcallback) {
@@ -132,12 +158,13 @@ exports.removeMyProject = function(obj, callback) {
 
 exports.addMyProject = function(obj, callback) {
     log.debug("addMyProject");
+    obj.push(true);
     projectDao.getProjectNResources(obj, callback);
 };
 
-exports.saveProject = function(obj, callback) {
+exports.saveProject = function(obj, teamId, callback) {
     log.debug("saveProject");
-    projectDao.saveProject(obj, function(returnValue) {
+    projectDao.saveProject(obj, teamId, function(returnValue) {
         util.handleErrors(returnValue, callback);
     });
 };
@@ -149,9 +176,9 @@ exports.editProject = function(obj, callback) {
     });
 };
 
-exports.removeProject = function(pid, callback) {
+exports.removeProject = function(obj, callback) {
     log.debug("removeProject");
-    projectDao.removeProject(pid, function(returnValue) {
+    projectDao.removeProject(obj, function(returnValue) {
         util.handleErrors(returnValue, callback);
     });
 };
@@ -164,7 +191,7 @@ exports.addResourceToProject = function(obj, callback) {
 };
 
 
-exports.editResourceOfProject = function(obj,prid, callback) {
+exports.editResourceOfProject = function(obj, prid, callback) {
 
     log.debug("editResourceOfProject");
     projectDao.editResourceOfProject(obj, prid, function(returnValue) {

@@ -4,6 +4,7 @@
 var async = require("async"),
     pool = require("../db-manager/dbmanager").getPool(),
     userDao = require("../dao/user-dao"),
+    util = require("../util/util"),
     queries = require("../sql/sql.json"),
     log = require('../logger/logger').logger("project-dao"),
     startTime = ' 00:00:00',
@@ -29,6 +30,79 @@ exports.getAdminProjects = function(userId, callback) {
         log.error(e);
     }
 };
+
+exports.getTProjects = function(userId, callback) {
+    try {
+        var getTProjectsSQL = queries.project.getTProjects;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getTProjectsSQL, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    var TProjects = new Array();
+                    if (rows.length > 0) {
+                        for (var i = 0; i < rows.length; i++) {
+                            getTeamsAssignedToProject(rows[i], function(teams) {
+                                TProjects.push(teams);
+                                if (TProjects.length === rows.length) {
+                                    callback(TProjects);
+                                }
+                            });
+                        }
+                    } else {
+                        callback([]);
+                    }
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.getNonTProjects = function(teamId, callback) {
+    try {
+        var getNonTProjectsSQL = queries.project.getNonTProjects;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getNonTProjectsSQL, teamId, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+var getTeamsAssignedToProject = function(project, callback) {
+    try {
+        var getTeamsAssignedToProjectSQL = queries.project.getTeamsAssignedToProject;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getTeamsAssignedToProjectSQL, project.id, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    project.teams = rows;
+                    callback(project);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+}
 
 exports.saveAdminProject = function(obj, callback) {
     try {
@@ -240,12 +314,12 @@ exports.getTeamProjectsByTeamId = function(obj, callback) {
     }
 };
 
-exports.getMyProjects = function(userId, callback) {
+exports.getMyProjects = function(teamId, callback) {
     try {
         var getMyProjectsSQL = queries.project.getMyProjects;
 
         pool.getConnection(function(err, connection) {
-            connection.query(getMyProjectsSQL, userId, function(err, rows) {
+            connection.query(getMyProjectsSQL, teamId, function(err, rows) {
                 connection.release();
                 if (err) {
                     log.error(err);
@@ -254,7 +328,7 @@ exports.getMyProjects = function(userId, callback) {
                     var myProjects = new Array();
                     if (rows.length > 0) {
                         for (var i = 0; i < rows.length; i++) {
-                            module.exports.getProjectNResources([rows[i].projectid, null], function(returnValue) {
+                            module.exports.getProjectNResources([rows[i].projectid, teamId, null], function(returnValue) {
                                 myProjects.push(returnValue);
                                 if (myProjects.length === rows.length) {
                                     callback(myProjects);
@@ -272,25 +346,25 @@ exports.getMyProjects = function(userId, callback) {
     }
 };
 
-exports.getActiveProjectsByTeamId = function(userId, callback) {
+exports.getActiveProjectsByTeamId = function(teamId, callback) {
     try {
         var getActiveProjectsByTeamIdSQL = queries.project.getActiveProjectsByTeamId;
 
         pool.getConnection(function(err, connection) {
-            connection.query(getActiveProjectsByTeamIdSQL, userId, function(err, rows) {
+            connection.query(getActiveProjectsByTeamIdSQL, teamId, function(err, rows) {
                 connection.release();
                 var projects = new Array();
                 if (rows.length > 0) {
                     for (var i = 0; i < rows.length; i++) {
                         var pid = rows[i].id;
-                            module.exports.getProjectNResources([pid, null], function(returnValue) {
+                        module.exports.getProjectNResources([pid, teamId, null], function(returnValue) {
                             projects.push(returnValue);
                             if (projects.length === rows.length) {
                                 callback(projects);
                             }
                         });
                     }
-                }else{
+                } else {
                     callback([]);
                 }
 
@@ -304,7 +378,8 @@ exports.getActiveProjectsByTeamId = function(userId, callback) {
 exports.getProjectNResources = function(obj, callback) {
     try {
         var getProjectSQL = queries.project.getProject,
-            pid = obj[0];
+            pid = obj[0],
+            teamId = obj[1];
 
         pool.getConnection(function(err, connection) {
             connection.query(getProjectSQL, [pid], function(err, rows) {
@@ -313,11 +388,11 @@ exports.getProjectNResources = function(obj, callback) {
                     log.error(err);
                     callback(err);
                 } else {
-                    getResourcesForProject(pid, function(returnValue) {
+                    getResourcesForProject([pid, teamId], function(returnValue) {
                         if (rows.length > 0) {
                             rows[0].users = returnValue;
                         }
-                        if (obj[1]) {
+                        if (obj[2]) {
                             module.exports.addMyProject(obj, function(returnValue) {});
                         }
                         callback(rows[0]);
@@ -352,13 +427,13 @@ exports.getProject = function(pid, callback) {
     }
 };
 
-var getResourcesForProject = function(id, callback) {
+var getResourcesForProject = function(obj, callback) {
     var resourcess = new Array();
     try {
         var getResourceForProjectsSQL = queries.project.getResourcesForProject;
 
         pool.getConnection(function(err, connection) {
-            connection.query(getResourceForProjectsSQL, [id], function(err, rows) {
+            connection.query(getResourceForProjectsSQL, obj, function(err, rows) {
                 connection.release();
                 if (err) {
                     log.error(err);
@@ -367,7 +442,7 @@ var getResourcesForProject = function(id, callback) {
                     if (rows.length > 0) {
                         for (var i = 0; i < rows.length; i++) {
                             var user = rows[i];
-                            getUserLoggedPerProject([user.id, id, user.startdate + startTime, user.enddate + endTime], user, function(returnValue) {
+                            getUserLoggedPerProject([user.id, obj[0], user.startdate + startTime, user.enddate + endTime], user, function(returnValue) {
                                 resourcess.push(i);
                                 if (resourcess.length === rows.length) {
                                     resourcess = null;
@@ -392,6 +467,11 @@ var getResourceDetailsForProject = function(obj, callback) {
     try {
         userDao.getUserById(obj[1], function(user) {
             getUserLoggedPerProject([user.id, obj[0], obj[2] + startTime, obj[3] + endTime], user, function(rows) {
+
+                var diffDays = util.dateDiffInDays(new Date(obj[3]), new Date());
+
+                rows.days = diffDays;
+
                 rows.billable = obj[5] ? 1 : 0;
                 rows.startdate = obj[2];
                 rows.enddate = obj[3];
@@ -405,12 +485,12 @@ var getResourceDetailsForProject = function(obj, callback) {
     }
 };
 
-exports.getDetailedProjectReportLogs = function(pid, callback) {
+exports.getDetailedProjectReportLogs = function(obj, callback) {
     try {
-        getResourcesForProject(pid,function(resources){            
+        getResourcesForProject(obj, function(resources) {
             callback(resources);
         });
-        
+
     } catch (e) {
         log.error(e);
     }
@@ -443,12 +523,57 @@ var getUserLoggedPerProject = function(obj, user, callback) {
 };
 
 
-exports.saveProject = function(obj, callback) {
+exports.saveProject = function(obj, teamId, callback) {
     try {
         var saveProjectSQL = queries.project.saveProject;
 
         pool.getConnection(function(err, connection) {
             connection.query(saveProjectSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    module.exports.giveAccessToProjectsByTeamId([rows.insertId, teamId], function(val) {
+                        callback(rows.insertId);
+                    });
+
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+
+exports.giveAccessToProjectsByTeamId = function(obj, callback) {
+    try {
+        var giveAccessToProjectsByTeamIdSQL = queries.project.giveAccessToProjectsByTeamId;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(giveAccessToProjectsByTeamIdSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows.insertId);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+
+exports.removeAccessToProjectsByTeamId = function(obj, callback) {
+    try {
+        var removeAccessToProjectsByTeamIdSQL = queries.project.removeAccessToProjectsByTeamId;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(removeAccessToProjectsByTeamIdSQL, obj, function(err, rows) {
                 connection.release();
                 if (err) {
                     log.error(err);
@@ -484,12 +609,12 @@ exports.editProject = function(obj, callback) {
     }
 };
 
-exports.removeProject = function(pid, callback) {
+exports.removeProject = function(obj, callback) {
     try {
         var removeProjectSQL = queries.project.removeProject;
 
         pool.getConnection(function(err, connection) {
-            connection.query(removeProjectSQL, pid, function(err, rows) {
+            connection.query(removeProjectSQL, obj, function(err, rows) {
                 connection.release();
                 if (err) {
                     log.error(err);
@@ -533,21 +658,21 @@ exports.addResourceToProject = function(obj, callback) {
 exports.editResourceOfProject = function(obj, prid, callback) {
     try {
 
-        var editResourceOfProjectSQL = queries.project.editResourceOfProject;    
-            obj.push(prid);
+        var editResourceOfProjectSQL = queries.project.editResourceOfProject;
+        obj.push(prid);
 
         pool.getConnection(function(err, connection) {
-          connection.query(editResourceOfProjectSQL, obj, function(err, rows) {
-                obj.splice(obj.length-1 , 1);
+            connection.query(editResourceOfProjectSQL, obj, function(err, rows) {
+                obj.splice(obj.length - 1, 1);
                 connection.release();
                 if (err) {
                     log.error(err);
                     callback(err);
                 } else {
-                        getResourceDetailsForProject(obj, function(val) {
-                            val.projectresourceid = prid;
-                            callback(val);
-                        });
+                    getResourceDetailsForProject(obj, function(val) {
+                        val.projectresourceid = prid;
+                        callback(val);
+                    });
                 }
             });
         });
@@ -559,9 +684,6 @@ exports.editResourceOfProject = function(obj, prid, callback) {
 exports.removeResourceFromProject = function(prid, callback) {
     try {
         var removeResourceFromProjectSQL = queries.project.removeResourceFromProject;
-
-        //save history
-        saveProjectResourceHistory(prid);
 
         pool.getConnection(function(err, connection) {
             connection.query(removeResourceFromProjectSQL, prid, function(err, rows) {
@@ -594,28 +716,6 @@ exports.addNRemoveResourceFromProject = function(obj, callback) {
                 }
             });
         });
-    } catch (e) {
-        log.error(e);
-    }
-};
-
-
-var saveProjectResourceHistory = function(prid) {
-    try {
-        var saveProjectResourceHistorySQL = queries.project.saveProjectResourceHistory;
-        getProjectResourcById(prid, function(val) {
-            var obj = [val.id, val.projectid, val.userid, val.startdate, val.enddate, val.description, val.billable, val.sowno, val.createddate];
-
-            pool.getConnection(function(err, connection) {
-                connection.query(saveProjectResourceHistorySQL, obj, function(err, rows) {
-                    connection.release();
-                    if (err) {
-                        console.log(err);
-                    }
-                });
-            });
-        });
-
     } catch (e) {
         log.error(e);
     }

@@ -1,18 +1,18 @@
 {
-    "unlock_request":{
-    	"subject" : "Nisum Planner - Unlock request raised",
-    	"text" : "Unlock request raised by %s for the log entered on %s"
+    "unlock_request": {
+        "subject": "Nisum Planner - Unlock request raised",
+        "text": "Unlock request raised by %s for the log entered on %s"
     },
-    "unlock_log":{
-    	"subject" : "Nisum Planner - Log unlocked",
-    	"text" : "Log unlocked by %s for the log entered on %s"
+    "unlock_log": {
+        "subject": "Nisum Planner - Log unlocked",
+        "text": "Log unlocked by %s for the log entered on %s"
     },
-    "add_resource":{
-    	"subject" : "Nisum Planner - Added to project",
-    	"text" : "%s added to %s"
+    "add_resource": {
+        "subject": "Nisum Planner - Added to project",
+        "text": "%s added to %s"
     },
-    "removed_resource":{
-    	"subject" : "Nisum Planner - Moved from project",
-    	"text" : "%s moved from %s"
+    "removed_resource": {
+        "subject": "Nisum Planner - Moved from project",
+        "text": "%s moved from %s"
     }
 }

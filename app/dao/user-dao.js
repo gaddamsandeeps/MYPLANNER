@@ -272,6 +272,66 @@ exports.saveUser = function(obj, callback) {
     }
 };
 
+exports.removeUser = function(uid, callback) {
+    try {
+        var removeUserSQL = queries.user.removeUser;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(removeUserSQL, uid, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.verifyUser = function(uid, callback) {
+    try {
+        var verifyUserSQL = queries.user.verifyUser;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(verifyUserSQL, uid, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.getUnverifiedUsers = function(callback) {
+    try {
+        var getUnverifiedUsersSQL = queries.user.getUnverifiedUsers;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getUnverifiedUsersSQL, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
 exports.editUser = function(obj, callback) {
     try {
         var editUserDetailsProSQL = queries.user.editUserDetailsPro;

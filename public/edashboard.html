@@ -24,9 +24,9 @@
     
     <div class="row">
         <div class="col-md-12">
-            
             <div class="group-tab-container">
                     <ul>
+						<label class="teamlabel">Teams : </label>
                         <% for(var i=0; i<teams.length; i++) {%>
                              <li data-teamid="<%= teams[i].id %>" ed-tab class="group-name"> <%= teams[i].name %> </li>
                         <% } %>
@@ -53,21 +53,21 @@
             <div class="col-md-12 leftPannelSection ed-fixed-header">
                 <div class="clearfix"></div>
                 <div id="ProjectView" class="">
-                    <div ng-repeat="p in droppedProjects" class="projectSection">
+                    <div ng-repeat="p in droppedProjects" ng-init="p.chartOpened=false" class="projectSection">
                         <div class="pv" resourcedroppable projectid="{{p.id}}" projectname="{{p.name}}">
-							<input type="button" class="btn btn-primary btn-xs showchart" id="showreports" ng-click="displayChart(p.id,p.name)" value="Show Report"/>
-                                <div onclick="minimaxConetent(this)">
+                                <div onclick="minimaxConetent(this)" ng-click="displayChart(p)">
                                 <div class="expand">
                                     <i class="fa fa-plus-square-o fa-lg pull-right"></i>
                                 </div>
                                 <h3 class="resourceTitle">{{p.name}}</h3>
+								<div id="{{p.id}}" class="graphpanel hidechart"></div>
                             </div>
                             <div class="resourcseToProject">
                                 <div>
                                     <p>{{p.description}}</p>
                                 </div>
                                 <div>
-                                    <div class="timelineWrapper">
+                                    <div class="timelinePane">
                                         <div class="timelineDates">
                                             <div class="pull-left">
                                                 {{p.startdate | date : 'shortDate'}}
@@ -87,7 +87,7 @@
                                         </p>
                                     </div>
                                 </div>
-                                <div class="resources">
+                                <div class="resourcespane">
                                     <h5 class="resourceTitle">Developers</h5>
                                     <div class="row container-fluid res-headers">
                                     <div class="col-md-3">Name</div>
@@ -98,7 +98,7 @@
                                     <div class="col-md-2">Spent</div>
                                     </div>
                                 </div>
-                                <div class="developers">
+                                <div class="developerspane">
                                     <div username="{{d.username}}" prid="{{d.projectresourceid}}" ng-repeat="d in p.users">
                                         <div class="item left-section">
                                             <div class="container-fluid res-padding">
@@ -135,7 +135,6 @@
                             </div>
                         </div>               
                     </div>
-					<div id="{{p.id}}" class="hidechart"></div>
                 </div>
             </div>
         </div>

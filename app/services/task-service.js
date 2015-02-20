@@ -1,5 +1,5 @@
 /**
- * story-service.js
+ * task-service.js
  */
 var taskDao = require("../dao/task-dao"),
     util = require("../util/util"),
@@ -12,23 +12,30 @@ exports.saveTask = function(obj, callback) {
     });
 };
 
-exports.editTask = function(obj, callback) {
+exports.editTask = function(obj, id, callback) {
     log.debug("editTask");
-    taskDao.editTask(obj, function(returnValue) {
+    taskDao.editTask(obj, id, function(returnValue) {
         util.handleErrors(returnValue, callback);
     });
 };
 
-exports.removeTask = function(id, callback) {
+exports.removeTask = function(obj, id, callback) {
     log.debug("removeTask");
-    taskDao.removeTask(id, function(returnValue) {
+    taskDao.removeTask(obj, id, function(returnValue) {
         util.handleErrors(returnValue, callback);
     });
 };
 
-exports.taskCompleted = function(id, callback) {
-    log.debug("taskCompleted");
-    taskDao.taskCompleted(id, function(returnValue) {
+exports.changeTaskStatus = function(obj, type, callback) {
+    log.debug("changeTaskStatus");
+    taskDao.changeTaskStatus(obj, type, function(returnValue) {
+        util.handleErrors(returnValue, callback);
+    });
+};
+
+exports.addTaskComment = function(obj, callback) {
+    log.debug("addTaskComment");
+    taskDao.addTaskComment(obj, function(returnValue) {
         util.handleErrors(returnValue, callback);
     });
 };
@@ -38,7 +45,17 @@ exports.getTasks = function(sid, callback) {
     taskDao.getTasks(sid, callback);
 };
 
+exports.getInCompleteTasks = function(sid, callback) {
+    log.debug("getInCompleteTasks");
+    taskDao.getInCompleteTasks(sid, callback);
+};
+
 exports.getTask = function(id, callback) {
     log.debug("getTask");
     taskDao.getTask(id, callback);
+};
+
+exports.getTaskStatuses = function(callback) {
+    log.debug("getTaskStatuses");
+    taskDao.getTaskStatuses(callback);
 };

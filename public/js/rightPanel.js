@@ -17,8 +17,8 @@ $(function() {
         $('#addproject').trigger('click');
     });
 */
-$('.refereshIcon').click(function(e) {
-    e.stopPropagation();
-    location.reload();
-});
+    $('.refereshIcon').click(function(e) {
+        e.stopPropagation();
+        location.reload();
+    });
 });

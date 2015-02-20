@@ -30,19 +30,19 @@ exports.getExecutivesByTeamId = function(team, callback) {
         var getExecutivesByTeamIdSQL = queries.team.getExecutivesByTeamId;
 
         pool.getConnection(function(err, connection) {
-            var q = connection.query(getExecutivesByTeamIdSQL, team.id, function(err, rows) {                
+            connection.query(getExecutivesByTeamIdSQL, team.id, function(err, rows) {
                 connection.release();
                 if (err) {
                     log.error(err);
                     callback(err);
                 } else {
-                    if(rows.length > 0){
+                    if (rows.length > 0) {
                         team.executives = rows;
                         callback(team);
-                    }else{
+                    } else {
                         callback(team);
                     }
-                    
+
                 }
             });
         });
@@ -137,26 +137,26 @@ exports.saveTeam = function(obj, executives, callback) {
         var userId = obj[3];
 
         pool.getConnection(function(err, connection) {
-            connection.query(saveTeamSQL, obj, function(err, rows) {                
+            connection.query(saveTeamSQL, obj, function(err, rows) {
                 connection.release();
                 if (err) {
                     log.error(err);
                     callback(err);
                 } else {
                     var teamId = rows.insertId;
-                    
+
                     var lngt = new Array();
-                    if(executives.length === 0){
-                            callback(rows.insertId);
-                        }
-                    for(var i =0; i<executives.length;i++){                        
-                        saveExecutives(executives[i], teamId, userId, function(eval){
+                    if (executives.length === 0) {
+                        callback(rows.insertId);
+                    }
+                    for (var i = 0; i < executives.length; i++) {
+                        saveExecutives(executives[i], teamId, userId, function(eval) {
                             lngt.push(eval);
                             if (lngt.length === executives.length) {
                                 callback(rows.insertId);
                             }
                         });
-                    }                    
+                    }
                 }
             });
         });
@@ -218,20 +218,20 @@ exports.editTeam = function(obj, executives, callback) {
                     log.error(err);
                     callback(err);
                 } else {
-                    removeExecutives(teamId,function(){
+                    removeExecutives(teamId, function() {
                         var lngt = new Array();
-                        if(executives.length === 0){
-                                callback(rows.insertId);
-                            }
-                        for(var i =0; i<executives.length;i++){                        
-                            saveExecutives(executives[i], teamId, userId, function(eval){
+                        if (executives.length === 0) {
+                            callback(rows.insertId);
+                        }
+                        for (var i = 0; i < executives.length; i++) {
+                            saveExecutives(executives[i], teamId, userId, function(eval) {
                                 lngt.push(eval);
                                 if (lngt.length === executives.length) {
                                     callback(rows.insertId);
                                 }
                             });
                         }
-                    });                    
+                    });
                 }
             });
         });

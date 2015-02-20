@@ -26,7 +26,7 @@
                 <div class="form-group" show-errors>
                     <label class="col-md-4 control-label" for="roleid">Role</label>
                     <div class="col-md-8">
-                        <select ng-disabled="!validRole" ng-change="roleChange()" ng-model="editUser.roleid" ng-options="opt as opt.name for opt in Roles" id="roleid" name="roleid" class="form-control" required>
+                        <select ng-change="roleChange()" ng-model="editUser.roleid" ng-options="opt as opt.name for opt in Roles" id="roleid" name="roleid" class="form-control" required>
                             <option value="">Choose Role</option>
                         </select>
                         <span class="error-message" ng-show="EditUserForm.roleid.$dirty && EditUserForm.roleid.$invalid">Select Role</span>
@@ -55,20 +55,8 @@
                         <span class="error-message" ng-show="EditUserForm.lastname.$error.required">LastName is required</span>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label" for="editusersex">Sex</label>
-                    <div class="col-md-8">
-                        <input type="radio" value="M" ng-model="editUser.sex">male
-                        <input type="radio" value="F" ng-model="editUser.sex">female
-                    </div>
-                </div>
-                <div class="form-group" show-errors>
-                    <label class="col-md-4 control-label" for="dob">Date Of Birth</label>
-                    <div class="col-md-8">
-                        <input type="date" id="dob" name="dob" ng-model="editUser.dob" class="form-control" placeholder="Date Of Birth" required>
-                        <span class="error-message" ng-show="EditUserForm.dob.$error.required">Date Of Birth is required</span>
-                    </div>
-                </div>
+                
+                
                 <div class="form-group" show-errors>
                     <label class="col-md-4 control-label" for="edituserphone">Contact</label>
                     <div class="col-md-8">

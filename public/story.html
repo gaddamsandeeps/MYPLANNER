@@ -9,49 +9,115 @@
   <link href="css/validation.css" rel="stylesheet">
   <link href='css/datatables/jquery.dataTables.css' rel='stylesheet'>
   <link href="css/story.css" rel="stylesheet">
+  <link href="css/report/report.css" rel="stylesheet">
+  <script type="text/javascript">
+    var taskStatus = new Array(),iterations = [];
+    var task = null,iteration;
+    <% for(var i=0; i<taskstatus.length; i++) {%>
+      task = new Object();
+      task.id = <%=taskstatus[i].id%>;
+      task.name = '<%=taskstatus[i].name%>';
+      task.description = '<%=taskstatus[i].description%>';
+      task.step = <%=taskstatus[i].step%>;
+      
+      taskStatus.push(task);   
+    <% } %>
+	
+	<% for(var i=0; i<iterations.length; i++) {%>
+          iteration = {};
+		  iteration.id = <%=iterations[i].id%>
+		  iteration.name = <%=iterations[i].name%>
+		  iterations.push(iteration);
+    <% } %>
+  </script>
 </head>
 <body>
   <% var pageName='story' %>
   <%include header.html%>
-  <br><br><br><br><br>
-  <div class="container">
-    <form name="storyForm" id="storyForm" role="form" novalidate class="form-horizontal stories" ng-controller="StoryEntryController">
-     <div class="col-md-12 form-group">
-       <div class="col-md-3 form-group">
-         <div class="addstorylabel">Projects:</div>
-         <select id="projects" name="projects" class="form-control" ng-change="getStories()" ng-model="projectId">
-          <option value="0">Select Project</option>
-          <% for(var i=0; i<projects.length; i++) {%>
-          <option value="<%= projects[i].id %>"><%= projects[i].name %></option>
-          <% } %>
-        </select>
-      </div>
-      <div class="col-md-2 form-group"> 
-	   <div class="addstorylabel"></div>
-       <button class="btn btn-primary addonstory" style="display:none"  id="addStory" ng-click="addStory()">Add Story</button>
-     </div>
-
-      <div class="col-md-4 form-group">       
-     </div>
+	<div class="fixed-header">
+	   <h3>Sprints</h3>
+	</div>
+	<div class="container-fluid">
+		<form name="storyForm" id="storyForm" role="form" novalidate class="form-horizontal stories" ng-controller="StoryEntryController">
+		
+		<!--FORM START-->
+		<div class="col-md-12">
+		  <div class="form-group">
+			<label class="col-md-1 hform-label">Projects:</label>
+			<div class="col-md-2">
+				<select id="projects" name="projects" class="form-control"  ng-model="projectId">
+				  <option value="0">Select Project</option>
+				  <% for(var i=0; i<projects.length; i++) {%>
+				  <option value="<%= projects[i].id %>"><%= projects[i].name %></option>
+				  <% } %>
+				</select>
+			</div>
+			<label class="col-md-1 hform-label">Iteration:</label>
+			<div class="col-md-2">
+				<select id="selectedIteration" name="selectedIteration" class="form-control addonstory" ng-model="iterationId">
+				  <option value="0">Select Iteration</option>
+				  <% for(var i=0; i<iterations.length; i++) {%>
+				  <option value="<%= iterations[i].id %>"><%= iterations[i].name %></option>
+				  <% } %>
+				</select>
+			</div>
+			<div class="col-md-3">
+			  <button id="checkReport" class="btn btn-primary btn-sm rep-btn"  id="getStories" ng-click="getStories()">View</button>
+			  <button id="generateExcel" class="btn btn-primary btn-sm rep-btn"  id="addStory" ng-click="addStory()">Add Story/Task</button>
+			</div>
+		  </div>
+		</div>
+		<!--FORM END-->
+		
+		<!--LAYOUT START-->
+		<div class="col-md-12 bordered" style="display:none;">
+			<div class="col-md-2 col-layout-card">
+				<h4>Open (15)</h4>
+				<div class="layout-card type-story">
+					<div class="card-type"></div>
+					<div class="card-title">Payment gateway</div>
+					<div class="card-data">Iteration: 1502</div>
+					<div class="card-data">Author: Sandeep</div>
+					<div class="card-data">last Updated: Gangadhar</div>
+					<div class="card-data">Time spent: 5h</div>
+					<div class="card-data"><a href="#">Add Task</a></div>
+				</div>
+			</div>
+		</div>		
+		<!--LAYOUT END-->
+	</div>
+	
+	<!--OLD GRID-->
+	<div class="container-fluid">	 
+		 <div class="col-md-12" style="display:none;">
+			<input type="button" title="Edit" alt="Edit" class="btn btn-primary" value="Edit" ng-click="EditStory()" id="rowEdit"/> 
+			<input type="button" title="Add" alt="Add" class="btn btn-primary" value="Add"  ng-click="AddSubTask()" id="AddRow"/>
+		</div>	
    </div>
-   
-   <div class="tab-pane wholereport">
-    <div id="excelReport" class="reports"></div>
-   <table id="storyReportTable" class="display" cellspacing="0" width="100%">
-      <thead>
-       <tr>
-        <th>ID</th>	
-        <th>NAME</th>
-        <th>DESCRIPTION</th>
-        <th>HOURS</th>
-        <th>CREATED BY</th>
-		    <th>EDIT</th>
-        <th>TYPE</th>
-        <th>SUB TASK</th>        
-      </tr>
-    </thead>
-  </table>
-</div>	
+   <div class="container-fluid">	
+		<div class="col-md-12">
+			<div class="wholereport">
+				<div id="excelReport" class="sprints"></div>
+				<table id="storyReportTable" class="display" cellspacing="0" width="100%">
+					<thead>
+					<tr class="tr-head">
+						<th></th>
+						<th>Id#</th>	
+						<th>Name</th>
+						<th>Iteration</th>
+						<th>Description</th>
+						<th>Hrs</th>
+						<th>Author</th>		 
+						<th>Updated By</th>
+						<th>Type</th>
+						<th>Status</th>  
+						<th>Action</th>    	
+					</tr>
+					</thead>
+				</table>
+			</div>	
+		</div>
+	</div>
 </form>
 
 <div id="modeSection" ng-controller= "storyController">
@@ -66,26 +132,7 @@
         </div>
         <div class="modal-body">
           <UL id="errorContainer"></UL>
-          <div class="form-group">
-            <label class="col-md-3 control-label" for="storyName">Story Name:</label>
-            <div class="col-md-8">
-              <input type="text" id="storyName" name="storyName" class="form-control" placeholder="Story Name" required>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-md-3 control-label" for="Story Description">Story Description:</label>
-            <div class="col-md-8">
-              <textarea id="storyDescription" rows="5" name="storyDescription" class="form-control" placeholder="Story Description" required></textarea>
-            </div>
-          </div>
-          <div class="form-group" id="storyHoursContainer">
-            <label class="col-md-3 control-label" for="storyHours">Hours</label>
-            <div class="col-md-8">
-              <input type="text" id="storyHours" name="storyHours" class="form-control" placeholder="Story Estimated Hours" required>
-            </div>
-          </div>         
-
-          <div class="form-group">
+		  <div class="form-group">
             <label class="col-md-3 control-label" for="storyType">Story Type</label>
             <div class="col-md-8">
               <select id="storyType" name="storyType" class="form-control">
@@ -96,7 +143,38 @@
               </select>
             </div>
           </div>
-
+          <div class="form-group">
+            <label class="col-md-3 control-label" for="iteration">Iteration:</label>
+            <div class="col-md-8" id="iteratedrop">
+              <select id="iteration" name="iteration" class="form-control">
+                  <option value="0">Select Iteration</option>
+                  <% for(var i=0; i<iterations.length; i++) {%>
+                  <option value="<%= iterations[i].id %>"><%= iterations[i].name %></option>
+                  <% } %>
+              </select>
+            </div>
+			<div class="col-md-8 nodisplay" id="iteratetext">
+				  <input type="text" id="iterationno" name="iteration" class="form-control" placeholder="Iteration no" disabled="disabled"/>
+			</div>  
+          </div>
+          <div class="form-group">	
+            <label class="col-md-3 control-label" for="storyName">Story Number:</label>
+            <div class="col-md-8">
+              <input type="text" id="storyName" name="storyName" class="form-control" placeholder="Number should match with mingle/version one" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label" for="Story Description">Story Description:</label>
+            <div class="col-md-8">
+              <textarea id="storyDescription" rows="5" name="storyDescription" class="form-control" placeholder="Story Description" required></textarea>
+            </div>
+          </div>
+          <div class="form-group" id="storyHoursContainer">
+            <label class="col-md-3 control-label" for="storyHours">Estimated Hours</label>
+            <div class="col-md-8">
+              <input type="text" id="storyHours" name="storyHours" class="form-control" placeholder="Story Estimated Hours" required>
+            </div>
+          </div>         
         </div>
         <div class="modal-footer">
           <button id="saveStory" type="submit" class="btn btn-primary" ng-click="saveStory()">Save</button>
@@ -156,22 +234,8 @@
       </form>
     </div>
   </div>
-</div>  
-
-
-
 </div>
-
-
-
-
-
-
-
-
-
-
-
+</div>
 </div>
 <% include footer.html %>
 <script src="lib/angular.js"></script>
@@ -181,6 +245,7 @@
 <script src='lib/jquery.dataTables.min.js'></script>
 <script src="lib/bootstrap.js"></script>
 <script src="js/common/directives.js"></script>
+<script src="js/minimize.js"></script>
 <script src="js/common/util.js"></script>
 <script src="js/story.js"></script>
 </body>

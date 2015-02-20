@@ -1,4 +1,3 @@
-
 var nodemailer = require('nodemailer'),
     smtpTransport = require('nodemailer-smtp-transport'),
     mailConfig = require("../../config.json").mail_config,
@@ -23,20 +22,20 @@ var transporter = nodemailer.createTransport(smtpTransport({
 }
 });*/
 
-exports.sendMail = function(to,cc, subject, body) {
+exports.sendMail = function(to, cc, subject, body) {
     mailOptions = {
         from: mailConfig.from, // sender address
         to: to, // list of receivers
         cc: cc,
         subject: subject, // Subject line    
         html: body
-    };            
+    };
 
     // send mail with defined transport object based on flag
-    if(mailConfig.enabled){
-        transporter.sendMail(mailOptions, function(error, info){
-            if(error){
-               log.error(error);
+    if (mailConfig.enabled) {
+        transporter.sendMail(mailOptions, function(error, info) {
+            if (error) {
+                log.error(error);
             }
         });
     }

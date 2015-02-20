@@ -14,15 +14,15 @@ function toUTC(x) {
 }
 
 function sameDates(st, et) {
-	var year = (st.split('-')[0] === et.split('-')[0]);
-	var month = (st.split('-')[1] === et.split('-')[1]);
-	var day   = (st.split('-')[2].substring(0,2) === et.split('-')[2].substring(0,2));
-	
-    if(day && month && year){
+    var year = (st.split('-')[0] === et.split('-')[0]);
+    var month = (st.split('-')[1] === et.split('-')[1]);
+    var day = (st.split('-')[2].substring(0, 2) === et.split('-')[2].substring(0, 2));
+
+    if (day && month && year) {
         return true;
-    }else{
+    } else {
         return false;
-    } 
+    }
 }
 
 function currentDateStatus(endDate, startDate) {
@@ -48,10 +48,10 @@ function loghours(logged) {
 }
 
 function projectloghours(count, logged) {
-	count = (count == 0) ? 1 : count;
+    count = (count == 0) ? 1 : count;
     var totalhours = count * 480;
     var totalworkedhours = logged;
-	var projectlogged = Math.round((totalworkedhours / totalhours) * 100);
+    var projectlogged = Math.round((totalworkedhours / totalhours) * 100);
     return projectlogged;
 }
 
@@ -85,8 +85,7 @@ function calcBusinessDays(dDate1, dDate2) {
 
 //******Leading Zero in minutes******
 
-function lz(mntsnum)
-{
+function lz(mntsnum) {
     var str = String(mntsnum);
     return (str.length < 2) ? "0" + mntsnum : mntsnum;
 }

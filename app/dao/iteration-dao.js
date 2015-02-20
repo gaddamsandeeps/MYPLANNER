@@ -44,3 +44,23 @@ exports.getIterations = function(callback) {
         log.error(e);
     }
 };
+
+exports.getIterationIds = function(callback) {
+    try {
+        var getIterationIdsSQL = queries.iteration.getIterationIds;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getIterationIdsSQL, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};

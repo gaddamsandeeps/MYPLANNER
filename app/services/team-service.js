@@ -29,20 +29,20 @@ exports.removeTeam = function(teamId, callback) {
 
 exports.getTeams = function(callback) {
     log.debug("getTeams");
-    teamDao.getTeams(function(teams){
+    teamDao.getTeams(function(teams) {
         var lngt = new Array();
-        if(teams.length === 0){
+        if (teams.length === 0) {
             callback([]);
         }
-        for (var i = 0; i < teams.length; i++) {        
-         teamDao.getExecutivesByTeamId(teams[i], function(val){                        
-            lngt.push(val);   
-            if (lngt.length === teams.length) {
-                callback(lngt);
-            }
-         });
+        for (var i = 0; i < teams.length; i++) {
+            teamDao.getExecutivesByTeamId(teams[i], function(val) {
+                lngt.push(val);
+                if (lngt.length === teams.length) {
+                    callback(lngt);
+                }
+            });
         }
-       
+
     });
 };
 

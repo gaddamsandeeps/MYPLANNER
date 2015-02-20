@@ -16,8 +16,8 @@
 <div class="container admin">
     <div id="Teams" ng-controller="TeamCtrl">
         <div class="row modal-header">
-            <div class="col-md-1">
-                <h4>Teams</h4>
+            <div class="col-md-2">
+                <h4>Teams ({{Teams.length}})</h4>
             </div>
             <div class="col-md-1">
                 <button type="button" class="btn btn-primary " ng-click="addTeam()">Add</button>
@@ -26,7 +26,6 @@
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>Id</th>
                 <th>Name</th>
                 <th>Description</th>
                 <th>Lead</th>
@@ -36,8 +35,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat-start="t in Teams">
-                <td>{{t.id}}</td>
+            <tr ng-repeat-start="t in Teams  | orderBy:'name'">                
                 <td>{{t.name}}</td>
                 <td>{{t.description}}</td>
                 <td>{{t.username}}</td>               
@@ -56,7 +54,7 @@
                                     <th>Executive Id</th>
                                     <th>Executive Email</th>                            
                                 </tr>
-                                <tr ng-repeat="k in t.executives">
+                                <tr ng-repeat="k in t.executives  | orderBy:'username'">
                                     <td>{{k.id}}</td>                            
                                     <td>{{k.username}}</td>
                                 </tr>
@@ -119,8 +117,6 @@
                             <button type="button" class="btn btn-primary" ng-click="resetExecutives()">Reset Selection</button>
                         </div>
 
-
-
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary" ng-click="saveTeam()">Save</button>
                             <button type="reset" class="btn btn-default" ng-click="reset()">Reset</button>
@@ -133,8 +129,8 @@
     </div>
     <div id="Roles" ng-controller="RoleCtrl">
         <div class="row modal-header">
-            <div class="col-md-1">
-                <h4>Roles</h4>
+            <div class="col-md-2">
+                <h4>Roles ({{Roles.length}})</h4>
             </div>
             <div class="col-md-1">
                 <button type="button" class="btn btn-primary " ng-click="addRole()">Add</button>
@@ -143,15 +139,13 @@
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>Id</th>
                 <th>Name</th>
                 <th>Description</th>
                 <th>Action</th>
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="r in Roles">
-                <td>{{r.id}}</td>
+            <tr ng-repeat="r in Roles  | orderBy:'name'">
                 <td>{{r.name}}</td>
                 <td>{{r.description}}</td>
                 <td>
@@ -197,10 +191,10 @@
             </div>
         </div>
     </div>
-    <div id="Projects" ng-controller="ProjectCtrl">
+    <div id="Projects" ng-controller="NTProjectCtrl">
         <div class="row modal-header">
-            <div class="col-md-1 ">
-                <h4>Projects</h4>
+            <div class="col-md-2">
+                <h4>Projects ({{Projects.length}})</h4>
             </div>
             <div class="col-md-1">
                 <button type="button" class="btn btn-primary " ng-click="addProject()">Add</button>
@@ -209,21 +203,20 @@
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>Id</th>
                 <th>Name</th>
                 <th>Description</th>
-                <th></th>
+                <th>Action</th>
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="p in Projects">
-                <td>{{p.id}}</td>
+            <tr ng-repeat="p in Projects  | orderBy:'name'">
                 <td>{{p.name}}</td>
                 <td>{{p.description}}</td>
                 <td>
                     <img alt="Edit" src="images/edit.png" ng-click="editProject(p.id)">
                 </td>
             </tr>
+ 
             </tbody>
         </table>
 		<div class="row modal-footer "></div>
@@ -265,13 +258,10 @@
             </div>
         </div>
     </div>
-
-
-
  <div id="IterationWrapper" ng-controller="IterationCtrl">
         <div class="row modal-header">
-            <div class="col-md-1 ">
-                <h4>Iterations</h4>
+            <div class="col-md-2 ">
+                <h4>Iterations ({{Iterations.length}})</h4>
             </div>
             <div class="col-md-1">
                 <button type="button" class="btn btn-primary " ng-click="addIteration()">Add</button>
@@ -280,7 +270,6 @@
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>Id</th>
                 <th>Iteration No.</th>
                 <th>Description</th>
                 <th>Start date</th>
@@ -289,8 +278,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="iteration in Iterations">
-                <td ng-bind="iteration.id"></td>
+            <tr ng-repeat="iteration in Iterations | orderBy:'name'">
                 <td ng-bind="iteration.name"></td>
                 <td ng-bind="iteration.description"></td>
                 <td ng-bind="iteration.startdate"></td>
@@ -317,8 +305,8 @@
                                 <label for="projectname" class="col-md-3 control-label">Iteration Number</label>
 
                                 <div class="col-md-9">
-                                    <input type="number" id="iterationNumber" name="iterationnumber" ng-model="iteration.name" class="form-control" placeholder="Iteration Number" required>
-                                    <span class="error-message" ng-show="ProjectForm.projectname.$error.required">Iteration number is required</span>
+                                    <input type="number" id="iterationNumber" name="iterationNumber" ng-model="iteration.name" class="form-control" placeholder="Iteration Number" required>
+                                    <span class="error-message" ng-show="IterationForm.iterationNumber.$error.required">Iteration Number is required</span>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -329,22 +317,22 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group" show-errors>
                                 <label for="iterationDescription" class="col-md-3 control-label">Start date</label>
 
                                 <div class="col-md-9">
-                                    <input type="date" id="iterationNumber" name="iterationnumber" ng-model="iteration.startdate" class="form-control" placeholder="Iteration start date" required>
-                                    <span class="error-message" ng-show="ProjectForm.projectname.$error.required">Iteration number is required</span>
+                                    <input type="date" id="iterationStartdate" name="iterationStartdate" ng-model="iteration.startdate" class="form-control" placeholder="Iteration start date" required>
+                                    <span class="error-message" ng-show="IterationForm.iterationStartdate.$error.required">Iteration Start date is required</span>
                                 </div>
                             </div>
 
 
-                            <div class="form-group">
+                            <div class="form-group" show-errors>
                                 <label for="iterationDescription" class="col-md-3 control-label">End date</label>
 
                                 <div class="col-md-9">
-                                   <input type="date" id="iterationNumber" name="iterationnumber" ng-model="iteration.enddate" class="form-control" placeholder="Iteration end date" required>
-                                    <span class="error-message" ng-show="ProjectForm.projectname.$error.required">Iteration number is required</span>
+                                   <input type="date" id="iterationEnddate" name="iterationEnddate" ng-model="iteration.enddate" class="form-control" placeholder="Iteration end date" required>
+                                    <span class="error-message" ng-show="IterationForm.iterationEnddate.$error.required">Iteration End date is required</span>
                                 </div>
                             </div>
   
@@ -359,6 +347,32 @@
             </div>
         </div>
     </div>
+
+    <div id="UserWrapper" ng-controller="UersCtrl">
+        <div class="row modal-header">
+            <div class="col-md-3 ">
+                <h4>Verify Users ({{users.length}})</h4>
+            </div>            
+        </div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Name</th>
+                <th>Verify</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="u in users | orderBy:'username'">
+                <td ng-bind="u.username"></td>
+                <td ng-bind="u.firstname+' '+u.lastname"></td>
+                <td> 
+                    <img alt="Verify" src="images/verify.png" ng-click="verifyUser(u.id, u.firstname+' '+u.lastname, $index, (users | orderBy:'username'))">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
 
 </div>
 <script src="lib/jquery.js"></script>

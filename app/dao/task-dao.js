@@ -2,6 +2,7 @@
  * CURD operations on Story
  */
 var pool = require("../db-manager/dbmanager").getPool(),
+    async = require("async"),
     queries = require("../sql/sql.json"),
     log = require('../logger/logger').logger("task-dao");
 
@@ -17,8 +18,11 @@ exports.saveTask = function(obj, callback) {
                     callback(err);
                 } else {
                     //Previous hours will be zero for new tasks
-                    module.exports.updateStoryHours(obj[3], 0, obj[1]);
-                    callback(rows.insertId);
+                    //module.exports.updateStoryHours(obj[3], 0, obj[1]);
+                    //callback(rows.insertId);
+                    module.exports.getTask(rows.insertId, function(res) {
+                        callback(res);
+                    });
                 }
             });
         });
@@ -27,7 +31,7 @@ exports.saveTask = function(obj, callback) {
     }
 };
 
-exports.editTask = function(obj, callback) {
+exports.editTask = function(obj, id, callback) {
     try {
         var editTaskSQL = queries.task.editTask;
 
@@ -38,8 +42,11 @@ exports.editTask = function(obj, callback) {
                     log.error(err);
                     callback(err);
                 } else {
-                    module.exports.updateStoryHours(obj[2], obj[5],obj[6]);
-                    callback(rows.insertId);
+                    //module.exports.updateStoryHours(obj[2], obj[5], obj[6]);
+                    //callback(rows.insertId);
+                    module.exports.getTask(id, function(res) {
+                        callback(res);
+                    });
                 }
             });
         });
@@ -48,12 +55,12 @@ exports.editTask = function(obj, callback) {
     }
 };
 
-exports.removeTask = function(id, callback) {
+exports.removeTask = function(obj, id, callback) {
     try {
         var removeTaskSQL = queries.task.removeTask;
 
         pool.getConnection(function(err, connection) {
-            connection.query(removeTaskSQL, id, function(err, rows) {
+            connection.query(removeTaskSQL, obj, function(err, rows) {
                 connection.release();
                 if (err) {
                     log.error(err);
@@ -68,12 +75,12 @@ exports.removeTask = function(id, callback) {
     }
 };
 
-exports.taskCompleted = function(id, callback) {
+exports.changeTaskStatus = function(obj, type, callback) {
     try {
-        var taskCompletedSQL = queries.task.taskCompleted;
+        var changeTaskStatusSQL = (type === '2') ? queries.story.changeDefectStatus : queries.task.changeTaskStatus;
 
         pool.getConnection(function(err, connection) {
-            connection.query(taskCompletedSQL, id, function(err, rows) {
+            connection.query(changeTaskStatusSQL, obj, function(err, rows) {
                 connection.release();
                 if (err) {
                     log.error(err);
@@ -88,6 +95,69 @@ exports.taskCompleted = function(id, callback) {
     }
 };
 
+exports.addTaskComment = function(obj, callback) {
+    try {
+        var addTaskCommentSQL = queries.task.addTaskComment;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(addTaskCommentSQL, obj, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows.insertId);
+                    getTaskCommentByCommentId(getTaskCommentByCommentId, callback);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+var getTaskCommentByCommentId = function(cid, callback) {
+    try {
+        var getTaskCommentByCommentIdSQL = queries.task.getTaskCommentByCommentId;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getTaskCommentByCommentIdSQL, cid, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows[0]);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+}
+
+exports.getTaskCommentsById = function(tid, callback) {
+    try {
+        var getTaskCommentsByIdSQL = queries.task.getTaskCommentsById;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getTaskCommentsByIdSQL, tid, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+}
+
+
+//not used any where
 exports.removeTasksByStoryId = function(sid, callback) {
     try {
         var removeTasksSQL = queries.task.removeTasks;
@@ -114,6 +184,59 @@ exports.getTasks = function(sid, callback) {
 
         pool.getConnection(function(err, connection) {
             connection.query(getTasksSQL, sid, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+
+exports.getDetailedTasks = function(tid, finalcallback) {
+    try {
+        var getTaskSQL = queries.task.getTask;
+
+        async.series({
+                tasks: function(callback) {
+                    module.exports.getTask(tid, function(res) {
+                        callback(null, res);
+                    });
+                },
+                comments: function(callback) {
+                    module.exports.getTaskCommentsById(tid, function(res) {
+                        callback(null, res);
+                    });
+                }
+            },
+            function(err, results) {
+                var tasks = results.tasks,
+                    comments = results.comments;
+
+                tasks.comments = comments;
+                finalcallback(tasks);
+
+            });
+
+
+    } catch (e) {
+        log.error(e);
+    }
+
+};
+
+exports.getInCompleteTasks = function(sid, callback) {
+    try {
+        var getInCompleteTasksSQL = queries.task.getInCompleteTasks;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getInCompleteTasksSQL, sid, function(err, rows) {
                 connection.release();
                 if (err) {
                     log.error(err);
@@ -156,12 +279,32 @@ exports.updateStoryHours = function(currentTaskHrs, prevTaskHrs, storyId) {
         var updateStoryHoursSQL = queries.task.updateStoryHours;
 
         pool.getConnection(function(err, connection) {
-            connection.query(updateStoryHoursSQL, [currentTaskHrs, prevTaskHrs, storyId] , function(err, rows) {
+            connection.query(updateStoryHoursSQL, [currentTaskHrs, prevTaskHrs, storyId], function(err, rows) {
                 connection.release();
                 if (err) {
                     log.error(err);
                     callback(err);
-                }                                     
+                }
+            });
+        });
+    } catch (e) {
+        log.error(e);
+    }
+};
+
+exports.getTaskStatuses = function(callback) {
+    try {
+        var getTaskStatusesSQL = queries.taskstatus.getTaskStatuses;
+
+        pool.getConnection(function(err, connection) {
+            connection.query(getTaskStatusesSQL, function(err, rows) {
+                connection.release();
+                if (err) {
+                    log.error(err);
+                    callback(err);
+                } else {
+                    callback(rows);
+                }
             });
         });
     } catch (e) {

@@ -73,3 +73,15 @@ exports.emptyFailureErrObj = function() {
     res.data.message = "Invalid details entered.";
     return res;
 }
+
+
+// a and b are javascript Date objects
+exports.dateDiffInDays = function(date1, date2) {    
+    //Get 1 day in milliseconds
+  var oneDay = 24*60*60*1000;
+
+  var diffDays = Math.round(((date1.getTime() - date2.getTime())/(oneDay))+1);   
+  
+  return diffDays;     
+
+}
