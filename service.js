@@ -1,11 +1,11 @@
 var Service = require('node-windows').Service,
-    config = require("./config.json");
+    config = require("./config/config");
 
 // Create a new service object
 var svc = new Service({
     name: 'Nisum Planner',
-    description: config.common.projectName + " app is a resource management tool.",
-    script: require('path').join(__dirname, 'server/server.js')
+    description: config.appname + " app is a resource management tool.",
+    script: require('path').join(__dirname, 'app.js')
 });
 
 //svc.user.domain = 'mydomain.local';
@@ -15,32 +15,32 @@ var svc = new Service({
 // Listen for the "install" event, which indicates the
 // process is available as a service.
 svc.on('install', function() {
-    console.log(config.common.projectName + "Tool Service installed.");
+    console.log(config.appname + "Tool Service installed.");
     svc.start();
 });
 
 svc.on('alreadyinstalled ', function() {
-    console.log(config.common.projectName + " Tool Service already installed.");
+    console.log(config.appname + " Tool Service already installed.");
 });
 
 svc.on('invalidinstallation ', function() {
-    console.log(config.common.projectName + " Tool Service invalid installation.");
+    console.log(config.appname + " Tool Service invalid installation.");
 });
 
 svc.on('uninstall ', function() {
-    console.log(config.common.projectName + " Tool Service uninstalled.");
+    console.log(config.appname + " Tool Service uninstalled.");
 });
 
 svc.on('start ', function() {
-    console.log(config.common.projectName + " Tool Service started.");
+    console.log(config.appname + " Tool Service started.");
 });
 
 svc.on('stop', function() {
-    console.log(config.common.projectName + " Tool Service stopped.");
+    console.log(config.appname + " Tool Service stopped.");
 });
 
 svc.on('error ', function() {
-    console.log(config.common.projectName + " Tool Service has an error.");
+    console.log(config.appname + " Tool Service has an error.");
 });
 
 var args = process.argv.slice(2)[0];

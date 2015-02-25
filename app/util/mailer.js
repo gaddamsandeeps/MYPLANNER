@@ -1,6 +1,6 @@
 var nodemailer = require('nodemailer'),
     smtpTransport = require('nodemailer-smtp-transport'),
-    mailConfig = require("../../config.json").mail_config,
+    mailConfig = require("../../config/config").mail_config,
     log = require('../logger/logger').logger("mailer"),
     mailOptions;
 

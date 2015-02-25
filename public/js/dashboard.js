@@ -509,11 +509,18 @@ app.controller('projectViewController', function($scope, $rootScope, Services, $
             name: d.firstname + " " + d.lastname,
             sowprojectdescription: d.description,
             sowstartdate: d.startdate,
-            sowenddate: d.enddate,
+            sowenddate: d.enddate,	
             billable: d.billable,
-            sowno: d.sowno
+            sowno: d.sowno,
+			id: p.id,
+			projectresourceid : d.projectresourceid,
+			projectname : p.name,
+			userid : d.id
         };
-
+		
+		$rootScope.oldmodel = {};
+		angular.copy( sowproject , $rootScope.oldmodel );
+	
         $("#saveSow").hide();
         $("#editSow").show();
         $('#AddDateModal').modal('show');
@@ -653,7 +660,7 @@ app.controller('projectViewController', function($scope, $rootScope, Services, $
 });
 
 app.controller('ProjectController', function($scope, $rootScope, Services) {
-    var tempObj = null;
+    var tempObj = {};
     $rootScope.$on('editProject', function() {
         Services.getURL('/getProject?id=' + $rootScope.projectId).then(function(d) {
             var s1 = new Date(d.startdate);
@@ -669,6 +676,9 @@ app.controller('ProjectController', function($scope, $rootScope, Services) {
                 enddate: e2.value,
                 id: d.id
             };
+			$rootScope.oldmodel = {};
+			angular.copy( obj , $rootScope.oldmodel );
+			
             tempObj = JSON.parse(angular.toJson(obj));
             $scope.project = tempObj;
             //$scope.reset();
@@ -687,7 +697,7 @@ app.controller('ProjectController', function($scope, $rootScope, Services) {
 
     $scope.saveProject = function() {
         $scope.$broadcast('show-errors-check-validity');
-        if ($scope.ProjectForm.$valid) {
+	     if ($scope.ProjectForm.$valid) {
             if (document.getElementById('enddate').valueAsNumber > document.getElementById('startdate').valueAsNumber) {
                 var url, msg = '',
                     projectname = document.getElementById('projectname').value;
@@ -699,7 +709,10 @@ app.controller('ProjectController', function($scope, $rootScope, Services) {
                     msg = 'Project ' + projectname + ' created';
                 }
                 var model = JSON.parse(angular.toJson($scope.project));
-
+				var modelchanged = angular.equals( $rootScope.oldmodel, model);
+				
+			if( !modelchanged ) {
+				
                 Services.postURL(url, model).then(function(d) {
 
                     showStatus(d, msg);
@@ -714,8 +727,8 @@ app.controller('ProjectController', function($scope, $rootScope, Services) {
                 }, function(e) {
                     console.log(e);
                 });
-
-                $('#ProjectModal').modal('hide');
+			}
+              $('#ProjectModal').modal('hide');
                 //document.forms['ProjectForm'].reset();
             } else {
                 $('#errorContainer').html('<LI>End Date should be Greater than Start Date</LI>');
@@ -731,6 +744,7 @@ app.controller('ProjectController', function($scope, $rootScope, Services) {
                 $scope.$broadcast('show-errors-reset');
                 $scope.project = o;
             }
+			$scope.project = {};
         } else {
             document.forms['ProjectForm'].reset();
         }
@@ -748,7 +762,7 @@ app.controller('SowController', function($scope, $rootScope, Services, $filter) 
             $scope.sowproject.sowno = "NA";
         }
     };
-
+	
     $scope.saveSow = function() {
         $scope.$broadcast('show-errors-check-validity');
         if ($scope.SowForm.$valid) {
@@ -759,6 +773,10 @@ app.controller('SowController', function($scope, $rootScope, Services, $filter) 
                 model.userid = $rootScope.userid;
                 model.id = $rootScope.projectid;
                 model.projectname = $rootScope.projectname;
+				
+				if ( !model.sowno ){
+					model.sowno = "NA";
+				}
 
                 var msg = $rootScope.resourcefullname + ' added to project ' + $rootScope.projectname;
 
@@ -847,10 +865,10 @@ app.controller('SowController', function($scope, $rootScope, Services, $filter) 
         }
 
     });
-
+	
     $scope.updateSow = function() {
-
-        if ($scope.SowForm.$invalid) {
+		
+	    if ($scope.SowForm.$invalid) {
             $scope.$broadcast('show-errors-check-validity');
             return;
         }
@@ -870,13 +888,14 @@ app.controller('SowController', function($scope, $rootScope, Services, $filter) 
         model.id = $rootScope.projectid;
         model.projectname = $rootScope.projectname;
         model.projectresourceid = $rootScope.projectresourceid;
-
+			
         var msg = $rootScope.resourcefullname + " 's status updated to project " + $rootScope.projectname;
-
-
+		var modelchanged = angular.equals( $rootScope.oldmodel , model );
+		
+		
+	if( !modelchanged ){
         if ($scope.sowproject.sowenddate >= $scope.sowproject.sowstartdate) {
             $('#sowerrorContainer').empty();
-
             Services.postURL('/editResourceOfProject', model).then(function(d) {
 
                 if (d.message === 'success') {
@@ -934,6 +953,8 @@ app.controller('SowController', function($scope, $rootScope, Services, $filter) 
         } else {
             $('#sowerrorContainer').html('<LI>End Date should be Greater than Start Date</LI>');
         }
+	  }
+		$('#AddDateModal').modal('hide');
     };
 
     $scope.closeSow = function() {

@@ -72,7 +72,7 @@
 
     "role": {
         "getRoles": "SELECT id, name, description FROM role",
-        "getRole": "SELECT role.name FROM userdetails JOIN ROLE ON userdetails.roleid = role.id WHERE userdetails.userid = ?",
+        "getRole": "SELECT role.name, role.id FROM userdetails JOIN ROLE ON userdetails.roleid = role.id WHERE userdetails.userid = ?",
         "getRoleByUserName": "SELECT role.name, role.id FROM users JOIN userdetails ON users.id = userdetails.userid JOIN role ON userdetails.roleid = role.id WHERE users.username = ?",
         "saveRole": "INSERT INTO role(name , description ) VALUES  (?, ?)",
         "editRole": "UPDATE role SET name = ?, description = ?  WHERE id = ?",
@@ -122,7 +122,7 @@
         "getInCompleteStoriesNTasksByPidnIterId": "SELECT id FROM story WHERE projectid = ? AND iteration = ? AND active = 1",
         "getDetailedStory": "SELECT s.id, s.name, i.id AS iterationid, i.name AS iterationname, p.id AS projectid, p.name AS projectname, s.description, st.id as storytypeid, st.name as storytypename, s.hours, s.status, CONCAT (usd.firstname, ' ' , usd.lastname) as createdby, CONCAT (usd1.firstname, ' ' , usd1.lastname) as editedby, s.createddate, s.editdate, s.active  FROM story AS s JOIN userdetails AS usd ON s.createdby = usd.userid JOIN storytype as st on st.id = s.type LEFT JOIN userdetails as usd1 on usd1.userid = s.editedby JOIN iteration AS i ON s.iteration = i.id  JOIN project AS p ON p.id= s.projectid WHERE s.id = ?",
         "getStory": "SELECT id FROM story  WHERE id = ?",
-        "getStoryTypesObj": "SELECT * FROM storytype",
+        "getStoryTypes": "SELECT * FROM storytype",
 
         "addStoryComment": "INSERT INTO storycomments (storyid, userid, description, createddate) VALUES (?, ?, ?, now())",
         "getStoryCommentByCommentId": "SELECT sc.id, sc.storyid,  sc.description , CONCAT (usd.firstname, ' ' , usd.lastname) as createdby FROM storycomments sc JOIN userdetails AS usd ON sc.userid = usd.userid WHERE sc.id = ?",

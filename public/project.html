@@ -1,67 +1,73 @@
 <!DOCTYPE html>
 <html ng-app="resourceTracking">
+
 <head>
-  <title>Projects</title>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="lib/bootstrap.css" rel="stylesheet">
-  <link href="css/validation.css" rel="stylesheet">
-  <link href='css/datatables/jquery.dataTables.css' rel='stylesheet'>
-  <link href="css/project.css" rel="stylesheet">
-  <link href="css/resource.css" rel="stylesheet">
+    <title>Projects</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="lib/bootstrap.css" rel="stylesheet">
+    <link href="css/validation.css" rel="stylesheet">
+    <link href='css/datatables/jquery.dataTables.css' rel='stylesheet'>
+    <link href="css/project.css" rel="stylesheet">
+    <link href="css/resource.css" rel="stylesheet">
 </head>
+
 <body>
-  <% var pageName='project' %>
-  <%include header.html%>
-  <br><br><br><br><br>
-  <div class="container">
+    <% var pageName='project' %>
+        <%include header.html%>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <div class="container">
 
-<div id="modeSection" ng-controller= "projectController">
-  <div class="row modal-header">
-            <div class="col-md-3">
-                <h4>Projects ({{Projects.length}})</h4>
-            </div> 
-			<div class="projectSearchBox">
-                        <input type="text" ng-model="searchUser" placeholder="Search"/>
-                        <input type="submit" value="" class="projectSearchBoxSubmitBtn">
-            </div>			
-        </div>
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>Add</td>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>User</th>
-            
-        </tr>
-        </thead>
-        <tbody>
-          <tr ng-repeat="p in Projects | orderBy:'name' | filter:searchUser">
-                <td>
-                    <input id="{{p.id}}" type="checkbox" ng-click="projectAccess(p)"/> {{t.name}}                   
-                </td>
-                <td>{{p.name}}</td>
-                <td style="width: 300px; overflow-x: auto;">{{p.description}}</td>
-                <td>{{p.startdate}}</td>
-                <td>{{p.enddate}}</td>                
-                <td>{{p.firstname}} {{p.lastname}}</td>
-                
-            </tr>
-      </tbody>
-    </table>
-</div>
-</div>
+                <div id="modeSection" ng-controller="projectController">
+                    <div class="row modal-header">
+                        <div class="col-md-3">
+                            <h4>Projects ({{Projects.length}})</h4>
+                        </div>
+                        <div class="projectSearchBox">
+                            <input type="text" ng-model="searchUser" placeholder="Search" />
+                        </div>
+                    </div>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Add</td>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>User</th>
 
-<% include footer.html %>
-<script src="lib/jquery.js"></script>
-<script src="lib/bootstrap.js"></script>
-<script src="lib/angular.js"></script>
-<script src="js/common/directives.js"></script>
-<script src="js/project.js"></script>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="p in Projects | orderBy:'name' | filter:searchUser">
+                                <td>
+                                    <input id="{{p.id}}" type="checkbox" ng-click="projectAccess(p)" /> {{t.name}}
+                                </td>
+                                <td>{{p.name}}</td>
+                                <td style="width: 300px; overflow-x: auto;">{{p.description}}</td>
+                                <td>{{p.startdate}}</td>
+                                <td>{{p.enddate}}</td>
+                                <td>{{p.firstname}} {{p.lastname}}</td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <% include footer.html %>
+                <script src="lib/jquery.js"></script>
+                <script src="lib/bootstrap.js"></script>
+                <script src="lib/angular.js"></script>
+                <script src="js/common/directives.js"></script>
+                <script src="js/project.js"></script>
 
 </body>
+
 </html>

@@ -5,7 +5,6 @@ var logDao = require("../dao/log-dao"),
     log = require('../logger/logger').logger("log-service"),
     util = require("../util/util");
 
-
 exports.getStoryStatuses = function(callback) {
     log.debug("getStoryStatuses");
     logDao.getStoryStatuses(callback);

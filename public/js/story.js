@@ -26,7 +26,7 @@ app.controller('StoryEntryController', function($scope, $http, $rootScope) {
         getStories($scope.projectId, $scope.iterationId, renderDataTable, true);
 
     };
-
+	
     $scope.addStory = function() {
         $('#iteratedrop').removeClass('nodisplay');
         $('#iteratetext').addClass('nodisplay');
@@ -75,7 +75,6 @@ app.controller('storyController', function($scope, $http, $rootScope) {
                     $('#addStoryForm')[0].reset();
                     $('#storyModal').modal('hide');
 
-
                     if (storyUpdateMode) {
 
                         $('#' + eventObj.id).find('td').eq(2).text(resp.data.name);
@@ -83,18 +82,10 @@ app.controller('storyController', function($scope, $http, $rootScope) {
                         if (resp.data.storytypeid === 2) {
                             $('#' + eventObj.id).find('td').eq(5).text(resp.data.hours);
                         }
-
                     } else {
-                        /*var table = $('#storyReportTable').DataTable();
-                                          table.row.add([
-                                              "" +'.1',
-                                              $(eventObj.id).find('td').eq(1).text(resp.data.name) +'.2',
-                                              "test" +'.3',
-                                              $(eventObj.id).find('td').eq(4).text(resp.data.hours) +'.4',
-                                              "" +'.5'
-                                          ]);*/
+						 var table = $("#storyReportTable").dataTable();
+						 table.fnAddData(resp.data);
                     }
-
                     // Reset storyUpdateMode 
                     storyUpdateMode = false;
                     synchedStoryId = "";
@@ -102,9 +93,8 @@ app.controller('storyController', function($scope, $http, $rootScope) {
                 });
         }
     };
-
-
 });
+
 
 String.prototype.trunc = String.prototype.trunc ||
     function(n) {
@@ -140,10 +130,6 @@ function getStories(projectId, iterationId, callback, taskFlag) {
     }).done(function(resp) {
         callback(resp);
     });
-}
-
-function getStoriesNTasks() {
-
 }
 
 function getStory(storyId) {
@@ -187,8 +173,6 @@ function storyCompleted(storyId, storyName) {
             showStatus(resp, storyName + ' story status changed to completed  ');
         });
 };
-
-
 
 function iterationChange() {
     var tid = $(event.target).parent().parent().attr('id');
@@ -422,7 +406,6 @@ function moveIteration(taskId, storyId, currentIndex) {
             if (resp.message == "success") {
                 var table = $('#storyReportTable').DataTable();
                 //table.row( $(this).parents('tr') ).remove().draw();
-                console.log($(this).parents('td tr'));
                 showStatus(resp, resp.name + 'moved to next Iteration');
             }
         });
@@ -450,7 +433,7 @@ function getTaskData(rowData, rowChildObj, rowObj) {
 }
 
 function renderDataTable(resp) {
-    $(".wholereport").show();
+	$(".wholereport").show();
     var table = $("#storyReportTable").DataTable({
         "data": resp,
         "fnCreatedRow": function(nRow, source, iDataIndex) {
@@ -518,7 +501,6 @@ function renderDataTable(resp) {
         }]
     });
 
-
     $('#storyReportTable tbody').off();
     $('#storyReportTable tbody').on('click', 'td .view-task', function() {
         var tr = $(this).closest('tr');
@@ -530,7 +512,7 @@ function renderDataTable(resp) {
             getTaskData(row.data(), row.child, tr);
 
         }
-    });
+    }); 
 }
 
 
@@ -543,7 +525,6 @@ var stroyDesErrMsg = "Please provide description for story.";
 var hoursErrMsg = "Hours cannot be empty and should contain only numeric values";
 var zeroHrsErrMsg = "Task with zero hours cannot be updated.";
 var storyTypeErrMsg = "Please select the story type."
-
 var storySelectErrMsg = "Please select the applicable story.";
 var taskErrMsg = "Task name cannot be empty.";
 var taskDesErrMsg = "Task description cannot be empty.";

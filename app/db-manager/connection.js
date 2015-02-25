@@ -3,7 +3,7 @@
  * create connection
  */
 var mysql = require('mysql'),
-    dbConfig = require("../../config.json").db_config,
+    dbConfig = require("../../config/config").db_config,
     log = require('../logger/logger').logger("connection"),
     host = dbConfig.host,
     dbPort = dbConfig.port,

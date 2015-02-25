@@ -40,9 +40,9 @@ exports.addStoryComment = function(obj, callback) {
     });
 };
 
-exports.getStoryTypesObj = function(callback) {
-    log.debug("getStoryTypesObj");
-    storyDao.getStoryTypesObj(callback);
+exports.getStoryTypes = function(callback) {
+    log.debug("getStoryTypes");
+    storyDao.getStoryTypes(callback);
 };
 
 exports.getStories = function(pid, callback) {

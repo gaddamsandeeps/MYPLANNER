@@ -62,24 +62,20 @@ app.controller('TeamCtrl', function($scope, $http, $filter) {
 
         $('#AddTeamModal').modal('show');
     };
-    $scope.editTeam = function($event, item_id) {
+    $scope.editTeam = function( $event, item_id ) {
 
 
         var tcheck = $filter('filter')($scope.Teams, {
             id: item_id
         });
-
-
+		
         if (tcheck.length) {
             var o = tcheck[0];
             var lcheck = $filter('filter')($scope.Leads, {
                 id: o.leadid
             });
 
-
             var scopeExecutives = $scope.Executives;
-
-
 
             $.each(scopeExecutives, function(index, exeObj) {
 
@@ -87,7 +83,6 @@ app.controller('TeamCtrl', function($scope, $http, $filter) {
                     scopeExecutives.splice(index, 1);
                     return false;
                 }
-
             });
 
             if (lcheck.length) {
@@ -95,9 +90,13 @@ app.controller('TeamCtrl', function($scope, $http, $filter) {
             }
             $scope.team = JSON.parse(angular.toJson(o));
             $scope.team.leadid = o.leadid;
-
-
-        }
+		}
+	
+		$scope.teamsmodel ={};
+		angular.copy( $scope.team , $scope.teamsmodel);
+		
+		
+		
         $scope.mode = 'Edit';
         $('#AddTeamModal').modal('show');
 
@@ -158,8 +157,6 @@ app.controller('TeamCtrl', function($scope, $http, $filter) {
 
         var username, mockLead, mockExecutive;
 
-
-
         if ($scope.AddTeamForm.$valid) {
             var model = JSON.parse(angular.toJson($scope.team));
 
@@ -171,7 +168,6 @@ app.controller('TeamCtrl', function($scope, $http, $filter) {
                 username = model.leadid.username;
                 model.leadid = model.leadid.id;
             }
-
 
             var url;
             if ($scope.mode === 'Add') {
@@ -185,8 +181,9 @@ app.controller('TeamCtrl', function($scope, $http, $filter) {
             if (!model.executives) {
                 model.executives = [];
             }
-
-
+			
+			var modelchanged = angular.equals( $scope.team , $scope.teamsmodel);
+	
             if (model.executives.length) {
                 $.each(model.executives, function(index, execObj) {
                     execArray.push(execObj.id);
@@ -194,12 +191,11 @@ app.controller('TeamCtrl', function($scope, $http, $filter) {
             }
 
             model.executives = execArray;
-
+			
+		if( !modelchanged ){ 	
             $http.post(url, model).then(function(obj) {
                 var d = obj.data;
                 var msg = d.message;
-
-
                 if ($scope.mode === 'Add') {
                     showStatus(d, model.name + ' Team   added');
                     if (msg === "success") {
@@ -231,13 +227,12 @@ app.controller('TeamCtrl', function($scope, $http, $filter) {
                             }
                         }
                         $scope.Teams[index] = model;
-
                     }
                 }
             }, function(e) {
                 console.log(e);
             });
-
+    }
             $scope.Executives = localExecutivesObj;
 
             $('#AddTeamModal').modal('hide');
@@ -285,6 +280,11 @@ app.controller('RoleCtrl', function($scope, $http, $filter) {
             var o = tcheck[0];
             $scope.role = JSON.parse(angular.toJson(o));
         }
+		
+		$scope.rolesmodel = {};
+		angular.copy( $scope.role , $scope.rolesmodel);
+		
+		
         $scope.mode = 'Edit';
         $('#AddRoleModal').modal('show');
     };
@@ -320,6 +320,10 @@ app.controller('RoleCtrl', function($scope, $http, $filter) {
             } else {
                 url = '/editRole';
             }
+		
+			var modelchanged = angular.equals( model , $scope.rolesmodel);
+	
+			if(!modelchanged){
             $http.post(url, model).then(function(obj) {
                 var d = obj.data;
                 var msg = d.message;
@@ -346,6 +350,7 @@ app.controller('RoleCtrl', function($scope, $http, $filter) {
             }, function(e) {
                 console.log(e);
             });
+			}
             $('#AddRoleModal').modal('hide');
         }
     };
@@ -377,6 +382,10 @@ app.controller('NTProjectCtrl', function($scope, $http, $filter) {
             var o = tcheck[0];
             $scope.project = JSON.parse(angular.toJson(o));
         }
+		
+		$scope.projectmodel = {};
+		angular.copy( $scope.project , $scope.projectmodel );
+		
         $scope.mode = 'Edit';
         $('#ProjectModal').modal('show');
     };
@@ -390,6 +399,11 @@ app.controller('NTProjectCtrl', function($scope, $http, $filter) {
             } else {
                 url = '/editAdminProject';
             }
+			
+			
+			var modelchanged = angular.equals( model , $scope.projectmodel );
+			
+			if( !modelchanged){
             $http.post(url, model).then(function(obj) {
                 var d = obj.data;
                 var msg = d.message;
@@ -416,6 +430,7 @@ app.controller('NTProjectCtrl', function($scope, $http, $filter) {
             }, function(e) {
                 console.log(e);
             });
+		  }
             $('#ProjectModal').modal('hide');
         }
     };

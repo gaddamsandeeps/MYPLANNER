@@ -152,12 +152,12 @@ exports.getStoryCommentsById = function(sid, callback) {
     }
 }
 
-exports.getStoryTypesObj = function(callback) {
+exports.getStoryTypes = function(callback) {
     try {
-        var getStoryTypesObjSQL = queries.story.getStoryTypesObj;
+        var getStoryTypesSQL = queries.story.getStoryTypes;
 
         pool.getConnection(function(err, connection) {
-            connection.query(getStoryTypesObjSQL, function(err, rows) {
+            connection.query(getStoryTypesSQL, function(err, rows) {
                 connection.release();
                 if (err) {
                     log.error(err);

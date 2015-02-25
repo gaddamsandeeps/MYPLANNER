@@ -1,43 +1,419 @@
 /**
- * request processor - Helper class
+ * controller
  */
 var defaultUtil = require('util'),
-    log = require('../app/logger/logger').logger("request-processor"),
-    properties = require("../properties.json"),
-    userService = require("../app/services/user-service"),
-    logService = require("../app/services/log-service"),
-    projectService = require("../app/services/project-service"),
-    iterationService = require("../app/services/iteration-service"),
-    storyService = require("../app/services/story-service"),
-    taskService = require("../app/services/task-service"),
-    teamService = require("../app/services/team-service"),
-    teamResourceService = require("../app/services/team-resource-service"),
-    roleService = require("../app/services/role-service"),
-    encrypt = require("../app/util/encrypt"),
-    util = require("../app/util/util"),
-    mailer = require("../app/util/mailer"),
-    mailerMessages = require("../mailer-messages.json"),
+    async = require("async"),
+    log = require('../logger/logger').logger("controller"),
+    properties = require("../../properties.json"),
+    userService = require("../services/user-service"),
+    logService = require("../services/log-service"),
+    projectService = require("../services/project-service"),
+    iterationService = require("../services/iteration-service"),
+    storyService = require("../services/story-service"),
+    taskService = require("../services/task-service"),
+    teamService = require("../services/team-service"),
+    teamResourceService = require("../services/team-resource-service"),
+    roleService = require("../services/role-service"),
+    encrypt = require("../util/encrypt"),
+    util = require("../util/util"),
+    mailer = require("../util/mailer"),
+    mailerMessages = require("../../mailer-messages.json"),
     startTime = ' 00:00:00',
     endTime = ' 23:59:59';
 
-exports.auth = function(name, pwd, callback) {
+
+//pages
+exports.dashboard = function(request, response) {
+    response.render('dashboard.html', {
+        user: request.user,
+        message: request.flash('error')
+    });
+}
+
+exports.edashboard = function(request, response) {
+    var eteam = {};
+    if (request.user.roleId === properties.roles.manager) {
+        eteam.id = request.user.teamId;
+        eteam.name = request.user.teamName;
+        eteam.username = request.user.username;
+        eteam.leadid = request.user.id;
+    }
+    var userId = request.user.id;
+
+    async.series({
+            teams: function(callback) {
+                teamService.getExecutiveTeams(userId, function(val) {
+                    if (request.user.roleId === properties.roles.manager) {
+                        val.push(eteam);
+                    }
+                    callback(null, val);
+                });
+            }
+        },
+        function(err, results) {
+            response.render('edashboard.html', {
+                user: request.user,
+                teams: results.teams,
+                message: request.flash('error')
+            });
+        });
+}
+
+exports.ereports = function(request, response) {
+    var eteam = {};
+    if (request.user.roleId === properties.roles.manager) {
+        eteam.id = request.user.teamId;
+        eteam.name = request.user.teamName;
+        eteam.username = request.user.username;
+        eteam.leadid = request.user.id;
+    }
+    var userId = request.user.id;
+
+    async.series({
+            teams: function(callback) {
+                teamService.getExecutiveTeams(userId, function(val) {
+                    if (request.user.roleId === properties.roles.manager) {
+                        val.push(eteam);
+                    }
+                    callback(null, val);
+                });
+            }
+        },
+        function(err, results) {
+            response.render('ereports.html', {
+                user: request.user,
+                teams: results.teams,
+                message: request.flash('error')
+            });
+        });
+}
+
+exports.story = function(request, response) {
+    var userId = request.user.id;
+    var teamId = request.user.teamId;
+
+    if (request.user.isLead && !request.user.hasTeam) {
+        response.render('story.html', {
+            user: request.user,
+            projects: [],
+            storytypes: [],
+            iterations: [],
+            taskstatus: [],
+            message: request.flash('error')
+        });
+    } else {
+        async.series({
+                projects: function(callback) {
+                    projectService.getTeamProjectsByTeamId(teamId, function(val) {
+                        callback(null, val);
+                    });
+                },
+                iterations: function(callback) {
+                    iterationService.getIterations(function(val) {
+                        callback(null, val);
+                    });
+                },
+                storytypes: function(callback) {
+                    storyService.getStoryTypes(function(val) {
+                        callback(null, val);
+                    });
+                },
+                taskstatus: function(callback) {
+                    taskService.getTaskStatuses(function(val) {
+                        callback(null, val);
+                    });
+                }
+            },
+            function(err, results) {
+                response.render('story.html', {
+                    user: request.user,
+                    projects: results.projects,
+                    storytypes: results.storytypes,
+                    iterations: results.iterations,
+                    taskstatus: results.taskstatus,
+                    message: request.flash('error')
+                });
+            });
+    }
+}
+
+exports.project = function(request, response) {
+    var userId = request.user.id;
+    var teamId = request.user.teamId;
+
+    async.series({
+            projects: function(callback) {
+                projectService.getNonTProjects([teamId], function(val) {
+                    callback(null, val);
+                });
+            },
+            teams: function(callback) {
+                teamService.getTeams(function(val) {
+                    callback(null, val);
+                });
+            },
+        },
+        function(err, results) {
+            response.render('project.html', {
+                user: request.user,
+                projects: results.projects,
+                teams: results.teams,
+                message: request.flash('error')
+            });
+        });
+}
+
+exports.timesheet = function(request, response) {
+    var userId = request.user.id;
+    var teamId = request.user.teamId;
+    async.series({
+            logstatus: function(callback) {
+                logService.getLogStatuses(function(val) {
+                    callback(null, val);
+                });
+            },
+            storystatus: function(callback) {
+                logService.getStoryStatuses(function(val) {
+                    callback(null, val);
+                });
+            },
+            logAccess: function(callback) {
+                if (request.user.isLead) {
+                    val = {
+                        accesslevel: 2,
+                        userid: userId,
+                        teamid: teamId
+                    };
+                    callback(null, val);
+                } else {
+                    teamService.hasLogAccess(userId, function(val) {
+                        callback(null, val);
+                    });
+                }
+            },
+            projects: function(callback) {
+                projectService.getUserProjects(teamId, function(val) {
+                    callback(null, val);
+                });
+            },
+            iterations: function(callback) {
+                iterationService.getIterations(function(val) {
+                    callback(null, val);
+                });
+            },
+            teamMembers: function(callback) {
+                userService.getTeamUsersByTeamId(teamId, function(val) {
+                    callback(null, val);
+                });
+            }
+        },
+        function(err, results) {
+            response.render('timesheet.html', {
+                user: request.user,
+                storystatus: results.storystatus,
+                logstatus: results.logstatus,
+                projects: results.projects,
+                iterations: results.iterations,
+                logAccess: results.logAccess,
+                teamMembers: results.teamMembers,
+                message: request.flash('error')
+            });
+        });
+}
+
+exports.usertimesheet = function(request, response) {
+    var teamId = request.user.teamId;
+    var selectedUserId = request.param('id');
+    var userId = request.user.id;
+
+    async.series({
+            selectedUser: function(callback) {
+                userService.getUserById(selectedUserId, function(val) {
+                    callback(null, val);
+                });
+            },
+            teamMembers: function(callback) {
+                userService.getTeamUsersByTeamId(teamId, function(val) {
+                    callback(null, val);
+                });
+            }
+        },
+        function(err, results) {
+            response.render('usertimesheet.html', {
+                user: request.user,
+                message: request.flash('error'),
+                selectedUser: results.selectedUser,
+                teamMembers: results.teamMembers
+            });
+        });
+}
+
+
+exports.register = function(request, response) {
+    response.render('register.html');
+}
+
+exports.profile = function(request, response) {
+    response.render('profile.html', {
+        user: request.user,
+        message: request.flash('error')
+    });
+}
+
+exports.forgotpassword = function(request, response) {
+    response.render('forgotpassword.html');
+}
+
+exports.report = function(request, response) {
+    var selectedUserId = request.param('id');
+    var userId = request.user.id;
+    if (selectedUserId) {
+        var teamId = request.user.teamId;
+        async.series({
+                selectedUser: function(callback) {
+                    userService.getUserById(selectedUserId, function(val) {
+                        callback(null, val);
+                    });
+                },
+                teamMembers: function(callback) {
+                    userService.getTeamUsersByTeamId(teamId, function(val) {
+                        callback(null, val);
+                    });
+                }
+            },
+            function(err, results) {
+                response.render('report.html', {
+                    user: request.user,
+                    message: request.flash('error'),
+                    selectedUser: results.selectedUser,
+                    teamMembers: results.teamMembers
+                });
+            });
+    } else {
+        response.render('report.html', {
+            user: request.user,
+            message: request.flash('error')
+        });
+    }
+
+}
+
+exports.login = function(request, response) {
+    response.render('login.html');
+}
+
+exports.verify = function(request, response) {
+    response.render('verify.html', {
+        user: request.user,
+        message: request.flash('error')
+    });
+}
+
+exports.admin = function(request, response) {
+    var teams = null,
+        roles = null;
+
+    var userId = request.user.id;
+
+    async.series({
+            teams: function(callback) {
+                teamService.getTeams(function(val) {
+                    callback(null, val);
+                });
+            },
+            executives: function(callback) {
+                userService.getExecutives(function(val) {
+                    callback(null, val);
+                });
+            },
+            roles: function(callback) {
+                roleService.getRoles(function(val) {
+                    callback(null, val);
+                });
+            },
+            adminprojects: function(callback) {
+                projectService.getAdminProjects([userId], function(val) {
+                    callback(null, val);
+                });
+            },
+            iterations: function(callback) {
+                iterationService.getIterations(function(val) {
+                    callback(null, val);
+                });
+            }
+        },
+        function(err, results) {
+            response.render('admin.html', {
+                user: request.user,
+                executives: results.executives,
+                teams: results.teams,
+                roles: results.roles,
+                adminprojects: results.adminprojects,
+                iterations: results.iterations,
+                message: request.flash('error')
+            });
+        });
+}
+
+//method to get logs of any team
+exports.getTeamReport = function(request, response) {
+        var teamId = request.param('teamId');
+        request.user.teamId = teamId;
+        response.redirect('/report');
+    }
+    //end of pages
+
+//services
+exports.auth = function(name, pwd, finalcallback) {
     log.debug("auth : name is " + name);
     try {
-        userService.auth([name, encrypt.encrypt(pwd)], callback);
+        userService.auth([name, encrypt.encrypt(pwd)], function(user) {
+            if (!user) {
+                return finalcallback(user);
+            } else {
+                async.series({
+                        role: function(callback) {
+                            roleService.getRole(user.id, function(val) {
+                                callback(null, val);
+                            });
+                        },
+                        team: function(callback) {
+                            teamService.getTeamByLeadId(user.id, function(val) {
+                                callback(null, val);
+                            });
+                        },
+                        teamId: function(callback) {
+                            teamService.getTeamByUserId(user.id, function(val) {
+                                callback(null, val);
+                            });
+                        }
+                    },
+                    function(err, results) {
+                        user.roleId = results.role.id;
+                        user.roleName = results.role.name;
+                        if (results.team) {
+                            user.teamId = results.team.id;
+                            user.teamName = results.team.name;
+                            user.hasTeam = true;
+                        } else {
+                            user.hasTeam = false;
+                        }
+                        if (results.role.id === properties.roles.manager) {
+                            user.isLead = true;
+                        } else {
+                            user.isLead = false;
+                            if (results.teamId) {
+                                user.teamId = results.teamId.id;
+                            }
+                        }
+                        return finalcallback(user);
+                    });
+            }
+        });
     } catch (e) {
         log.error("Error : " + e);
         callback([]);
     }
-};
-
-exports.getRoleByUserNameObj = function(userName, callback) {
-    log.debug("getRoleByUserNameObj : userName is " + userName);
-    roleService.getRoleByUserName(userName, callback);
-};
-
-exports.getTeamByLeadIdObj = function(userId, callback) {
-    log.debug("getTeamByLeadIdObj : userId is " + userId);
-    teamService.getTeamByLeadId(userId, callback);
 };
 
 exports.getTeamByUserId = function(userId, callback) {
@@ -57,16 +433,6 @@ exports.getUser = function(request, response, callback) {
     userService.getUser(userId, function(returnValue) {
         response.json(returnValue);
     });
-};
-
-exports.getUserByIdObj = function(userId, callback) {
-    log.debug("getUserById");
-    userService.getUserById(userId, callback);
-};
-
-exports.getExecutivesAsObj = function(userId, callback) {
-    log.debug("getExecutivesAsObj : logged in user is " + (userId));
-    userService.getExecutives(callback);
 };
 
 exports.getExecutives = function(request, response) {
@@ -93,11 +459,6 @@ exports.getTeamUsersByTeamId = function(request, response, callback) {
     });
 };
 
-exports.getTeamUsersByTeamIdObj = function(userId, teamId, callback) {
-    log.debug("getTeamUsersByTeamIdObj : logged in user is " + (userId));
-    userService.getTeamUsersByTeamId(teamId, callback);
-};
-
 exports.getNonTeamUsers = function(request, response, callback) {
     log.debug("getNonTeamUsers : logged in user is " + (request.user.id));
     var teamId = request.user.teamId;
@@ -118,16 +479,6 @@ exports.getTeams = function(request, response, callback) {
     teamService.getTeams(function(returnValue) {
         response.json(returnValue);
     });
-};
-
-exports.getTeamsAsObj = function(userId, callback) {
-    log.debug("getTeamsAsObj : logged in user is " + (userId));
-    teamService.getTeams(callback);
-};
-
-exports.getExecutiveTeamsAsObj = function(userId, callback) {
-    log.debug("getExecutiveTeamsAsObj : logged in user is " + (userId));
-    teamService.getExecutiveTeams(userId, callback);
 };
 
 exports.getTeamByLeadId = function(userId, request, response, callback) {
@@ -154,23 +505,12 @@ exports.getAdminProjects = function(request, response) {
     });
 };
 
-exports.getAdminProjectsObj = function(userId, callback) {
-    log.debug("getAdminProjectsObj : logged in user is " + (userId));
-    projectService.getAdminProjects([userId], callback);
-};
-
 exports.getTProjects = function(request, response) {
     log.debug("getTProjects : logged in user is " + (request.user.id));
     var userId = request.user.id;
     projectService.getTProjects([userId], function(returnValue) {
         response.json(returnValue);
     });
-};
-
-exports.getTProjectsAsObj = function(userId, callback) {
-    log.debug("getTProjects : logged in user is " + (userId));
-
-    projectService.getTProjects([userId], callback);
 };
 
 exports.getNonTProjects = function(request, response) {
@@ -182,14 +522,6 @@ exports.getNonTProjects = function(request, response) {
         response.json(returnValue);
     });
 };
-
-exports.getNonTProjectsAsObj = function(userId, teamId, callback) {
-    log.debug("getNonTProjectsAsObj : logged in user is " + (userId));
-
-    projectService.getNonTProjects([teamId], callback);
-};
-
-
 
 exports.giveAccessToProjectsByTeamId = function(request, response) {
     log.debug("giveAccessToProjectsByTeamId : logged in user is " + (request.user.id));
@@ -263,16 +595,6 @@ exports.getActiveProjectsByTeamId = function(request, response) {
     });
 };
 
-exports.getTeamProjectsObj = function(userId, teamId, callback) {
-    log.debug("getTeamProjects : logged in user is " + (userId));
-    projectService.getTeamProjectsByTeamId(teamId, callback);
-};
-
-exports.getUserProjectsObj = function(userId, teamId, callback) {
-    log.debug("getUserProjectsObj : logged in user is " + (userId));
-    projectService.getUserProjects(teamId, callback);
-};
-
 exports.removeMyProject = function(request, response) {
     log.debug("removeMyProject : logged in user is " + (request.user.id));
     var userId = request.user.id;
@@ -287,11 +609,6 @@ exports.getRoles = function(request, response) {
     roleService.getRoles(function(returnValue) {
         response.json(returnValue);
     });
-};
-
-exports.getRolesAsObj = function(callback) {
-    log.debug("getRolesAsObj");
-    roleService.getRoles(callback);
 };
 
 exports.saveUser = function(request, response, callback) {
@@ -502,11 +819,6 @@ exports.getIterations = function(request, response, callback) {
     });
 };
 
-exports.getIterationsAsObj = function(userId, callback) {
-    log.debug("getIterationsAsObj : logged in user is " + (userId));
-    iterationService.getIterations(callback);
-};
-
 exports.saveStory = function(request, response, callback) {
     log.debug("saveStory : logged in user is " + (request.user.id));
     var userId = request.user.id;
@@ -621,11 +933,6 @@ exports.getStory = function(request, response, callback) {
     });
 };
 
-exports.getStoryTypesObj = function(userId, callback) {
-    log.debug("getStoryTypesObj : logged in user is " + (userId));
-    storyService.getStoryTypesObj(callback);
-};
-
 exports.saveTask = function(request, response, callback) {
     log.debug("saveTask : logged in user is " + (request.user.id));
     var userId = request.user.id;
@@ -695,12 +1002,6 @@ exports.getTasks = function(request, response, callback) {
     taskService.getTasks(storyId, function(returnValue) {
         response.json(returnValue);
     });
-};
-
-exports.getTaskStatusesAsObj = function(userId, callback) {
-    log.debug("getTaskStatuses : logged in user is " + (userId));
-
-    taskService.getTaskStatuses(callback);
 };
 
 exports.getInCompleteTasks = function(request, response, callback) {
@@ -914,21 +1215,11 @@ exports.getStoryStatuses = function(request, response, callback) {
     });
 };
 
-exports.getStoryStatusesObj = function(userId, callback) {
-    log.debug("getStoryStatusesObj : logged in user is " + (userId));
-    logService.getStoryStatuses(callback);
-};
-
 exports.getLogStatuses = function(request, response, callback) {
     log.debug("getLogStatuses : logged in user is " + (request.user.id));
     logService.getLogStatuses(function(returnValue) {
         response.json(returnValue);
     });
-};
-
-exports.getLogStatusesObj = function(userId, callback) {
-    log.debug("getLogStatusesObj : logged in user is " + (userId));
-    logService.getLogStatuses(callback);
 };
 
 exports.getUserReportLogs = function(request, response, callback) {
@@ -1072,11 +1363,6 @@ exports.hasLogAccess = function(request, response) {
     teamService.hasLogAccess(userId, function(returnValue) {
         response.json(returnValue);
     });
-};
-
-exports.hasLogAccessObj = function(userId, callback) {
-    log.debug("hasLogAccessObj : logged in user is " + (userId));
-    teamService.hasLogAccess(userId, callback);
 };
 
 exports.getTeamMembersByRole = function(request, response) {
