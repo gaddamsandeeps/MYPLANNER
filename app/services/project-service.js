@@ -70,7 +70,7 @@ exports.getProjectsByTeamId = function(obj, finalcallback) {
         async.series({
                 projects: function(callback) {
                     projectDao.getProjectsByTeamId(teamId, function(projects) {
-                        if (projects.length == 0) {
+                        if (projects.length === 0) {
                             finalcallback(projects);
                         }
                         callback(null, projects);

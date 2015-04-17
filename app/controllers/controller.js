@@ -28,7 +28,7 @@ exports.dashboard = function(request, response) {
         user: request.user,
         message: request.flash('error')
     });
-}
+};
 
 exports.edashboard = function(request, response) {
     var eteam = {};
@@ -57,7 +57,7 @@ exports.edashboard = function(request, response) {
                 message: request.flash('error')
             });
         });
-}
+};
 
 exports.ereports = function(request, response) {
     var eteam = {};
@@ -86,7 +86,7 @@ exports.ereports = function(request, response) {
                 message: request.flash('error')
             });
         });
-}
+};
 
 exports.story = function(request, response) {
     var userId = request.user.id;
@@ -135,7 +135,7 @@ exports.story = function(request, response) {
                 });
             });
     }
-}
+};
 
 exports.project = function(request, response) {
     var userId = request.user.id;
@@ -161,7 +161,7 @@ exports.project = function(request, response) {
                 message: request.flash('error')
             });
         });
-}
+};
 
 exports.timesheet = function(request, response) {
     var userId = request.user.id;
@@ -219,7 +219,7 @@ exports.timesheet = function(request, response) {
                 message: request.flash('error')
             });
         });
-}
+};
 
 exports.usertimesheet = function(request, response) {
     var teamId = request.user.teamId;
@@ -246,23 +246,23 @@ exports.usertimesheet = function(request, response) {
                 teamMembers: results.teamMembers
             });
         });
-}
+};
 
 
 exports.register = function(request, response) {
     response.render('register.html');
-}
+};
 
 exports.profile = function(request, response) {
     response.render('profile.html', {
         user: request.user,
         message: request.flash('error')
     });
-}
+};
 
 exports.forgotpassword = function(request, response) {
     response.render('forgotpassword.html');
-}
+};
 
 exports.report = function(request, response) {
     var selectedUserId = request.param('id');
@@ -296,18 +296,18 @@ exports.report = function(request, response) {
         });
     }
 
-}
+};
 
 exports.login = function(request, response) {
     response.render('login.html');
-}
+};
 
 exports.verify = function(request, response) {
     response.render('verify.html', {
         user: request.user,
         message: request.flash('error')
     });
-}
+};
 
 exports.admin = function(request, response) {
     var teams = null,
@@ -353,15 +353,15 @@ exports.admin = function(request, response) {
                 message: request.flash('error')
             });
         });
-}
+};
 
 //method to get logs of any team
 exports.getTeamReport = function(request, response) {
-        var teamId = request.param('teamId');
-        request.user.teamId = teamId;
-        response.redirect('/report');
-    }
-    //end of pages
+    var teamId = request.param('teamId');
+    request.user.teamId = teamId;
+    response.redirect('/report');
+};
+//end of pages
 
 //services
 exports.auth = function(name, pwd, finalcallback) {
@@ -702,7 +702,7 @@ exports.resetPassword = function(request, response, callback) {
     var contact = request.param(properties.user.contact);
     var username = request.param(properties.user.userName);
     userService.contactExist([username, contact], function(res) {
-        if (res.length == 0) {
+        if (res.length === 0) {
             response.json(util.emptyFailureErrObj());
         } else {
             userService.editPassword([encrypt.encrypt(pwd), username], function(returnValue) {
@@ -905,7 +905,7 @@ exports.getStoriesNTasksByPidnIterId = function(request, response, callback) {
     log.debug("getStoriesNTasksByPidnIterId : logged in user is " + (request.user.id));
     var userId = request.user.id;
     var projectId = request.param(properties.story.projectId);
-    var iterationId = request.param(properties.iteration.iterationid);
+    var iterationId = parseInt(request.param(properties.iteration.iterationid));
 
     storyService.getStoriesNTasksByPidnIterId([projectId, iterationId], function(returnValue) {
         response.json(returnValue);
@@ -1081,7 +1081,7 @@ exports.addResourceToProject = function(request, response, callback) {
     var billable = request.param(properties.project.billable);
     var sowNo = request.param(properties.project.sowNo);
 
-    sowNo = (billable == 0) ? "NA" : sowNo;
+    sowNo = (billable === 0) ? "NA" : sowNo;
 
     var projectname = request.param(properties.project.projectname);
 
@@ -1109,7 +1109,7 @@ exports.editResourceOfProject = function(request, response, callback) {
     var billable = request.param(properties.project.billable);
     var sowNo = request.param(properties.project.sowNo);
 
-    sowNo = (billable == 0) ? "NA" : sowNo;
+    sowNo = (billable === 0) ? "NA" : sowNo;
 
     var projectname = request.param(properties.project.projectname);
 
@@ -1163,10 +1163,10 @@ exports.savePlannedLog = function(request, response, callback) {
     var plannedEndDate = request.param(properties.logs.plannedEndDate);
     var desc = request.param(properties.logs.desc);
     var status = request.param(properties.logs.status);
-    storyStatus = (storyStatus == '' ? null : storyStatus);
-    iterationNo = (iterationNo == '' ? null : iterationNo);
-    story = (story == '' ? null : story);
-    task = (task == '' ? null : task);
+    storyStatus = (storyStatus === '' ? null : storyStatus);
+    iterationNo = (iterationNo === '' ? null : iterationNo);
+    story = (story === '' ? null : story);
+    task = (task === '' ? null : task);
     logService.savePlannedLog([projectId, teamId, iterationNo, story, task, storyStatus, plannedStartDate, plannedEndDate, userId, loggedUserId, desc, status], function(returnValue) {
         response.json(returnValue);
     });

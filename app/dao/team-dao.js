@@ -145,13 +145,13 @@ exports.saveTeam = function(obj, executives, callback) {
                 } else {
                     var teamId = rows.insertId;
 
-                    var lngt = new Array();
+                    var lngt = [];
                     if (executives.length === 0) {
                         callback(rows.insertId);
                     }
                     for (var i = 0; i < executives.length; i++) {
-                        saveExecutives(executives[i], teamId, userId, function(eval) {
-                            lngt.push(eval);
+                        saveExecutives(executives[i], teamId, userId, function(val) {
+                            lngt.push(val);
                             if (lngt.length === executives.length) {
                                 callback(rows.insertId);
                             }
@@ -219,13 +219,13 @@ exports.editTeam = function(obj, executives, callback) {
                     callback(err);
                 } else {
                     removeExecutives(teamId, function() {
-                        var lngt = new Array();
+                        var lngt = [];
                         if (executives.length === 0) {
                             callback(rows.insertId);
                         }
                         for (var i = 0; i < executives.length; i++) {
-                            saveExecutives(executives[i], teamId, userId, function(eval) {
-                                lngt.push(eval);
+                            saveExecutives(executives[i], teamId, userId, function(val) {
+                                lngt.push(val);
                                 if (lngt.length === executives.length) {
                                     callback(rows.insertId);
                                 }

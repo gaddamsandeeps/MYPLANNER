@@ -10,4 +10,4 @@ module.exports = {
         maxAge: 1800000,
         expires: 1800000
     }
-}
+};

@@ -134,7 +134,7 @@ var getTaskCommentByCommentId = function(cid, callback) {
     } catch (e) {
         log.error(e);
     }
-}
+};
 
 exports.getTaskCommentsById = function(tid, callback) {
     try {
@@ -154,7 +154,7 @@ exports.getTaskCommentsById = function(tid, callback) {
     } catch (e) {
         log.error(e);
     }
-}
+};
 
 
 //not used any where

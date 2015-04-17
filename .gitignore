@@ -4,3 +4,6 @@
 /nbproject/private/
 *.log
 /server/daemon
+/_SpecRunner.html
+/.grunt
+/dist

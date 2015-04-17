@@ -42,7 +42,7 @@ exports.getTProjects = function(userId, callback) {
                     log.error(err);
                     callback(err);
                 } else {
-                    var TProjects = new Array();
+                    var TProjects = [];
                     if (rows.length > 0) {
                         for (var i = 0; i < rows.length; i++) {
                             getTeamsAssignedToProject(rows[i], function(teams) {
@@ -102,7 +102,7 @@ var getTeamsAssignedToProject = function(project, callback) {
     } catch (e) {
         log.error(e);
     }
-}
+};
 
 exports.saveAdminProject = function(obj, callback) {
     try {
@@ -325,7 +325,7 @@ exports.getMyProjects = function(teamId, callback) {
                     log.error(err);
                     callback(err);
                 } else {
-                    var myProjects = new Array();
+                    var myProjects = [];
                     if (rows.length > 0) {
                         for (var i = 0; i < rows.length; i++) {
                             module.exports.getProjectNResources([rows[i].projectid, teamId, null], function(returnValue) {
@@ -353,7 +353,7 @@ exports.getActiveProjectsByTeamId = function(teamId, callback) {
         pool.getConnection(function(err, connection) {
             connection.query(getActiveProjectsByTeamIdSQL, teamId, function(err, rows) {
                 connection.release();
-                var projects = new Array();
+                var projects = [];
                 if (rows.length > 0) {
                     for (var i = 0; i < rows.length; i++) {
                         var pid = rows[i].id;
@@ -428,7 +428,7 @@ exports.getProject = function(pid, callback) {
 };
 
 var getResourcesForProject = function(obj, callback) {
-    var resourcess = new Array();
+    var resourcess = [];
     try {
         var getResourceForProjectsSQL = queries.project.getResourcesForProject;
 

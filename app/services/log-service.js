@@ -102,7 +102,7 @@ exports.editLog = function(obj, logid, callback) {
 
 var formatLogs = function(returnValue, callback) {
     try {
-        if (returnValue.length == 0) {
+        if (returnValue.length === 0) {
             callback([]);
         }
         for (var i = 0; i < returnValue.length; i++) {
@@ -129,4 +129,4 @@ var formatLogs = function(returnValue, callback) {
         log.error(e);
         callback([]);
     }
-}
+};

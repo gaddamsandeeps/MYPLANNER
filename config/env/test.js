@@ -29,4 +29,4 @@ module.exports = {
         maxLogSize: "75MB",
         backups: 10
     }
-}
+};

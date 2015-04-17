@@ -25,4 +25,4 @@ exports.getPool = function() {
     });
 
     return pool;
-}
+};

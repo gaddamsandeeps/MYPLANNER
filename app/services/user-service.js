@@ -31,7 +31,7 @@ exports.getTeamUsersAndAvailability = function(obj, finalcallback) {
         async.series({
                 users: function(callback) {
                     module.exports.getTeamUsersByTeamId(teamId, function(users) {
-                        if (users.length == 0) {
+                        if (users.length === 0) {
                             finalcallback(users);
                         }
                         callback(null, users);

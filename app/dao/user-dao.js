@@ -136,7 +136,6 @@ exports.getTeamUsersByTeamId = function(userId, callback) {
                 connection.query(getTeamUsersByTeamIdSQL, userId, function(err, rows) {
                     connection.release();
                     if (err) {
-                        e
                         log.error(err);
                         callback(err);
                     } else {

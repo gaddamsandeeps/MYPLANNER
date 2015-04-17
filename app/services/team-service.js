@@ -30,7 +30,7 @@ exports.removeTeam = function(teamId, callback) {
 exports.getTeams = function(callback) {
     log.debug("getTeams");
     teamDao.getTeams(function(teams) {
-        var lngt = new Array();
+        var lngt = [];
         if (teams.length === 0) {
             callback([]);
         }

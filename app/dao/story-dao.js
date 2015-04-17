@@ -130,7 +130,7 @@ var getStoryCommentByCommentId = function(sid, callback) {
     } catch (e) {
         log.error(e);
     }
-}
+};
 
 exports.getStoryCommentsById = function(sid, callback) {
     try {
@@ -150,7 +150,7 @@ exports.getStoryCommentsById = function(sid, callback) {
     } catch (e) {
         log.error(e);
     }
-}
+};
 
 exports.getStoryTypes = function(callback) {
     try {
@@ -196,7 +196,7 @@ exports.getStoriesNTasks = function(pid, callback) {
 
 exports.getStoriesNTasksByPidnIterId = function(obj, callback) {
     try {
-        var sql = (obj[1] == 0) ? queries.story.getStoriesNTasks : queries.story.getStoriesNTasksIdsByPidnIterId;
+        var sql = (obj[1] === 0) ? queries.story.getStoriesNTasks : queries.story.getStoriesNTasksIdsByPidnIterId;
 
         getDetailedStoriesNTasks(sql, obj, callback);
     } catch (e) {
@@ -228,7 +228,7 @@ exports.getStory = function(id, callback) {
         var getStorySQL = queries.story.getStory;
 
         getDetailedStoriesNTasks(getStorySQL, id, function(rows) {
-            callback(rows[0])
+            callback(rows[0]);
         });
     } catch (e) {
         log.error(e);
@@ -253,7 +253,7 @@ var getDetailedStoriesNTasks = function(sql, obj, callback) {
                         log.error(err);
                         callback(err);
                     } else {
-                        var stories = new Array();
+                        var stories = [];
                         if (val.length > 0) {
                             for (var i = 0; i < val.length; i++) {
                                 getDetailedStory(val[i].id, maxtaskstatus, function(story) {
@@ -356,7 +356,7 @@ var getMaxTaskStatus = function(callback) {
             }
         });
     });
-}
+};
 
 var getTasksTotalHrsByStoryId = function(sid, callback) {
     try {

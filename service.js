@@ -1,3 +1,5 @@
+var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
 var Service = require('node-windows').Service,
     config = require("./config/config");
 
@@ -19,19 +21,19 @@ svc.on('install', function() {
     svc.start();
 });
 
-svc.on('alreadyinstalled ', function() {
+svc.on('alreadyinstalled', function() {
     console.log(config.appname + " Tool Service already installed.");
 });
 
-svc.on('invalidinstallation ', function() {
+svc.on('invalidinstallation', function() {
     console.log(config.appname + " Tool Service invalid installation.");
 });
 
-svc.on('uninstall ', function() {
+svc.on('uninstall', function() {
     console.log(config.appname + " Tool Service uninstalled.");
 });
 
-svc.on('start ', function() {
+svc.on('start', function() {
     console.log(config.appname + " Tool Service started.");
 });
 
@@ -39,7 +41,7 @@ svc.on('stop', function() {
     console.log(config.appname + " Tool Service stopped.");
 });
 
-svc.on('error ', function() {
+svc.on('error', function() {
     console.log(config.appname + " Tool Service has an error.");
 });
 

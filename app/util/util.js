@@ -14,7 +14,7 @@ exports.mergeJSON = function(source1, source2) {
 
     for (var attrname in source1) {
         if (mergedJSON.hasOwnProperty(attrname)) {
-            if (source1[attrname] != null && source1[attrname].constructor == Object) {
+            if (source1[attrname] !== null && source1[attrname].constructor == Object) {
                 /*
                  * Recursive call if the property is an object,
                  * Iterate the object and set all properties of the inner object.
@@ -29,11 +29,11 @@ exports.mergeJSON = function(source1, source2) {
     }
 
     return mergedJSON;
-}
+};
 
 exports.handleErrors = function(obj, callback) {
-    var res = new Object();
-    res.data = new Object();
+    var res = {};
+    res.data = {};
 
     if (obj.errno) {
         res.message = 'failure';
@@ -51,7 +51,7 @@ exports.handleErrors = function(obj, callback) {
         res.data = obj;
         callback(res);
     }
-}
+};
 
 exports.formatDate = function(val, callback) {
     try {
@@ -60,19 +60,19 @@ exports.formatDate = function(val, callback) {
     } catch (e) {
         return '';
     }
-}
+};
 
 //empty error object to pass 
 exports.emptyFailureErrObj = function() {
-    var res = new Object();
-    res.data = new Object();
+    var res = {};
+    res.data = {};
 
     res.message = 'failure';
     res.data.errno = '';
     res.data.code = '';
     res.data.message = "Invalid details entered.";
     return res;
-}
+};
 
 
 // a and b are javascript Date objects
@@ -84,4 +84,4 @@ exports.dateDiffInDays = function(date1, date2) {
   
   return diffDays;     
 
-}
+};

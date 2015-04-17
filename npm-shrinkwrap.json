@@ -4,7 +4,8 @@
     "dependencies": {
         "async": {
             "version": "0.9.0",
-            "from": "async@0.9.0"
+            "from": "https://registry.npmjs.org/async/-/async-0.9.0.tgz",
+            "resolved": "https://registry.npmjs.org/async/-/async-0.9.0.tgz"
         },
         "connect-flash": {
             "version": "0.1.1",
@@ -114,7 +115,8 @@
                 },
                 "cookie": {
                     "version": "0.1.0",
-                    "from": "cookie@0.1.0"
+                    "from": "https://registry.npmjs.org/cookie/-/cookie-0.1.0.tgz",
+                    "resolved": "https://registry.npmjs.org/cookie/-/cookie-0.1.0.tgz"
                 },
                 "buffer-crc32": {
                     "version": "0.2.1",
@@ -144,7 +146,8 @@
                 },
                 "debug": {
                     "version": "2.1.0",
-                    "from": "debug@2.1.0",
+                    "from": "https://registry.npmjs.org/debug/-/debug-2.1.0.tgz",
+                    "resolved": "https://registry.npmjs.org/debug/-/debug-2.1.0.tgz",
                     "dependencies": {
                         "ms": {
                             "version": "0.6.2",
@@ -184,7 +187,8 @@
         },
         "lodash": {
             "version": "3.3.0",
-            "from": "lodash@"
+            "from": "https://registry.npmjs.org/lodash/-/lodash-3.3.0.tgz",
+            "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.3.0.tgz"
         },
         "log4js": {
             "version": "0.6.16",
@@ -192,11 +196,13 @@
             "dependencies": {
                 "async": {
                     "version": "0.1.15",
-                    "from": "async@0.1.15"
+                    "from": "https://registry.npmjs.org/async/-/async-0.1.15.tgz",
+                    "resolved": "https://registry.npmjs.org/async/-/async-0.1.15.tgz"
                 },
                 "semver": {
                     "version": "1.1.4",
-                    "from": "semver@1.1.4"
+                    "from": "https://registry.npmjs.org/semver/-/semver-1.1.4.tgz",
+                    "resolved": "https://registry.npmjs.org/semver/-/semver-1.1.4.tgz"
                 },
                 "readable-stream": {
                     "version": "1.0.33",
@@ -254,7 +260,8 @@
                 },
                 "require-all": {
                     "version": "0.0.8",
-                    "from": "require-all@0.0.8"
+                    "from": "https://registry.npmjs.org/require-all/-/require-all-0.0.8.tgz",
+                    "resolved": "https://registry.npmjs.org/require-all/-/require-all-0.0.8.tgz"
                 }
             }
         },
@@ -320,7 +327,8 @@
                     "dependencies": {
                         "iconv-lite": {
                             "version": "0.4.5",
-                            "from": "iconv-lite@0.4.5"
+                            "from": "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.5.tgz",
+                            "resolved": "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.5.tgz"
                         },
                         "libbase64": {
                             "version": "0.1.0",

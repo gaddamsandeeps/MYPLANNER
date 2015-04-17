@@ -4,4 +4,4 @@
  */
 exports.getPool = function() {
     return require("./connection").getPool();
-}
+};
